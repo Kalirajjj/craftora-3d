@@ -1,0 +1,102 @@
+<div class="cart-page">
+  <div class="container">
+    <header class="cart-heading">
+      <span class="cart-eyebrow">CRAFTORA 3D · SHOPPING BAG</span>
+      <h1 class="page-title">Your shopping cart</h1>
+      <p>Thoughtful design, made to bring your ideas to life.</p>
+    </header>
+
+    @if (cartService.cartItems().length > 0) {
+      <div class="cart-layout">
+        <!-- Item list -->
+        <div class="items-list">
+          <div class="items-list-heading"><div><span class="cart-section-eyebrow">YOUR SELECTION</span><h2>Items in your cart</h2></div><span class="item-count">{{ cartService.totalItemsCount() }} {{ cartService.totalItemsCount() === 1 ? 'item' : 'items' }}</span></div>
+          @for (item of cartService.cartItems(); track (item.product.id + '-' + item.selectedColor)) {
+            <div class="cart-item">
+              <img 
+                [src]="item.product.image || item.product.imageUrl || 'assets/placeholder.png'" 
+                [alt]="item.product.name" 
+                class="item-img" 
+              />
+              <div class="item-details">
+                <h3>{{ item.product.name }}</h3>
+                <span class="finish-tag">Finish: {{ item.selectedColor }}</span>
+                <div class="price-mobile">Unit price · ₹{{ item.product.price }}</div>
+              </div>
+
+              <div class="qty-control">
+                <button (click)="decrease(item.product.id, item.selectedColor)" aria-label="Decrease quantity">
+                  <i class="pi pi-minus"></i>
+                </button>
+                <span>{{ item.quantity }}</span>
+                <button (click)="increase(item.product.id, item.selectedColor)" aria-label="Increase quantity">
+                  <i class="pi pi-plus"></i>
+                </button>
+              </div>
+
+              <div class="total-price">
+                ₹{{ item.product.price * item.quantity }}
+              </div>
+
+              <button class="remove-btn" (click)="remove(item.product.id, item.selectedColor)" aria-label="Remove item">
+                <i class="pi pi-trash"></i>
+              </button>
+            </div>
+          }
+        </div>
+
+        <!-- Order Summary -->
+        <div class="summary-card">
+          <div class="summary-heading"><div><span class="cart-section-eyebrow">AT A GLANCE</span><h3>Order summary</h3></div><i class="pi pi-receipt" aria-hidden="true"></i></div>
+          <div class="summary-row">
+            <span>Subtotal</span>
+            <strong>₹{{ cartService.subtotal() }}</strong>
+          </div>
+          <div class="summary-row">
+            <span>Standard Delivery</span>
+            <span>{{ cartService.deliveryFee() === 0 ? 'FREE' : '₹' + cartService.deliveryFee() }}</span>
+          </div>
+          
+          @if (cartService.deliveryFee() === 0) {
+            <div class="free-shipping-alert">
+              <i class="pi pi-check"></i> Free shipping applied on orders above ₹999!
+            </div>
+          }
+
+          <div class="summary-row total">
+            <span>Grand Total</span>
+            <strong>₹{{ cartService.grandTotal() }}</strong>
+          </div>
+
+          <a routerLink="/checkout" class="btn btn-primary btn-block">
+            Proceed to checkout <i class="pi pi-arrow-right" aria-hidden="true"></i>
+          </a>
+          <a routerLink="/shop" class="continue-link">
+            <i class="pi pi-arrow-left"></i> Continue Shopping
+          </a>
+        </div>
+      </div>
+    } @else {
+      <!-- Empty State -->
+      <section class="empty-cart" aria-labelledby="empty-cart-title">
+        <div class="empty-cart-copy">
+          <span class="empty-cart-kicker"><i class="pi pi-sparkles" aria-hidden="true"></i> MADE FOR YOUR SPACE</span>
+          <h2 id="empty-cart-title">A little room for something extraordinary.</h2>
+          <p>Your cart is empty. Explore considered home décor, useful desk pieces, and personal gifts designed by Craftora 3D.</p>
+          <div class="empty-cart-actions">
+            <a routerLink="/shop" class="btn btn-primary">Explore the collection <i class="pi pi-arrow-right" aria-hidden="true"></i></a>
+            <a routerLink="/custom-order" class="custom-order-link">Looking for a custom print? <span>Start a quote</span></a>
+          </div>
+        </div>
+        <div class="empty-cart-art" aria-hidden="true">
+          <div class="art-ring art-ring-outer"></div>
+          <div class="art-ring art-ring-inner"></div>
+          <div class="art-object"><i class="pi pi-shopping-bag"></i></div>
+          <span class="art-spark art-spark-one">✦</span>
+          <span class="art-spark art-spark-two">✧</span>
+          <span class="art-caption">DESIGNED WITH INTENTION</span>
+        </div>
+      </section>
+    }
+  </div>
+</div>

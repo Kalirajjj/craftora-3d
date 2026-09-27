@@ -1,0 +1,40 @@
+<div class="product-card" [routerLink]="['/product', product.id]">
+  <div class="image-wrapper">
+    <img 
+      [src]="product.image || product.imageUrl || 'assets/placeholder.png'" 
+      [alt]="product.name" 
+      loading="lazy" 
+    />
+    @if (product.category) {
+      <span class="category-pill">{{ product.category }}</span>
+    }
+  </div>
+
+  <div class="product-info">
+    <div class="rating-row">
+      <span class="stars"><i class="pi pi-star-fill"></i> {{ product.rating || 5.0 }}</span>
+      <span class="colors-indicator">
+        {{ (product.availableColors?.length) || 1 }} {{ (product.availableColors?.length === 1) ? 'Color' : 'Colors' }}
+      </span>
+    </div>
+
+    <h3 class="product-title">{{ product.name }}</h3>
+    <p class="product-desc">{{ product.description }}</p>
+
+    <div class="card-footer">
+      <div class="price-box">
+        <span class="currency">₹</span>
+        <span class="amount">{{ product.price }}</span>
+      </div>
+
+      <button 
+        type="button"
+        class="btn btn-card" 
+        (click)="addToCart($event)" 
+        [disabled]="isAdded">
+        <i class="pi" [ngClass]="isAdded ? 'pi-check' : 'pi-shopping-cart'"></i>
+        {{ isAdded ? 'Added' : 'Add' }}
+      </button>
+    </div>
+  </div>
+</div>

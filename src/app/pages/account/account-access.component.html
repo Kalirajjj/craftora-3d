@@ -1,0 +1,46 @@
+<main class="account-page">
+  <section class="account-card">
+    <span class="account-eyebrow">CRAFTORA 3D ACCOUNT</span>
+    <ng-container [ngSwitch]="mode">
+      <ng-container *ngSwitchCase="'register'"><h1>Create your account</h1><p>Save your cart and keep your quote requests together.</p></ng-container>
+      <ng-container *ngSwitchCase="'verify'"><h1>{{ message ? 'Email verified' : 'Verify your email' }}</h1><p>{{ message ? 'Your Craftora 3D account is ready. Sign in to continue.' : 'Confirm your email address to activate your account.' }}</p></ng-container>
+      <ng-container *ngSwitchCase="'forgot-password'"><h1>Reset your password</h1><p>We’ll email you a secure reset link.</p></ng-container>
+      <ng-container *ngSwitchCase="'reset-password'"><h1>Choose a new password</h1><p>Use at least 12 characters for your new password.</p></ng-container>
+      <ng-container *ngSwitchDefault><h1>Welcome back</h1><p>Sign in to access your saved cart and quotes.</p></ng-container>
+    </ng-container>
+
+    <form (ngSubmit)="submit()" #accessForm="ngForm">
+      <ng-container *ngIf="mode === 'register'">
+        <label for="fullName">Full name</label><input id="fullName" name="fullName" [(ngModel)]="fullName" required maxlength="120" autocomplete="name">
+        <label for="phone">Phone <span class="optional">(optional)</span></label><input id="phone" name="phone" [(ngModel)]="phone" maxlength="40" autocomplete="tel">
+      </ng-container>
+      <ng-container *ngIf="mode === 'login' || mode === 'register' || mode === 'forgot-password'">
+        <label for="email">Email address</label><input id="email" name="email" type="email" [(ngModel)]="email" required email autocomplete="email">
+      </ng-container>
+      <ng-container *ngIf="mode === 'login' || mode === 'register' || mode === 'reset-password'">
+        <label for="password">{{ mode === 'login' ? 'Password' : 'Password (12–72 characters)' }}</label><div class="password-input-wrap"><input id="password" name="password" [type]="showPassword ? 'text' : 'password'" [(ngModel)]="password" required [minlength]="mode === 'login' ? 1 : 12" maxlength="72" [autocomplete]="mode === 'login' ? 'current-password' : 'new-password'"><button class="password-visibility-toggle" type="button" (click)="showPassword = !showPassword" [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'" [attr.aria-pressed]="showPassword"><i class="pi" [ngClass]="showPassword ? 'pi-eye-slash' : 'pi-eye'" aria-hidden="true"></i></button></div>
+      </ng-container>
+      <ng-container *ngIf="mode === 'reset-password'">
+        <label for="confirmPassword">Confirm new password</label><div class="password-input-wrap"><input id="confirmPassword" name="confirmPassword" [type]="showConfirmPassword ? 'text' : 'password'" [(ngModel)]="confirmPassword" required minlength="12" maxlength="72" autocomplete="new-password"><button class="password-visibility-toggle" type="button" (click)="showConfirmPassword = !showConfirmPassword" [attr.aria-label]="showConfirmPassword ? 'Hide confirmation password' : 'Show confirmation password'" [attr.aria-pressed]="showConfirmPassword"><i class="pi" [ngClass]="showConfirmPassword ? 'pi-eye-slash' : 'pi-eye'" aria-hidden="true"></i></button></div>
+      </ng-container>
+
+      <p class="account-message" *ngIf="message" role="status">{{ message }}</p>
+      <p class="account-error" *ngIf="error" role="alert">{{ error }}</p>
+      <button class="account-submit" *ngIf="mode !== 'verify' || (!message && !error)" type="submit" [disabled]="isBusy || (mode !== 'verify' && !accessForm.valid) || ((mode === 'verify' || mode === 'reset-password') && !actionToken)">
+        <i class="pi" [ngClass]="isBusy ? 'pi-spin pi-spinner' : 'pi-arrow-right'" aria-hidden="true"></i>
+        {{ isBusy ? 'Please wait…' : (mode === 'register' ? 'Create account' : mode === 'verify' ? 'Verify email' : mode === 'forgot-password' ? 'Send reset link' : mode === 'reset-password' ? 'Update password' : 'Sign in') }}
+      </button>
+    </form>
+
+    <button class="resend-verification" *ngIf="(mode === 'login' || mode === 'register') && error.toLowerCase().includes('verif')" type="button" (click)="resendVerification()" [disabled]="isBusy">Resend verification email</button>
+
+    <nav class="account-links" *ngIf="mode === 'login'">
+      <a routerLink="/account/forgot-password">Forgot password?</a>
+      <span>New to Craftora? <a routerLink="/account/register">Create an account</a></span>
+    </nav>
+    <p class="account-footnote" *ngIf="mode === 'register'">We’ll send a verification link to your email before you can sign in.</p>
+    <p class="account-footnote" *ngIf="mode === 'verify' && !actionToken">This verification link is missing its token. Open the complete link from your email.</p>
+    <p class="account-footnote" *ngIf="mode === 'reset-password' && !actionToken">This reset link is missing its token. Request a new one.</p>
+    <a class="back-login" *ngIf="mode !== 'login'" routerLink="/account/login">Back to sign in</a>
+  </section>
+</main>

@@ -1,0 +1,51 @@
+<footer class="footer">
+  <div class="container footer-container">
+    <div class="footer-col brand-col">
+      <div class="brand-title">Craftora <span class="brand-badge">3D</span></div>
+      <p class="brand-desc">
+        Where Ideas Take Shape. Crafting premium 3D-printed modern home décor, customized gifts, and precision functional items.
+      </p>
+      <div class="social-links">
+        <a href="https://instagram.com" target="_blank" rel="noopener" aria-label="Instagram"><i class="pi pi-instagram"></i></a>
+        <a href="https://wa.me/919361416827" target="_blank" rel="noopener" aria-label="WhatsApp"><i class="pi pi-whatsapp"></i></a>
+        <a href="mailto:craftora3d&#64;gmail.com" aria-label="Email"><i class="pi pi-envelope"></i></a>
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <h4>Shop Categories</h4>
+      <ul>
+        <li><a routerLink="/shop" [queryParams]="{category: 'Home Décor'}">Home Décor</a></li>
+        <li><a routerLink="/shop" [queryParams]="{category: 'Planters'}">Planters</a></li>
+        <li><a routerLink="/shop" [queryParams]="{category: 'Desk Décor'}">Desk Accessories</a></li>
+        <li><a routerLink="/shop" [queryParams]="{category: 'Lamps & Lighting'}">Lamps & Lithophanes</a></li>
+        <li><a routerLink="/shop" [queryParams]="{category: 'Personalized Gifts'}">Personalized Gifts</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4>Explore</h4>
+      <ul>
+        <li><a routerLink="/custom-order">Custom Print Service</a></li>
+        <li><a routerLink="/about">About Our Studio</a></li>
+        <li><a routerLink="/contact">Contact & Studio</a></li>
+        <li><a routerLink="/cart">View Cart</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col contact-col">
+      <h4>Customer Support</h4>
+      <p><i class="pi pi-map-marker"></i> Chennai, Tamil Nadu, India</p>
+      <p><i class="pi pi-envelope"></i> <a href="mailto:craftora3d&#64;gmail.com">craftora3d&#64;gmail.com</a></p>
+      <p><i class="pi pi-phone"></i> <a href="tel:+919361416827">+91 9361416827</a></p>
+      <div class="badge badge-accent mt-2">All India Shipping Available</div>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <div class="container footer-bottom-inner">
+      <p>&copy; {{ currentYear }} Craftora 3D. All rights reserved.</p>
+      <p class="tagline-sub">Precision Additive Manufacturing & Bespoke Design</p>
+    </div>
+  </div>
+</footer>

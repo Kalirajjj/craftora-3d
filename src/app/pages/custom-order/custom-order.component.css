@@ -1,0 +1,109 @@
+.page-header {
+  background-color: var(--surface-color);
+  padding: 4rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.page-header h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin: 0.5rem 0;
+}
+
+.page-header p {
+  color: var(--text-secondary);
+}
+
+.form-container {
+  max-width: 840px;
+  padding: 3rem 1.5rem;
+}
+
+.order-form {
+  background-color: #ffffff;
+  border: 1px solid var(--border-color);
+  padding: 2.5rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.file-note {
+  display: block;
+  margin-top: 0.4rem;
+  color: var(--accent-color);
+  font-weight: 600;
+}
+
+.btn-large {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1.1rem;
+  margin-top: 1rem;
+}
+
+.success-card {
+  text-align: center;
+  background-color: #ffffff;
+  padding: 4rem 2rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border-color);
+}
+
+.success-icon {
+  font-size: 4rem;
+  color: var(--accent-color);
+  margin-bottom: 1rem;
+}
+
+.success-card h2 {
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+
+.success-card .sub {
+  color: var(--text-secondary);
+  max-width: 500px;
+  margin: 0.5rem auto 2rem;
+}
+
+@media (max-width: 600px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.success-card .tracking-reminder {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: .55rem;
+  max-width: 600px;
+  margin: 0 auto 1.5rem;
+  padding: .85rem 1rem;
+  border: 1px solid rgba(0, 168, 150, .25);
+  border-radius: 10px;
+  background: rgba(0, 168, 150, .08);
+  color: var(--text-primary);
+  font-size: .9rem;
+  text-align: left;
+}
+
+.tracking-reminder i { color: var(--accent-color); margin-top: .2rem; }
+.success-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: .75rem; }
+
+.file-picker-row{display:flex;align-items:center;gap:.8rem;min-width:0}.file-input-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;clip-path:inset(50%);border:0}.file-choose-button{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;flex:0 0 auto;padding:.65rem .9rem;border:1px solid var(--border-color);border-radius:8px;background:var(--surface-color);color:var(--text-primary);font:inherit;font-size:.9rem;font-weight:650;cursor:pointer;transition:var(--transition)}.file-choose-button:hover{border-color:var(--accent-color);color:var(--accent-color)}.file-choose-button:focus-visible{outline:2px solid var(--accent-color);outline-offset:2px}.file-name{overflow:hidden;color:var(--text-secondary);font-size:.85rem;text-overflow:ellipsis;white-space:nowrap}
+.quote-error{margin:0 0 1rem;padding:.8rem 1rem;border:1px solid #fecdca;border-radius:9px;background:#fff1f0;color:#b42318}
+.date-note{display:block;margin-top:.35rem;color:var(--text-secondary);font-size:.8rem;line-height:1.4}
+.sign-in-required{display:flex;flex-direction:column;align-items:center;text-align:center;padding:3rem 1.5rem;background:var(--surface-color);border:1px solid var(--border-color);border-radius:18px;box-shadow:var(--shadow-md);color:var(--text-primary)}
+.sign-in-icon{display:grid;place-items:center;width:54px;height:54px;border-radius:16px;background:rgba(0,168,150,.1);color:var(--accent-color);font-size:1.25rem}
+.sign-in-required h2{margin:1rem 0 .35rem;font-size:1.45rem}.sign-in-required p{max-width:480px;color:var(--text-secondary);line-height:1.6}
+.sign-in-required .btn{display:inline-flex;align-items:center;gap:.55rem;margin-top:.65rem;text-decoration:none}.create-account-link{margin-top:1rem;color:var(--accent-color);font-weight:700;text-decoration:none;font-size:.9rem}
+.customer-submission-note{display:flex;align-items:center;gap:.65rem;margin-bottom:1.5rem;padding:.9rem 1rem;border:1px solid rgba(0,168,150,.2);border-radius:11px;background:rgba(0,168,150,.06);color:var(--text-secondary);font-size:.88rem;line-height:1.5}.customer-submission-note>i{flex:0 0 auto;color:var(--accent-color)}.customer-submission-note span{flex:1;min-width:0}.customer-submission-note strong{color:var(--text-primary)}.customer-submission-note a{flex:0 0 auto;color:var(--accent-color);font-weight:700;text-decoration:none}
+@media(max-width:600px){.sign-in-required{padding:2.1rem 1rem}.customer-submission-note{align-items:flex-start;flex-wrap:wrap}.customer-submission-note a{margin-left:1.5rem}}

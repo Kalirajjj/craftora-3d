@@ -1,13 +1,19 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { NavbarComponent } from './components/navbar/navbar.component';
+import { FooterComponent } from './components/footer/footer.component';
+import { CustomerAuthService } from './services/customer-auth.service';
+import { CartService } from './services/cart.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, NavbarComponent, FooterComponent],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  styleUrls: ['./app.component.css']
 })
-export class AppComponent {
-  title = 'craftora-3d';
+export class AppComponent implements OnInit {
+  private readonly customerAuth = inject(CustomerAuthService);
+  private readonly cart = inject(CartService);
+  ngOnInit(): void { if (this.customerAuth.isSignedIn()) this.cart.loadSavedCart(); }
 }

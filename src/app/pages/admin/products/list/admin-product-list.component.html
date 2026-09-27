@@ -1,0 +1,57 @@
+<section class="admin-page-content catalogue-page">
+  <header class="catalogue-header">
+    <div>
+      <span class="eyebrow">CATALOGUE MANAGEMENT</span>
+      <h1>Products</h1>
+      <p class="page-lead">Manage the products displayed in your store.</p>
+    </div>
+    <div class="header-actions">
+      <a class="create-button" routerLink="/admin/products/new">
+        <span aria-hidden="true">＋</span> Add product
+      </a>
+      <button type="button" class="refresh-button" (click)="refresh()" [disabled]="isLoading">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4.9 9a7 7 0 0 1 11.8-2L20 12M4 17v-5h5m10.1 3a7 7 0 0 1-11.8 2L4 12" /></svg>
+        Refresh
+      </button>
+    </div>
+  </header>
+
+  <div class="catalogue-meta" *ngIf="!isLoading && products.length">
+    <span class="product-count">{{ products.length }} {{ products.length === 1 ? 'product' : 'products' }}</span>
+    <span class="meta-caption">Catalogue inventory</span>
+  </div>
+
+  <p class="error" *ngIf="errorMessage" role="alert">{{ errorMessage }}</p>
+  <div class="loading-state" *ngIf="isLoading"><span class="loading-dot"></span> Loading catalogue…</div>
+  <div class="empty-state" *ngIf="!isLoading && products.length === 0">
+    <div class="empty-icon" aria-hidden="true">◇</div>
+    <h2>No products yet</h2>
+    <p>Add your first item to start building the store catalogue.</p>
+    <a routerLink="/admin/products/new" class="create-button">＋ Add your first product</a>
+  </div>
+
+  <div class="table-wrap" *ngIf="!isLoading && products.length">
+    <table>
+      <thead><tr><th class="image-column">Product</th><th>Category</th><th>Price</th><th>Availability</th><th class="actions-heading">Manage</th></tr></thead>
+      <tbody>
+        <tr *ngFor="let product of products">
+          <td class="product-cell">
+            <img [src]="product.image || product.imageUrl || 'assets/placeholder.png'" [alt]="product.name" />
+            <div class="product-copy"><strong>{{ product.name }}</strong><span *ngIf="product.description">{{ product.description }}</span></div>
+          </td>
+          <td><span class="category-label">{{ product.category || 'Uncategorised' }}</span></td>
+          <td class="price-cell">₹{{ product.price | number:'1.0-2' }}</td>
+          <td><span class="stock-status" [class.out-of-stock]="!product.inStock"><i></i>{{ product.inStock ? 'In stock' : 'Out of stock' }}</span></td>
+          <td class="actions-cell">
+            <a [routerLink]="['/admin/products', product.id, 'edit']" class="icon-action edit-action" [attr.aria-label]="'Edit ' + product.name" title="Edit product">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 5 5 5M4 20l4.2-.9L19 8.3a2.1 2.1 0 0 0-3-3L5.2 16.1 4 20Z" /></svg><span>Edit</span>
+            </a>
+            <button type="button" class="icon-action delete-action" [disabled]="deletingId === product.id" (click)="deleteProduct(product)" [attr.aria-label]="'Delete ' + product.name" title="Delete product">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6m4-6v6M6 7l1 13h10l1-13M9 7V4h6v3" /></svg><span>{{ deletingId === product.id ? 'Deleting' : 'Delete' }}</span>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>

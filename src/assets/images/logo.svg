@@ -1,0 +1,70 @@
+<svg viewBox="80.19184652278177 55.296 684.8920863309353 639.36" xmlns="http://www.w3.org/2000/svg" style="max-height: 500px" width="684.8920863309353" height="639.36">
+  
+  <defs>
+    
+    <linearGradient y2="100%" x2="100%" y1="0%" x1="0%" id="charcoalDark">
+      <stop stop-color="#1B2428" offset="0%"/>
+      <stop stop-color="#0F1417" offset="100%"/>
+    </linearGradient>
+    <linearGradient y2="100%" x2="100%" y1="0%" x1="0%" id="charcoalMid">
+      <stop stop-color="#2C353B" offset="0%"/>
+      <stop stop-color="#1D252A" offset="100%"/>
+    </linearGradient>
+
+    
+    <linearGradient y2="100%" x2="100%" y1="0%" x1="0%" id="tealLight">
+      <stop stop-color="#00A896" offset="0%"/>
+      <stop stop-color="#028090" offset="100%"/>
+    </linearGradient>
+    <linearGradient y2="100%" x2="100%" y1="0%" x1="0%" id="tealDark">
+      <stop stop-color="#05668D" offset="0%"/>
+      <stop stop-color="#024559" offset="100%"/>
+    </linearGradient>
+
+    
+    <filter height="130%" width="130%" y="-10%" x="-10%" id="crispShadow">
+      <feDropShadow flood-opacity="0.15" stdDeviation="6" dy="8" dx="0"/>
+    </filter>
+  </defs>
+
+  <g transform="translate(100, 40)" id="craftora-icon">
+    
+    
+    <polygon fill="url(#charcoalDark)" points="300,560 160,470 160,540 300,630"/>
+    
+    <polygon fill="url(#charcoalMid)" points="300,560 440,470 440,540 300,630"/>
+    
+    <polygon fill="#0A0E11" points="300,630 440,540 370,495 300,540"/>
+    <polygon fill="#131B1F" points="300,630 300,540 370,495 370,585"/>
+
+    
+    
+    <polygon filter="url(#crispShadow)" fill="url(#tealLight)" points="150,475 420,300 420,380 150,555"/>
+    
+    <polygon fill="url(#tealDark)" points="420,300 445,315 445,395 420,380"/>
+
+    
+    <polygon fill="url(#charcoalMid)" points="300,320 400,255 400,310 300,375"/>
+    <polygon fill="url(#charcoalDark)" points="180,395 300,320 300,375 180,450"/>
+
+    
+    <polygon filter="url(#crispShadow)" fill="url(#tealLight)" points="150,290 350,160 350,230 150,360"/>
+    <polygon fill="url(#tealDark)" points="350,160 380,180 380,250 350,230"/>
+
+    
+    
+    <polygon fill="url(#tealLight)" points="365,60 435,210 340,175"/>
+    
+    <polygon fill="#007F73" points="365,60 340,175 270,160"/>
+  </g>
+
+  
+  <g id="craftora-text">
+    <text fill="#1A2024" letter-spacing="-1.5" font-weight="800" font-size="88" font-family="system-ui, -apple-system, 'Inter', 'Montserrat', 'Helvetica Neue', sans-serif" text-anchor="middle" y="800" x="360">
+      Craftora
+    </text>
+    <text fill="#00A896" letter-spacing="0.5" font-weight="900" font-size="44" font-family="system-ui, -apple-system, 'Inter', 'Montserrat', 'Helvetica Neue', sans-serif" y="745" x="565">
+      3D
+    </text>
+  </g>
+</svg>

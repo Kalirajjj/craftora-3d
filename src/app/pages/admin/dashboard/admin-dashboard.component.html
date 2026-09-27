@@ -1,0 +1,31 @@
+<section class="admin-page-content">
+  <span class="eyebrow">ADMIN OVERVIEW</span>
+  <h1>Dashboard</h1>
+  <p class="page-lead">Choose a task to manage your Craftora 3D store.</p>
+  <div class="overview-card">
+    <i class="pi pi-box"></i>
+    <div><strong>{{ productCount }}</strong><span>Products in catalogue</span></div>
+  </div>
+  <div class="admin-shortcuts">
+    <a routerLink="/admin/products/new" class="shortcut-card">
+      <span class="shortcut-icon"><i class="pi pi-plus-circle"></i></span>
+      <strong>Create Product</strong><small>Add product details and upload an image.</small>
+      <span class="shortcut-link">Open page <i class="pi pi-arrow-right"></i></span>
+    </a>
+    <a routerLink="/admin/products" class="shortcut-card">
+      <span class="shortcut-icon"><i class="pi pi-list"></i></span>
+      <strong>Product List</strong><small>View products saved in PostgreSQL.</small>
+      <span class="shortcut-link">Open page <i class="pi pi-arrow-right"></i></span>
+    </a>
+    <a routerLink="/admin/users/new" class="shortcut-card">
+      <span class="shortcut-icon"><i class="pi pi-user-plus"></i></span>
+      <strong>Create Admin User</strong><small>Add another account with admin access.</small>
+      <span class="shortcut-link">Open page <i class="pi pi-arrow-right"></i></span>
+    </a>
+    <a routerLink="/admin/requests" class="shortcut-card">
+      <span class="shortcut-icon"><i class="pi pi-inbox"></i></span>
+      <strong>Quote Requests</strong><small>Review customer custom-print enquiries and update their status.</small>
+      <span class="shortcut-link">Open page <i class="pi pi-arrow-right"></i></span>
+    </a>
+  </div>
+</section>

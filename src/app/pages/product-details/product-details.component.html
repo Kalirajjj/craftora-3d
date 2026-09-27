@@ -1,0 +1,86 @@
+<div class="product-detail-page" *ngIf="product">
+  <div class="container breadcrumbs">
+    <a routerLink="/">Home</a> / <a routerLink="/shop">Shop</a> / <span>{{ product.name }}</span>
+  </div>
+
+  <div class="container details-container">
+    <!-- Gallery -->
+    <div class="gallery-wrapper">
+      <img [src]="selectedImageUrl || product.image" [alt]="product.name" class="main-image" />
+      <div class="gallery-thumbnails" *ngIf="product.images?.length"><button type="button" *ngFor="let photo of product.images; let i = index" class="thumbnail-button" [class.active]="selectedImageUrl === photo.url" [attr.aria-label]="'Show product image ' + (i + 1)" (click)="selectImage(photo.url)"><img [src]="photo.url" [alt]="product.name + ' view ' + (i + 1)" /></button></div>
+    </div>
+
+    <!-- Product Info -->
+    <div class="details-info">
+      <span class="badge badge-accent">{{ product.category }}</span>
+      <h1 class="product-name">{{ product.name }}</h1>
+
+      <div class="rating-badge">
+        <i class="pi pi-star-fill"></i>
+        <span>{{ product.rating }} (Verified Studio Rating)</span>
+      </div>
+
+      <div class="price-tag">
+        <span class="currency">₹</span>{{ product.price }}
+        <span class="tax-note">Inclusive of all taxes & packing</span>
+      </div>
+
+      <p class="description">{{ product.description }}</p>
+
+      <!-- Color selection -->
+      <div class="option-block">
+        <label>Available Finishes / Filament:</label>
+        <div class="color-options">
+          <button 
+            *ngFor="let color of product.availableColors" 
+            class="color-pill"
+            [class.selected]="selectedColor === color"
+            (click)="selectColor(color)">
+            {{ color }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Quantity -->
+      <div class="option-block">
+        <label>Quantity:</label>
+        <div class="quantity-controller">
+          <button (click)="decrementQty()"><i class="pi pi-minus"></i></button>
+          <span>{{ quantity }}</span>
+          <button (click)="incrementQty()"><i class="pi pi-plus"></i></button>
+        </div>
+      </div>
+
+      <!-- Buttons -->
+      <div class="cta-actions">
+        <button class="btn btn-primary btn-block" (click)="addToCart()">
+          <i class="pi pi-shopping-bag"></i> Add to Cart
+        </button>
+        <button class="btn btn-dark btn-block" (click)="buyNow()">
+          Buy Now
+        </button>
+      </div>
+
+      <div class="alert-box" *ngIf="addedAlert">
+        <i class="pi pi-check"></i> Added {{ quantity }} item(s) to cart successfully!
+      </div>
+
+      <!-- Tech specs table -->
+      <div class="specs-card">
+        <h3>Specifications</h3>
+        <div class="spec-row"><span>Layer Resolution:</span> <strong>0.16mm High Detail</strong></div>
+        <div class="spec-row"><span>Dimensions:</span> <strong>{{ product.dimensions || 'Custom scaled' }}</strong></div>
+        <div class="spec-row"><span>Weight:</span> <strong>~{{ product.weightGrams }} grams</strong></div>
+        <div class="spec-row"><span>Material:</span> <strong>Eco-Friendly Matte PLA</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Related Products -->
+  <section class="container related-section" *ngIf="relatedProducts.length > 0">
+    <h2 class="section-title text-left">Pairs Well With</h2>
+    <div class="products-grid">
+      <app-product-card *ngFor="let p of relatedProducts" [product]="p"></app-product-card>
+    </div>
+  </section>
+</div>

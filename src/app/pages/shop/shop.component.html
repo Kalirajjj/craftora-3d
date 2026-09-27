@@ -1,0 +1,94 @@
+<div class="shop-page">
+  <div class="shop-header">
+    <div class="container">
+      <h1 class="shop-title">3D Printed Collection</h1>
+      <p class="shop-subtitle">Artisan home pieces, geometric planters, desk accoutrements, and custom memorabilia.</p>
+    </div>
+  </div>
+
+  <div class="container shop-body">
+    <!-- FILTERS SIDEBAR -->
+    <aside class="filters-sidebar">
+      <div class="filter-header">
+        <h3>Filters</h3>
+        <button class="btn-text" (click)="resetFilters()">Reset All</button>
+      </div>
+
+      <!-- Categories -->
+      <div class="filter-group">
+        <h4>Category</h4>
+        <div class="category-pills">
+          <button 
+            class="pill-btn" 
+            [class.active]="selectedCategory === 'All'"
+            (click)="setCategory('All')">
+            All Products
+          </button>
+          <button 
+            *ngFor="let c of categories" 
+            class="pill-btn" 
+            [class.active]="selectedCategory === c.name"
+            (click)="setCategory(c.name)">
+            {{ c.name }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Price Slider -->
+      <div class="filter-group">
+        <h4>Max Price: ₹{{ maxPrice }}</h4>
+        <input 
+          type="range" 
+          min="300" 
+          max="2500" 
+          step="50" 
+          [(ngModel)]="maxPrice" 
+          (input)="applyFilters()" 
+          class="price-range" />
+        <div class="range-labels">
+          <span>₹300</span>
+          <span>₹2500</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN PRODUCT LIST -->
+    <main class="products-main">
+      <div class="toolbar">
+        <div class="search-input-wrapper">
+          <i class="pi pi-search"></i>
+          <input 
+            type="text" 
+            placeholder="Search geometric vase, planter, lamp..." 
+            [(ngModel)]="searchQuery" 
+            (input)="applyFilters()" />
+        </div>
+
+        <div class="sort-wrapper">
+          <label>Sort By:</label>
+          <select [(ngModel)]="sortBy" (change)="applyFilters()">
+            <option value="popular">Popularity</option>
+            <option value="price-low">Price: Low to High</option>
+            <option value="price-high">Price: High to Low</option>
+            <option value="rating">Top Rated</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="results-count">
+        Showing <strong>{{ filteredProducts.length }}</strong> products
+      </div>
+
+      <div class="products-grid" *ngIf="filteredProducts.length > 0">
+        <app-product-card *ngFor="let prod of filteredProducts" [product]="prod"></app-product-card>
+      </div>
+
+      <div class="no-products" *ngIf="filteredProducts.length === 0">
+        <i class="pi pi-info-circle"></i>
+        <h3>No matching products found</h3>
+        <p>Try modifying your keyword search or adjusting the price threshold.</p>
+        <button class="btn btn-primary" (click)="resetFilters()">Clear Filters</button>
+      </div>
+    </main>
+  </div>
+</div>

@@ -1,0 +1,107 @@
+<div class="checkout-page">
+  <div class="container">
+    <div class="success-screen" *ngIf="placedOrder">
+      <div class="icon"><i class="pi pi-check-circle"></i></div>
+      <h1>Order Placed Successfully!</h1>
+      <p class="order-id">Order Reference: <strong>{{ placedOrder.id }}</strong></p>
+      <p class="status-note">Our studio has queued your items for 3D slicing & printing. We will update you via WhatsApp & Email.</p>
+
+      <div class="order-details-box">
+        <h3>Shipping Destination</h3>
+        <p><strong>{{ placedOrder.customer.fullName }}</strong></p>
+        <p>{{ placedOrder.customer.address }}, {{ placedOrder.customer.city }}, {{ placedOrder.customer.state }} - {{ placedOrder.customer.pincode }}</p>
+        <p>Phone: {{ placedOrder.customer.phone }}</p>
+      </div>
+
+      <a routerLink="/" class="btn btn-primary">Return to Storefront</a>
+    </div>
+
+    <div class="checkout-grid" *ngIf="!placedOrder">
+      <!-- Shipping Form -->
+      <form class="checkout-form" (ngSubmit)="placeOrder()" #chkForm="ngForm">
+        <h2>Delivery Address</h2>
+
+        <div class="form-group" *ngIf="savedAddresses.length">
+          <label class="form-label" for="savedAddress">Use a saved address</label>
+          <select id="savedAddress" class="form-control" name="savedAddress" [(ngModel)]="selectedAddressId" (ngModelChange)="useSavedAddress($event)">
+            <option [ngValue]="null">Enter a different address</option>
+            <option *ngFor="let address of savedAddresses" [ngValue]="address.id">{{ address.label }} — {{ address.addressLine1 }}, {{ address.city }}</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Full Name *</label>
+          <input type="text" class="form-control" [(ngModel)]="customer.fullName" name="fullName" required placeholder="John Doe" />
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Email Address *</label>
+            <input type="email" class="form-control" [(ngModel)]="customer.email" name="email" required placeholder="john@example.com" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone Number *</label>
+            <input type="tel" class="form-control" [(ngModel)]="customer.phone" name="phone" required placeholder="+91 98765 43210" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Address Line *</label>
+          <input type="text" class="form-control" [(ngModel)]="customer.address" name="address" required placeholder="Apartment, Street address" />
+        </div>
+
+        <div class="form-grid-three">
+          <div class="form-group">
+            <label class="form-label">City *</label>
+            <input type="text" class="form-control" [(ngModel)]="customer.city" name="city" required placeholder="Chennai" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">State *</label>
+            <input type="text" class="form-control" [(ngModel)]="customer.state" name="state" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">PIN Code *</label>
+            <input type="text" class="form-control" [(ngModel)]="customer.pincode" name="pincode" required placeholder="600001" />
+          </div>
+        </div>
+
+        <h2 class="mt-4">Payment Method (Mock Sandbox)</h2>
+        <div class="payment-mock-badge">
+          <i class="pi pi-credit-card"></i> Cash on Delivery / UPI on Delivery Enabled
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block btn-lg" [disabled]="!chkForm.form.valid || cartService.cartItems().length === 0">
+          Place Order (₹{{ cartService.grandTotal() }})
+        </button>
+      </form>
+
+      <!-- Sidebar Order Review -->
+      <div class="order-summary-sidebar">
+        <h3>Order Items ({{ cartService.totalItemsCount() }})</h3>
+        <div class="mini-items-list">
+          <div class="mini-item" *ngFor="let item of cartService.cartItems()">
+            <img [src]="item.product.image" [alt]="item.product.name" />
+            <div class="mini-info">
+              <h4>{{ item.product.name }}</h4>
+              <small>{{ item.selectedColor }} x {{ item.quantity }}</small>
+            </div>
+            <div class="mini-price">₹{{ item.product.price * item.quantity }}</div>
+          </div>
+        </div>
+
+        <div class="sub-line">
+          <span>Subtotal</span>
+          <strong>₹{{ cartService.subtotal() }}</strong>
+        </div>
+        <div class="sub-line">
+          <span>Shipping</span>
+          <span>{{ cartService.deliveryFee() === 0 ? 'FREE' : '₹' + cartService.deliveryFee() }}</span>
+        </div>
+        <div class="sub-line total-highlight">
+          <span>Total</span>
+          <strong>₹{{ cartService.grandTotal() }}</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

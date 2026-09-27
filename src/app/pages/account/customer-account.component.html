@@ -1,0 +1,36 @@
+<main class="customer-dashboard">
+  <header class="customer-heading"><div><span class="account-eyebrow">MY CRAFTORA</span><h1>Your account</h1><p>Manage your profile and saved delivery addresses.</p></div><div class="customer-heading-actions"><a class="track-quotes-button" routerLink="/track-quote"><i class="pi pi-search" aria-hidden="true"></i> Track quote requests</a><button type="button" class="signout-button" (click)="signOut()"><i class="pi pi-sign-out"></i> Sign out</button></div></header>
+  <div class="customer-grid">
+    <section class="customer-panel profile-panel">
+      <h2>Profile details</h2><p class="panel-intro">Your information is saved to your account.</p>
+      <label>Email address</label><div class="read-only-field">{{ profile?.email || 'Loading…' }} <span class="verified" *ngIf="profile?.verified">Verified</span></div>
+      <label for="accountName">Full name</label><input id="accountName" [(ngModel)]="fullName" maxlength="120">
+      <label for="accountPhone">Phone</label><input id="accountPhone" [(ngModel)]="phone" maxlength="40">
+      <p class="account-message" *ngIf="message">{{ message }}</p><p class="account-error" *ngIf="error">{{ error }}</p>
+      <button class="account-submit" type="button" (click)="saveProfile()" [disabled]="isSaving">{{ isSaving ? 'Saving…' : 'Save profile' }}</button>
+    </section>
+    <section class="customer-panel addresses-panel">
+      <h2>Saved delivery addresses</h2><p class="panel-intro">Save addresses for a faster checkout later.</p>
+      <article class="address-card" *ngFor="let saved of addresses">
+        <div><strong>{{ saved.label }} <span class="verified" *ngIf="saved.defaultAddress">Default</span></strong><span>{{ saved.recipientName }} · {{ saved.phone }}</span><small>{{ saved.addressLine1 }}<ng-container *ngIf="saved.addressLine2">, {{ saved.addressLine2 }}</ng-container>, {{ saved.city }}, {{ saved.state }} {{ saved.pincode }}</small></div>
+        <button type="button" (click)="removeAddress(saved)" [attr.aria-label]="'Remove ' + saved.label + ' address'"><i class="pi pi-trash"></i></button>
+      </article>
+      <p class="empty-account-state" *ngIf="addresses.length === 0">No delivery addresses saved yet.</p>
+      <form class="address-form" (ngSubmit)="saveAddress()" #addressForm="ngForm">
+        <div class="address-form-grid">
+          <label>Label<input name="label" [(ngModel)]="address.label" required maxlength="60" placeholder="Home or Work"></label>
+          <label>Recipient name<input name="recipientName" [(ngModel)]="address.recipientName" required maxlength="120" autocomplete="name"></label>
+          <label>Phone<input name="addressPhone" [(ngModel)]="address.phone" required maxlength="40" autocomplete="tel"></label>
+          <label>Address line 1<input name="addressLine1" [(ngModel)]="address.addressLine1" required maxlength="180" autocomplete="address-line1"></label>
+          <label>Address line 2 <span class="optional">(optional)</span><input name="addressLine2" [(ngModel)]="address.addressLine2" maxlength="180" autocomplete="address-line2"></label>
+          <label>City<input name="city" [(ngModel)]="address.city" required maxlength="80" autocomplete="address-level2"></label>
+          <label>State<input name="state" [(ngModel)]="address.state" required maxlength="80" autocomplete="address-level1"></label>
+          <label>PIN code<input name="pincode" [(ngModel)]="address.pincode" required minlength="3" maxlength="12" autocomplete="postal-code"></label>
+        </div>
+        <label class="default-check"><input type="checkbox" name="defaultAddress" [(ngModel)]="address.defaultAddress"> Make this my default address</label>
+        <p class="account-message" *ngIf="addressMessage">{{ addressMessage }}</p><p class="account-error" *ngIf="addressError">{{ addressError }}</p>
+        <button class="account-submit" type="submit" [disabled]="isSavingAddress || !addressForm.valid">{{ isSavingAddress ? 'Saving…' : 'Save delivery address' }}</button>
+      </form>
+    </section>
+  </div>
+</main>

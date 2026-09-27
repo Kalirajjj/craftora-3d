@@ -1,0 +1,87 @@
+.about-hero {
+  background-color: var(--surface-color);
+  padding: 5rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.about-hero h1 {
+  font-size: 2.75rem;
+  font-weight: 800;
+  margin: 0.5rem 0;
+}
+
+.lead {
+  font-size: 1.15rem;
+  color: var(--text-secondary);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.content-section {
+  padding: 5rem 1.5rem;
+}
+
+.about-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 4rem;
+  align-items: center;
+  margin-bottom: 5rem;
+}
+
+.text-block h2 {
+  font-size: 1.85rem;
+  font-weight: 800;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.text-block h2:first-child {
+  margin-top: 0;
+}
+
+.text-block p {
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.image-block img {
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  width: 100%;
+}
+
+.values-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+}
+
+.value-card {
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color);
+  padding: 2.5rem 2rem;
+  border-radius: var(--radius);
+}
+
+.value-card i {
+  font-size: 2rem;
+  color: var(--accent-color);
+  margin-bottom: 1rem;
+}
+
+.value-card h3 {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.value-card p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 868px) {
+  .about-grid {
+    grid-template-columns: 1fr;
+  }
+}

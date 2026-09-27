@@ -1,0 +1,51 @@
+<header class="navbar">
+  <div class="container nav-container">
+    <a routerLink="/" class="brand-logo" (click)="closeMobileMenu()">
+      <img src="images/logo.svg" alt="Craftora 3D Logo" class="brand-logo-img" />
+      <div class="brand-text">
+        <span class="brand-title">Craftora <span class="brand-badge">3D</span></span> 
+        <span class="brand-tagline">Where Ideas Take Shape</span>
+      </div>
+    </a>
+
+    <nav class="nav-links" [class.active]="isMobileMenuOpen">
+      <a routerLink="/" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}"
+        (click)="closeMobileMenu()">Home</a>
+      <a routerLink="/shop" routerLinkActive="active-link" (click)="closeMobileMenu()">Shop</a>
+      <a routerLink="/custom-order" routerLinkActive="active-link" (click)="closeMobileMenu()">Custom 3D Printing</a>
+      <a routerLink="/about" routerLinkActive="active-link" (click)="closeMobileMenu()">About</a>
+      <a routerLink="/contact" routerLinkActive="active-link" (click)="closeMobileMenu()">Contact</a>
+    </nav>
+
+    <div class="nav-actions">
+      <a class="customer-account-link" [routerLink]="customerAuth.isSignedIn() ? '/account' : '/account/login'" [attr.aria-label]="customerAuth.isSignedIn() ? 'My Account' : 'Sign in'" (click)="closeMobileMenu()">
+        <i class="pi" [ngClass]="customerAuth.isSignedIn() ? 'pi-user' : 'pi-sign-in'" aria-hidden="true"></i>
+        <span>{{ customerAuth.isSignedIn() ? (customerAuth.customer()?.fullName || 'My Account') : 'Sign in' }}</span>
+      </a>
+
+      <a routerLink="/cart" class="cart-btn" aria-label="Shopping Cart" title="Shopping Cart" (click)="closeMobileMenu()">
+        <i class="pi pi-shopping-bag"></i>
+        <span class="cart-count" *ngIf="cartService.totalItemsCount() > 0">
+          {{ cartService.totalItemsCount() }}
+        </span>
+      </a>
+
+      <div class="utility-menu">
+        <button class="utility-menu-toggle" type="button" (click)="toggleUtilityMenu()" [attr.aria-expanded]="isUtilityMenuOpen" aria-haspopup="true" [attr.aria-label]="isUtilityMenuOpen ? 'Close site menu' : 'Open site menu'">
+          <i class="pi pi-ellipsis-v" aria-hidden="true"></i>
+        </button>
+        <div class="utility-menu-panel" *ngIf="isUtilityMenuOpen" role="menu">
+          <a routerLink="/admin/login" role="menuitem" (click)="closeUtilityMenu()"><i class="pi pi-lock" aria-hidden="true"></i><span>Admin Login</span></a>
+          <button type="button" role="menuitem" (click)="themeService.toggle()">
+            <i class="pi" [ngClass]="themeService.isDarkMode() ? 'pi-sun' : 'pi-moon'" aria-hidden="true"></i>
+            <span>{{ themeService.isDarkMode() ? 'Light mode' : 'Dark mode' }}</span>
+          </button>
+        </div>
+      </div>
+
+      <button class="menu-toggle" type="button" (click)="toggleMobileMenu()" [attr.aria-expanded]="isMobileMenuOpen" aria-label="Toggle Navigation">
+        <i class="pi" [ngClass]="isMobileMenuOpen ? 'pi-times' : 'pi-bars'"></i>
+      </button>
+    </div>
+  </div>
+</header>

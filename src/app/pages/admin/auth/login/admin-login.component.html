@@ -1,0 +1,10 @@
+<main class="login-page"><section class="login-card">
+  <a class="back-link" routerLink="/">← Back to Craftora 3D</a><span class="eyebrow">CRAFTORA 3D ADMIN</span>
+  <h1>Welcome back</h1><p>Sign in to manage your product catalogue.</p>
+  <form (ngSubmit)="signIn()" #loginForm="ngForm">
+    <label>Username<input type="text" name="username" [(ngModel)]="username" autocomplete="username" required /></label>
+    <label>Password<span class="password-field"><input [type]="showPassword ? 'text' : 'password'" name="password" [(ngModel)]="password" autocomplete="current-password" required /><button class="password-toggle" type="button" (click)="togglePasswordVisibility()" [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'" [attr.aria-pressed]="showPassword"><i class="pi" [class.pi-eye]="!showPassword" [class.pi-eye-slash]="showPassword" aria-hidden="true"></i></button></span></label>
+    <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+    <button type="submit" [disabled]="loginForm.invalid || isBusy">{{ isBusy ? 'Signing in…' : 'Admin Login' }}</button>
+  </form>
+</section></main>

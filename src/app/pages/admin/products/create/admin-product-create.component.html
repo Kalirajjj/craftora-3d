@@ -1,0 +1,25 @@
+<section class="admin-page-content">
+  <span class="eyebrow">CATALOGUE</span><h1>{{ productId ? 'Edit Product' : 'Create Product' }}</h1>
+  <p class="page-lead">{{ productId ? 'Update the product details shown in your store.' : 'Add a product to the store catalogue.' }}</p>
+  <p class="notice success" *ngIf="successMessage">{{ successMessage }}</p>
+  <p class="notice error" *ngIf="errorMessage">{{ errorMessage }}</p>
+  <p class="page-lead" *ngIf="isLoadingProduct">Loading product details…</p>
+  <form class="admin-form" *ngIf="!isLoadingProduct && (!productId || productForm.name)" (ngSubmit)="save(productNgForm)" #productNgForm="ngForm">
+    <label><span>Product name *</span><input type="text" name="name" [(ngModel)]="productForm.name" required maxlength="140" /></label>
+    <div class="two-column">
+      <label><span>Category *</span><input name="category" [(ngModel)]="productForm.category" required placeholder="Home Décor" /></label>
+      <label><span>Price (₹) *</span><input type="number" name="price" [(ngModel)]="productForm.price" required min="1" step="0.01" /></label>
+    </div>
+    <label><span>Description</span><textarea name="description" [(ngModel)]="productForm.description" rows="4" maxlength="2000"></textarea></label>
+    <div class="image-picker-field"><label><span>Product images {{ productId ? '' : '*' }} <small>Up to {{ maxImages }} JPEG, PNG or WebP images; 5 MB each</small></span></label><div class="current-images" *ngIf="productId && currentImages.length && !selectedImages.length"><img *ngFor="let image of currentImages" [src]="image" alt="Current product image" /></div><p class="selected-summary" *ngIf="productId && currentImages.length && !selectedImages.length">Current images are kept unless you upload a replacement gallery.</p><button class="button image-picker-button" type="button" (click)="openImageDialog()">＋ {{ selectedImages.length ? 'Manage images' : productId ? 'Replace images' : 'Upload images' }}</button><div class="selected-summary" *ngIf="selectedImages.length">{{ selectedImages.length }} replacement image(s) selected · first image is the cover</div></div>
+    <label><span>Available colors <small>Separate colors with commas</small></span><input name="colors" [(ngModel)]="productForm.availableColors" placeholder="Matte black, Teal" /></label>
+    <div class="two-column">
+      <label><span>Dimensions</span><input name="dimensions" [(ngModel)]="productForm.dimensions" placeholder="120 x 120 x 220 mm" /></label>
+      <label><span>Weight (grams)</span><input type="number" name="weightGrams" [(ngModel)]="productForm.weightGrams" min="1" /></label>
+    </div>
+    <div class="check-row"><label><input type="checkbox" name="featured" [(ngModel)]="productForm.featured" /> Featured on home page</label><label><input type="checkbox" name="inStock" [(ngModel)]="productForm.inStock" /> In stock</label></div>
+    <div class="form-actions"><a routerLink="/admin/products" class="cancel-link">Cancel</a><button class="button primary" type="submit" [disabled]="productNgForm.invalid || isBusy">{{ isBusy ? 'Saving…' : productId ? 'Save changes' : 'Save product' }}</button></div>
+  </form>
+</section>
+
+<div class="image-dialog-backdrop" *ngIf="isImageDialogOpen" (click)="closeImageDialog()"><section class="image-dialog" role="dialog" aria-modal="true" aria-labelledby="image-dialog-title" (click)="$event.stopPropagation()"><header><div><span class="eyebrow">PRODUCT GALLERY</span><h2 id="image-dialog-title">{{ productId ? 'Replace product images' : 'Upload product images' }}</h2></div><button type="button" class="dialog-close" aria-label="Close" (click)="closeImageDialog()">×</button></header><p>Choose multiple images at once. The first image will be used as the product cover. In edit mode, the current gallery remains unchanged until you choose replacements.</p><label class="dropzone"><span>＋</span><strong>Choose image files</strong><small>JPEG, PNG or WebP · up to 5 MB each · {{ selectedImages.length }}/{{ maxImages }} selected</small><input type="file" accept="image/jpeg,image/png,image/webp" multiple [disabled]="selectedImages.length >= maxImages" (change)="onImagesSelected($event)" /></label><div class="image-grid" *ngIf="imagePreviews.length"><article class="image-tile" *ngFor="let preview of imagePreviews; let i = index"><img [src]="preview" [alt]="'Product image ' + (i + 1)" /><span *ngIf="i === 0" class="cover-tag">Cover</span><button type="button" class="remove-image" [attr.aria-label]="'Remove image ' + (i + 1)" (click)="removeImage(i)">×</button></article></div><footer><span>{{ selectedImages.length }} of {{ maxImages }} images</span><button type="button" class="button primary" (click)="closeImageDialog()">Done</button></footer></section></div>

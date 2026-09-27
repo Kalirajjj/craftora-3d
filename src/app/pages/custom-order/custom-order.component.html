@@ -1,0 +1,105 @@
+<div class="custom-order-page">
+  <div class="page-header">
+    <div class="container text-center">
+      <span class="badge badge-accent">On-Demand Manufacturing</span>
+      <h1>Have an Idea? We’ll Print It.</h1>
+      <p>Submit your 3D model (STL, OBJ, STEP, 3MF) or describe your vision for a quotation.</p>
+    </div>
+  </div>
+
+  <div class="container form-container">
+    <!-- Success Confirmation -->
+    <div class="success-card" *ngIf="submittedOrderNumber">
+      <div class="success-icon"><i class="pi pi-check-circle"></i></div>
+      <h2>Quote Request Received!</h2>
+      <p>Your reference identification is <strong>{{ submittedOrderNumber }}</strong>.</p>
+      <p>Current status: <strong>{{ submittedStatus }}</strong></p>
+      <p class="sub">Our engineering team is inspecting slicing parameters and will send the pricing quote to your email within 24 hours.</p>
+      <p class="tracking-reminder"><i class="pi pi-info-circle" aria-hidden="true"></i> You can track this request any time from Track Quote while signed in. Save a copy for your records if you like.</p>
+      <div class="success-actions">
+        <button class="btn btn-primary" type="button" (click)="saveQuoteDetails()"><i class="pi pi-download" aria-hidden="true"></i> Save quote details</button>
+        <button class="btn btn-outline" type="button" (click)="resetForm()">Submit Another Request</button>
+      </div>
+    </div>
+
+    <section class="sign-in-required" *ngIf="!isSignedIn">
+      <span class="sign-in-icon"><i class="pi pi-lock" aria-hidden="true"></i></span>
+      <h2>Sign in to request a quote</h2>
+      <p>Your quote requests are saved to your customer account, so you can track every update in one place.</p>
+      <a class="btn btn-primary" routerLink="/account/login" [queryParams]="{ returnUrl: '/custom-order' }"><i class="pi pi-sign-in" aria-hidden="true"></i> Sign in to continue</a>
+      <a class="create-account-link" routerLink="/account/register" [queryParams]="{ returnUrl: '/custom-order' }">Create an account</a>
+    </section>
+
+    <!-- The Form -->
+    <form class="order-form" *ngIf="isSignedIn && !submittedOrderNumber" (ngSubmit)="onSubmit()" #customForm="ngForm">
+      <div class="customer-submission-note">
+        <i class="pi pi-user" aria-hidden="true"></i>
+        <span>Requesting as <strong>{{ signedInCustomer?.fullName }}</strong> · {{ signedInCustomer?.email }}. We’ll use the details saved to your account.</span>
+        <a routerLink="/account">Edit account</a>
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Product / Project Category</label>
+          <select class="form-control" [(ngModel)]="formData.productType" name="productType">
+            <option value="Home Décor / Vase">Home Décor / Artistic</option>
+            <option value="Personalized Keepsake">Personalized Keepsake</option>
+            <option value="Name Plate / Desk Sign">Custom Name Plate</option>
+            <option value="Functional / Replacement Part">Functional Replacement Part</option>
+            <option value="Lithophane Light">Lithophane Light Box</option>
+            <option value="Other">Other Bespoke Idea</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Project Description & Dimensions *</label>
+        <textarea class="form-control" rows="4" [(ngModel)]="formData.description" name="description" required placeholder="Describe dimensions, intended usage, infill preferences or custom embossed text..."></textarea>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Preferred Filament Finish / Color</label>
+          <input type="text" class="form-control" [(ngModel)]="formData.preferredColor" name="preferredColor" placeholder="e.g., Matte Teal, Carbon Black, Marble White" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Quantity</label>
+          <input type="number" min="1" class="form-control" [(ngModel)]="formData.quantity" name="quantity" />
+        </div>
+
+        <ng-container *ngIf="!signedInCustomer?.phone">
+          <div class="form-group">
+            <label class="form-label">Phone Number for this request *</label>
+            <input type="tel" class="form-control" [(ngModel)]="formData.phone" name="phone" required placeholder="+91 98765 43210" autocomplete="tel" />
+            <small class="date-note">Add a phone number to your account to skip this field next time.</small>
+          </div>
+        </ng-container>
+        <div class="form-group">
+          <label class="form-label">Required Delivery Date</label>
+          <input type="date" class="form-control" [(ngModel)]="formData.requiredDate" name="requiredDate" [min]="minRequiredDate" />
+          <small class="date-note">Choose a delivery date at least 3 days from today.</small>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Upload 3D CAD or Sketch (.stl, .obj, .step, .png)</label>
+          <div class="file-picker-row">
+            <input #projectFileInput type="file" class="file-input-hidden" (change)="onFileSelected($event)" accept=".stl,.obj,.step,.3mf,.png,.jpg" />
+            <button type="button" class="file-choose-button" (click)="projectFileInput.click()"><i class="pi pi-upload" aria-hidden="true"></i> Choose file</button>
+            <span class="file-name">{{ uploadedFileName || 'No file chosen' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Additional Notes or Tolerance Specs</label>
+        <textarea class="form-control" rows="2" [(ngModel)]="formData.additionalNotes" name="additionalNotes" placeholder="Any mechanical tolerance or strength requirements?"></textarea>
+      </div>
+
+      <p class="quote-error" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+      <button type="submit" class="btn btn-primary btn-large" [disabled]="!customForm.form.valid || isSubmitting">
+        <i class="pi" [ngClass]="isSubmitting ? 'pi-spin pi-spinner' : 'pi-send'"></i> {{ isSubmitting ? 'Submitting…' : 'Request a Quote' }}
+      </button>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,57 @@
+<section class="admin-page-content quote-requests-page">
+  <span class="eyebrow">CUSTOM 3D PRINTING</span>
+  <div class="requests-title-row">
+    <div><h1>Quote Requests</h1><p class="page-lead">Review customer projects and keep each request moving.</p></div>
+    <button class="refresh-button" type="button" (click)="refresh()" [disabled]="isLoading"><i class="pi pi-refresh"></i> Refresh</button>
+  </div>
+
+  <div class="request-view-tabs" role="tablist" aria-label="Quote request views">
+    <button type="button" role="tab" [attr.aria-selected]="!showDeleted" [class.active]="!showDeleted" (click)="showRequestView(false)">Active requests <span>{{ activeRequests.length }}</span></button>
+    <button type="button" role="tab" [attr.aria-selected]="showDeleted" [class.active]="showDeleted" (click)="showRequestView(true)"><i class="pi pi-trash"></i> Deleted requests <span>{{ deletedRequests.length }}</span></button>
+  </div>
+
+  <div class="request-stats" *ngIf="!showDeleted" aria-label="Filter quote requests by status">
+    <button type="button" class="request-stat-card pending-stat" [class.selected]="selectedStatus === 'PENDING'" [attr.aria-pressed]="selectedStatus === 'PENDING'" (click)="selectStatus('PENDING')"><span class="request-stat-info"><span class="request-stat-heading"><i class="pi pi-clock" aria-hidden="true"></i><span>Pending</span></span><span class="request-stat-caption">Awaiting review</span></span><strong class="request-stat-value">{{ pendingCount }}</strong></button>
+    <button type="button" class="request-stat-card progress-stat" [class.selected]="selectedStatus === 'IN_PROGRESS'" [attr.aria-pressed]="selectedStatus === 'IN_PROGRESS'" (click)="selectStatus('IN_PROGRESS')"><span class="request-stat-info"><span class="request-stat-heading"><i class="pi pi-cog" aria-hidden="true"></i><span>In progress</span></span><span class="request-stat-caption">Currently being produced</span></span><strong class="request-stat-value">{{ inProgressCount }}</strong></button>
+    <button type="button" class="request-stat-card completed-stat" [class.selected]="selectedStatus === 'COMPLETED'" [attr.aria-pressed]="selectedStatus === 'COMPLETED'" (click)="selectStatus('COMPLETED')"><span class="request-stat-info"><span class="request-stat-heading"><i class="pi pi-check-circle" aria-hidden="true"></i><span>Completed</span></span><span class="request-stat-caption">Finished requests</span></span><strong class="request-stat-value">{{ completedCount }}</strong></button>
+  </div>
+
+  <p class="request-message error" *ngIf="errorMessage">{{ errorMessage }}</p>
+  <div class="request-empty" *ngIf="isLoading"><i class="pi pi-spin pi-spinner"></i> Loading quote requests…</div>
+  <div class="request-empty" *ngIf="!isLoading && visibleRequests.length === 0 && !errorMessage"><i class="pi" [ngClass]="showDeleted ? 'pi-trash' : (selectedStatus === 'PENDING' ? 'pi-clock' : selectedStatus === 'IN_PROGRESS' ? 'pi-cog' : 'pi-check-circle')"></i><h2>{{ emptyTitle }}</h2><p>{{ emptyDescription }}</p></div>
+
+  <div class="request-list" *ngIf="!isLoading && visibleRequests.length">
+    <article class="request-card" *ngFor="let request of visibleRequests" [class.status-menu-open]="openStatusMenuId === request.id">
+      <div class="request-card-top">
+        <div><span class="request-reference">{{ request.referenceCode }}</span><span class="request-date">{{ request.createdAt | date:'medium' }}</span><span class="deleted-date" *ngIf="request.deletedAt">Deleted {{ request.deletedAt | date:'mediumDate' }}</span></div>
+        <span class="status-badge" [ngClass]="'status-' + (request.status || 'PENDING').toLowerCase()">{{ statusLabel(request.status) }}</span>
+      </div>
+      <div class="request-summary">
+        <div><h2>{{ request.name }}</h2><p>{{ request.productType }} · Qty {{ request.quantity }}</p></div>
+        <div class="request-contact"><a [href]="'mailto:' + request.email">{{ request.email }}</a><a [href]="'tel:' + request.phone">{{ request.phone }}</a></div>
+      </div>
+      <div class="request-controls">
+        <button class="details-button" type="button" (click)="toggleDetails(request.id)">{{ expandedId === request.id ? 'Hide details' : 'View details' }} <i class="pi" [ngClass]="expandedId === request.id ? 'pi-chevron-up' : 'pi-chevron-down'"></i></button>
+        <button class="delete-request-button" *ngIf="!showDeleted" type="button" (click)="moveToDeleted(request)" [disabled]="updatingId === request.id"><i class="pi pi-trash"></i> {{ updatingId === request.id ? 'Moving…' : 'Move to deleted' }}</button>
+        <button class="restore-request-button" *ngIf="showDeleted" type="button" (click)="restoreRequest(request)" [disabled]="updatingId === request.id"><i class="pi pi-replay"></i> {{ updatingId === request.id ? 'Restoring…' : 'Restore request' }}</button>
+        <div class="status-menu" *ngIf="!showDeleted" [class.menu-open]="openStatusMenuId === request.id" [ngClass]="'status-control-' + (request.status || 'PENDING').toLowerCase()">
+          <span class="status-control-label">Update status</span>
+          <button class="status-trigger" type="button" [disabled]="updatingId === request.id" (click)="toggleStatusMenu(request.id)" [attr.aria-expanded]="openStatusMenuId === request.id" aria-haspopup="listbox" [attr.aria-label]="'Update status for ' + request.referenceCode">
+            <i class="pi" [ngClass]="statusIcon(request.status)" aria-hidden="true"></i><span>{{ statusLabel(request.status) }}</span><i class="pi pi-chevron-down status-trigger-chevron" aria-hidden="true"></i>
+          </button>
+          <div class="status-options" *ngIf="openStatusMenuId === request.id" role="listbox" [attr.aria-label]="'Choose status for ' + request.referenceCode">
+            <button *ngFor="let option of statusOptions" type="button" role="option" [attr.aria-selected]="(request.status || 'PENDING') === option.value" [class.selected]="(request.status || 'PENDING') === option.value" (click)="setStatus(request, option.value)">
+              <i class="pi" [ngClass]="option.icon" aria-hidden="true"></i><span>{{ option.label }}</span><i class="pi pi-check status-option-check" *ngIf="(request.status || 'PENDING') === option.value" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="request-details" *ngIf="expandedId === request.id">
+        <div><strong>Project description</strong><p>{{ request.description }}</p></div>
+        <div class="detail-grid"><p><strong>Preferred finish:</strong> {{ request.preferredColor || 'Not specified' }}</p><p><strong>Required date:</strong> {{ (request.requiredDate | date:'longDate') || 'Not specified' }}</p></div>
+        <div *ngIf="request.additionalNotes"><strong>Additional notes</strong><p>{{ request.additionalNotes }}</p></div>
+        <button class="attachment-button" *ngIf="request.attachmentUrl" type="button" (click)="downloadAttachment(request)" [disabled]="downloadingId === request.id"><i class="pi pi-download"></i> {{ downloadingId === request.id ? 'Downloading…' : 'Download ' + request.attachmentName }}</button>
+      </div>
+    </article>
+  </div>
+</section>

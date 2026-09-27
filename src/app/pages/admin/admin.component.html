@@ -1,0 +1,31 @@
+<section class="admin-workspace">
+  <aside class="admin-sidebar">
+    <a class="admin-sidebar-brand" routerLink="/admin/dashboard">
+      <span class="brand-mark"><i class="pi pi-box"></i></span>
+      <span><strong>Craftora 3D</strong><small>Admin workspace</small></span>
+    </a>
+    <nav class="admin-menu" aria-label="Admin menu">
+      <a routerLink="/admin/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+        <i class="pi pi-home"></i><span>Dashboard</span>
+      </a>
+      <a routerLink="/admin/products/new" routerLinkActive="active">
+        <i class="pi pi-plus-circle"></i><span>Create Product</span>
+      </a>
+      <a routerLink="/admin/products" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+        <i class="pi pi-box"></i><span>Product List</span>
+      </a>
+      <a routerLink="/admin/requests" routerLinkActive="active">
+        <i class="pi pi-inbox"></i><span>Quote Requests</span>
+      </a>
+      <a routerLink="/admin/users/new" routerLinkActive="active">
+        <i class="pi pi-user-plus"></i><span>Create Admin User</span>
+      </a>
+    </nav>
+    <button class="admin-signout" type="button" (click)="signOut()">
+      <i class="pi pi-sign-out"></i><span>Sign out</span>
+    </button>
+  </aside>
+  <main class="admin-main">
+    <router-outlet></router-outlet>
+  </main>
+</section>

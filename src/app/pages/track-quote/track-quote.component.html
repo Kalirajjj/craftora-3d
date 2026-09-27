@@ -1,0 +1,65 @@
+<main class="track-page">
+  <section class="track-card">
+    <header class="track-heading">
+      <span class="eyebrow"><i class="pi pi-box" aria-hidden="true"></i> CUSTOM 3D PRINTING <span class="eyebrow-divider">/</span> PROJECT TRACKING</span>
+      <h1>Track your quote requests</h1>
+      <p class="intro">See the latest status and delivery details for quotes submitted from your account.</p>
+    </header>
+
+    <section class="signed-out-state" *ngIf="!isSignedIn">
+      <span class="state-icon"><i class="pi pi-lock" aria-hidden="true"></i></span>
+      <h2>Sign in to track your quotes</h2>
+      <p>Your requests and their progress are available securely from your customer account.</p>
+      <a class="track-sign-in" routerLink="/account/login" [queryParams]="{ returnUrl: '/track-quote' }"><i class="pi pi-sign-in" aria-hidden="true"></i> Sign in</a>
+    </section>
+
+    <ng-container *ngIf="isSignedIn">
+      <p class="track-error" *ngIf="errorMessage" role="alert">{{ errorMessage }}</p>
+      <div class="track-loading" *ngIf="isLoading"><i class="pi pi-spin pi-spinner" aria-hidden="true"></i> Loading your quote requests…</div>
+      <section class="empty-quotes" *ngIf="!isLoading && !errorMessage && quotes.length === 0">
+        <span class="state-icon"><i class="pi pi-inbox" aria-hidden="true"></i></span>
+        <h2>No quote requests yet</h2>
+        <p>When you submit a custom printing request while signed in, it will appear here.</p>
+        <a routerLink="/custom-order">Request a custom quote <i class="pi pi-arrow-right" aria-hidden="true"></i></a>
+      </section>
+
+      <section class="quote-table-section" *ngIf="!isLoading && quotes.length > 0" aria-label="Your quote requests">
+        <div class="quote-table-heading"><div><h2>Your requests</h2><p>{{ quotes.length }} {{ quotes.length === 1 ? 'request' : 'requests' }} saved to your account</p></div></div>
+        <div class="quote-table-wrap">
+          <table class="quote-table">
+            <thead><tr><th scope="col">Reference</th><th scope="col">Project</th><th scope="col">Qty</th><th scope="col">Submitted</th><th scope="col">Status</th><th scope="col"><span class="sr-only">Details</span></th></tr></thead>
+            <tbody>
+              <tr *ngFor="let quote of quotes">
+                <td><span class="table-reference">{{ quote.referenceCode }}</span></td>
+                <td><span class="table-project">{{ quote.productType }}</span><small *ngIf="quote.requiredDate">Due {{ quote.requiredDate | date:'mediumDate' }}</small></td>
+                <td>{{ quote.quantity }}</td>
+                <td>{{ quote.createdAt | date:'mediumDate' }}</td>
+                <td><span class="status-pill" [ngClass]="quote.status.toLowerCase()">{{ statusLabel(quote.status) }}</span></td>
+                <td><button class="quote-details-button" type="button" (click)="openDetails(quote)" [attr.aria-label]="'View details for ' + quote.referenceCode" title="View request details"><i class="pi pi-eye" aria-hidden="true"></i></button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </ng-container>
+  </section>
+
+  <div class="quote-modal-backdrop" *ngIf="selectedQuote as quote" (click)="closeDetails()" (keydown.escape)="closeDetails()">
+    <section class="quote-modal" role="dialog" aria-modal="true" aria-labelledby="quoteModalTitle" (click)="$event.stopPropagation()">
+      <header class="quote-modal-header">
+        <div><span class="eyebrow">QUOTE DETAILS</span><p class="modal-reference">{{ quote.referenceCode }}</p></div>
+        <button type="button" class="modal-close" (click)="closeDetails()" aria-label="Close quote details"><i class="pi pi-times" aria-hidden="true"></i></button>
+      </header>
+      <div class="modal-title-row"><h2 id="quoteModalTitle">{{ quote.productType }}</h2><span class="status-pill" [ngClass]="quote.status.toLowerCase()">{{ statusLabel(quote.status) }}</span></div>
+      <div class="quote-detail-grid">
+        <div class="quote-detail-item description-detail"><span>Project description</span><p>{{ quote.description }}</p></div>
+        <div class="quote-detail-item"><span>Quantity</span><strong>{{ quote.quantity }} {{ quote.quantity === 1 ? 'item' : 'items' }}</strong></div>
+        <div class="quote-detail-item" *ngIf="quote.preferredColor"><span>Preferred finish / color</span><strong>{{ quote.preferredColor }}</strong></div>
+        <div class="quote-detail-item"><span>Submitted</span><strong>{{ quote.createdAt | date:'medium' }}</strong></div>
+        <div class="quote-detail-item" *ngIf="quote.requiredDate"><span>Required delivery</span><strong>{{ quote.requiredDate | date:'mediumDate' }}</strong></div>
+        <div class="quote-detail-item notes-detail" *ngIf="quote.additionalNotes"><span>Additional notes</span><p>{{ quote.additionalNotes }}</p></div>
+      </div>
+      <footer class="quote-modal-footer"><span><i class="pi pi-info-circle" aria-hidden="true"></i> Status updates appear here when your request changes.</span><button type="button" (click)="closeDetails()">Done</button></footer>
+    </section>
+  </div>
+</main>

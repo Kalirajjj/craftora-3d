@@ -1,0 +1,195 @@
+<section class="hero-section">
+  <div class="container hero-container">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <i class="pi pi-sparkles"></i> Precision Craftsmanship & 3D Décor
+      </div>
+      <h1 class="hero-title">
+        Where Ideas <br><span class="highlight">Take Shape.</span>
+      </h1>
+      <p class="hero-subtext">
+        Craftora 3D brings parametric elegance, bespoke customized gifts, and precision manufacturing straight to your space.
+      </p>
+      <div class="hero-actions">
+        <a routerLink="/shop" class="btn btn-primary">
+          <i class="pi pi-shopping-bag"></i> Explore Products
+        </a>
+        <a routerLink="/custom-order" class="btn btn-outline">
+          <i class="pi pi-cog"></i> Create Something Custom
+        </a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-item">
+          <span class="stat-num">500+</span>
+          <span class="stat-lbl">Prints Delivered</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-num">0.12mm</span>
+          <span class="stat-lbl">Layer Precision</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-num">4.9/5</span>
+          <span class="stat-lbl">Customer Rating</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="visual-card">
+        <img src="https://images.unsplash.com/photo-1581783342308-f792dbdd27c5?w=800&auto=format&fit=crop&q=80" alt="3D Printed Geometric Vase" />
+        <div class="visual-floating-badge">
+          <i class="pi pi-check-circle"></i>
+          <div>
+            <strong>Eco Matte PLA</strong>
+            <small>Biodegradable Polymer</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CATEGORIES SECTION -->
+<section class="section categories-section">
+  <div class="container">
+    <h2 class="section-title">Shop by Category</h2>
+    <p class="section-subtitle">Curated modern essentials for your desk, living space, and gifting occasions.</p>
+    <div class="category-grid">
+      <a [routerLink]="['/shop']" [queryParams]="{category: cat.name}" class="category-card" *ngFor="let cat of categories">
+        <div class="cat-icon-box">
+          <i class="pi {{ cat.icon }}"></i>
+        </div>
+        <h3>{{ cat.name }}</h3>
+        <p>{{ cat.description }}</p>
+        <span class="cat-link">Explore items <i class="pi pi-arrow-right"></i></span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURED PRODUCTS -->
+<section class="section featured-section">
+  <div class="container">
+    <div class="section-header-flex">
+      <div>
+        <h2 class="section-title text-left">Featured Creations</h2>
+        <p class="section-subtitle text-left">Our most loved parametric and functional items.</p>
+      </div>
+      <a routerLink="/shop" class="btn btn-outline">View All Collection</a>
+    </div>
+
+    <div class="products-grid">
+      <app-product-card *ngFor="let prod of featuredProducts" [product]="prod"></app-product-card>
+    </div>
+  </div>
+</section>
+
+<!-- CUSTOM PRINTING CTA SECTION -->
+<section class="custom-cta-section">
+  <div class="container custom-cta-container">
+    <div class="custom-cta-text">
+      <span class="badge badge-accent">Bespoke Manufacturing</span>
+      <h2>Have a 3D File or Unique Idea?</h2>
+      <p>
+        From custom family lithophanes and architectural models to functional replacement components and engineering prototypes. We slice, print, and finish with utmost precision.
+      </p>
+      <ul class="custom-perks">
+        <li><i class="pi pi-check"></i> Formats supported: STL, OBJ, 3MF, STEP</li>
+        <li><i class="pi pi-check"></i> Engineering materials: PLA+, PETG, ASA, Matte filaments</li>
+        <li><i class="pi pi-check"></i> Fast quoting within 24 business hours</li>
+      </ul>
+      <a routerLink="/custom-order" class="btn btn-primary">Start Custom Print Request</a>
+    </div>
+    <div class="custom-cta-visual">
+      <div class="tech-box">
+        <div class="tech-line"><span>Layer Height:</span> <strong>0.12 - 0.28 mm</strong></div>
+        <div class="tech-line"><span>Infill Density:</span> <strong>15% - 100%</strong></div>
+        <div class="tech-line"><span>Color Spectrum:</span> <strong>12+ Matte Finishes</strong></div>
+        <div class="tech-line"><span>Max Volume:</span> <strong>256 x 256 x 256 mm</strong></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section how-it-works-section">
+  <div class="container">
+    <h2 class="section-title">How Craftora 3D Works</h2>
+    <p class="section-subtitle">Simple, seamless steps from digital geometry to physical doorstep delivery.</p>
+
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-num">01</div>
+        <h4>Select or Upload</h4>
+        <p>Pick from our designed home décor catalog or send us your personal CAD / 3D model.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">02</div>
+        <h4>Configure & Inspect</h4>
+        <p>Choose your colors, dimensions, and infill strength. We review model slicing metrics.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">03</div>
+        <h4>Precision Print</h4>
+        <p>Manufactured on high-speed enclosed printers with high layer adhesion and zero warping.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">04</div>
+        <h4>Delivered to You</h4>
+        <p>Carefully finished, quality-inspected, securely packed, and dispatched across India.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="section testimonials-section">
+  <div class="container">
+    <h2 class="section-title">Loved by Design Enthusiasts</h2>
+    <p class="section-subtitle">Read what our customers say about our print quality and finish.</p>
+
+    <div class="testimonials-grid">
+      <div class="testimonial-card">
+        <div class="rating-stars">★★★★★</div>
+        <p class="quote">"The Parametric Vase is gorgeous! The matte teal finish looks like high-end ceramic without the fragility. Arrived safe and pristine."</p>
+        <div class="author-info">
+          <strong>Aravind S.</strong>
+          <span>Bengaluru, Karnataka</span>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="rating-stars">★★★★★</div>
+        <p class="quote">"Ordered a customized nameplate for our new apartment. The dual-color extrusion and sharp lettering blew us away. Outstanding work!"</p>
+        <div class="author-info">
+          <strong>Priya & Karthik</strong>
+          <span>Chennai, Tamil Nadu</span>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="rating-stars">★★★★★</div>
+        <p class="quote">"I had a small custom bracket needed for my sim-racing rig. Uploaded the STL, got a quote in hours, and it arrived in 3 days. Rock solid."</p>
+        <div class="author-info">
+          <strong>Rohan Mehta</strong>
+          <span>Mumbai, Maharashtra</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INSTAGRAM GALLERY -->
+<section class="section insta-section">
+  <div class="container text-center">
+    <span class="badge badge-accent">#Craftora3D</span>
+    <h2 class="section-title mt-2">Follow Our Production Farm</h2>
+    <p class="section-subtitle">Real print timelapses, new product prototypes, and behind-the-scenes.</p>
+    <div class="insta-grid">
+      <div class="insta-item"><img src="https://images.unsplash.com/photo-1581783342308-f792dbdd27c5?w=500&auto=format&fit=crop&q=80" alt="Print 1" /></div>
+      <div class="insta-item"><img src="https://images.unsplash.com/photo-1485955900006-10f4d324d411?w=500&auto=format&fit=crop&q=80" alt="Print 2" /></div>
+      <div class="insta-item"><img src="https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=500&auto=format&fit=crop&q=80" alt="Print 3" /></div>
+      <div class="insta-item"><img src="https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=500&auto=format&fit=crop&q=80" alt="Print 4" /></div>
+    </div>
+  </div>
+</section>

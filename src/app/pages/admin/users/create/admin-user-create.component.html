@@ -1,0 +1,14 @@
+<section class="admin-page-content">
+  <span class="eyebrow">ACCESS MANAGEMENT</span><h1>Create Admin User</h1>
+  <p class="page-lead">Create another account that can manage products and admins.</p>
+  <div class="user-form-card">
+    <form (ngSubmit)="create(userNgForm)" #userNgForm="ngForm">
+      <label><span>Username *</span><input type="text" name="username" [(ngModel)]="userForm.username" required minlength="3" maxlength="80" pattern="[A-Za-z0-9._-]+" autocomplete="off" /><small>3–80 letters, numbers, dots, underscores, or hyphens.</small></label>
+      <label><span>Password *</span><span class="password-input-wrapper"><input [type]="showPassword ? 'text' : 'password'" name="password" [(ngModel)]="userForm.password" required minlength="12" autocomplete="new-password" /><button class="password-toggle" type="button" (click)="togglePasswordVisibility('password')" [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'" [attr.aria-pressed]="showPassword"><i class="pi" [class.pi-eye]="!showPassword" [class.pi-eye-slash]="showPassword" aria-hidden="true"></i></button></span><small>At least 12 characters.</small></label>
+      <label><span>Confirm password *</span><span class="password-input-wrapper"><input [type]="showConfirmPassword ? 'text' : 'password'" name="confirmPassword" [(ngModel)]="userForm.confirmPassword" required minlength="12" autocomplete="new-password" /><button class="password-toggle" type="button" (click)="togglePasswordVisibility('confirmPassword')" [attr.aria-label]="showConfirmPassword ? 'Hide confirmation password' : 'Show confirmation password'" [attr.aria-pressed]="showConfirmPassword"><i class="pi" [class.pi-eye]="!showConfirmPassword" [class.pi-eye-slash]="showConfirmPassword" aria-hidden="true"></i></button></span></label>
+      <p class="notice success" *ngIf="successMessage">{{ successMessage }}</p>
+      <p class="notice error" *ngIf="errorMessage">{{ errorMessage }}</p>
+      <button class="button primary" type="submit" [disabled]="userNgForm.invalid || isBusy">{{ isBusy ? 'Creating…' : 'Create admin user' }}</button>
+    </form>
+  </div>
+</section>

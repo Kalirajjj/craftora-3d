@@ -1,0 +1,85 @@
+<div class="contact-page">
+  <div class="contact-header">
+    <div class="container text-center">
+      <h1>Get in Touch</h1>
+      <p>Have questions regarding custom print orders, bulk gifting, or existing deliveries?</p>
+    </div>
+  </div>
+
+  <div class="container contact-body">
+    <div class="contact-grid">
+      <!-- Contact details -->
+      <div class="contact-info">
+        <h2>Studio Information</h2>
+        <p class="desc">Connect directly with our 3D design team via WhatsApp, call, or email.</p>
+
+        <div class="info-item">
+          <i class="pi pi-whatsapp"></i>
+          <div>
+            <strong>WhatsApp Hotline</strong>
+            <p><a href="https://wa.me/919361416827" target="_blank" rel="noopener">+91 9361416827 (Instant Response)</a></p>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <i class="pi pi-envelope"></i>
+          <div>
+            <strong>Direct Inquiries</strong>
+            <p><a href="mailto:craftora3d&#64;gmail.com">craftora3d&#64;gmail.com</a></p>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <i class="pi pi-map-marker"></i>
+          <div>
+            <strong>Studio Location</strong>
+            <p>Chennai, Tamil Nadu</p>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <i class="pi pi-clock"></i>
+          <div>
+            <strong>Operational Hours</strong>
+            <p>Monday - Saturday: 9:30 AM – 7:30 PM IST</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact form -->
+      <div class="form-wrapper">
+        <div class="success-box" *ngIf="isSent">
+          <i class="pi pi-check-circle"></i>
+          <h3>Message Sent!</h3>
+          <p>Thank you for reaching out. We will get back to you shortly.</p>
+        </div>
+
+        <form *ngIf="!isSent" (ngSubmit)="sendMessage()" #cForm="ngForm">
+          <div class="form-group">
+            <label class="form-label">Name *</label>
+            <input type="text" class="form-control" [(ngModel)]="contactForm.name" name="name" required />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Email *</label>
+            <input type="email" class="form-control" [(ngModel)]="contactForm.email" name="email" required />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Phone</label>
+            <input type="tel" class="form-control" [(ngModel)]="contactForm.phone" name="phone" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Message *</label>
+            <textarea class="form-control" rows="4" [(ngModel)]="contactForm.message" name="message" required></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block" [disabled]="!cForm.form.valid">
+            Send Message
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
