@@ -1,0 +1,212 @@
+<div class="wishlist-page-container">
+  
+  <!-- Breadcrumb Navigation -->
+  <nav class="container atelier-breadcrumbs-wrap" aria-label="Breadcrumb">
+    <div class="breadcrumbs-path">
+      <a routerLink="/" class="crumb-link">Home</a>
+      <span class="crumb-separator">/</span>
+      <span class="crumb-current">My Wishlist</span>
+    </div>
+    <a routerLink="/shop" class="crumb-link back-link">
+      <i class="pi pi-arrow-left"></i>
+      <span>Continue Shopping</span>
+    </a>
+  </nav>
+
+  <!-- Hero Header Section -->
+  <section class="container wishlist-hero-header">
+    <div class="hero-left">
+      <div class="collection-eyebrow">
+        <i class="pi pi-heart-fill"></i>
+        <span>PERSONAL ATELIER CURATION</span>
+      </div>
+      <h1 class="wishlist-title">My Saved Wishlist</h1>
+      <p class="wishlist-subtitle">
+        Your hand-picked collection of bespoke 3D-crafted creations, saved for later or ready to print.
+      </p>
+    </div>
+
+    <!-- Right Summary Actions -->
+    <div class="hero-actions" *ngIf="products.length > 0">
+      <span class="item-count-pill">
+        <strong>{{ products.length }}</strong> {{ products.length === 1 ? 'Design Saved' : 'Designs Saved' }}
+      </span>
+
+      <button type="button" class="btn-move-all" (click)="moveAllToCart()">
+        <i class="pi pi-shopping-bag"></i>
+        <span>Move All to Cart</span>
+      </button>
+
+      <button type="button" class="btn-clear-wishlist" (click)="openClearModal()" title="Clear all saved items">
+        <i class="pi pi-trash"></i>
+        <span>Clear All</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- Account Sync Status Banner -->
+  <div class="container sync-status-wrapper">
+    <!-- Logged in state -->
+    <div class="sync-banner logged-in" *ngIf="customerAuth.isSignedIn()">
+      <div class="sync-icon-ring">
+        <i class="pi pi-shield"></i>
+      </div>
+      <div class="sync-text">
+        <strong>Synced to Account</strong>
+        <span>Your wishlist is safely stored with <strong>{{ customerAuth.customer()?.fullName }}</strong> ({{ customerAuth.customer()?.email }}). Access it anytime on any device.</span>
+      </div>
+    </div>
+
+    <!-- Guest / Not signed in state -->
+    <div class="sync-banner guest" *ngIf="!customerAuth.isSignedIn()">
+      <div class="sync-icon-ring guest-ring">
+        <i class="pi pi-info-circle"></i>
+      </div>
+      <div class="sync-text">
+        <strong>Browsing as Guest</strong>
+        <span>These items are currently stored locally in your browser. 
+          <a routerLink="/account/login" [queryParams]="{ returnUrl: '/wishlist' }" class="guest-signin-link">Sign in or create a free account</a> to save them permanently across all your devices.
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="container loading-stage" *ngIf="isLoading">
+    <div class="spinner-circle"></div>
+    <p>Loading your curated collection…</p>
+  </div>
+
+  <!-- Active Wishlist Grid -->
+  <section class="container wishlist-grid-section" *ngIf="!isLoading && products.length > 0">
+    <div class="wishlist-cards-grid">
+      <div class="wishlist-product-card" *ngFor="let p of products">
+        
+        <!-- Image & Actions Stage -->
+        <div class="card-media-stage" [routerLink]="['/product', p.id]">
+          <img [src]="p.image || p.imageUrl || p.images?.[0]?.url" [alt]="p.name" class="product-media-img" loading="lazy" />
+
+          <!-- Category Pill Badge -->
+          <span class="media-category-pill">{{ p.category || 'Atelier' }}</span>
+
+          <!-- Quick Remove Heart Button -->
+          <button 
+            type="button" 
+            class="btn-card-remove-heart active" 
+            (click)="removeFromWishlist(p, $event)" 
+            title="Remove from Wishlist" 
+            aria-label="Remove from Wishlist">
+            <i class="pi pi-heart-fill"></i>
+          </button>
+        </div>
+
+        <!-- Product Content -->
+        <div class="card-content-block">
+          <div class="card-title-row">
+            <a [routerLink]="['/product', p.id]" class="product-card-title">{{ p.name }}</a>
+          </div>
+
+          <!-- Price & Discounts -->
+          <div class="price-row">
+            <div class="price-figures">
+              <span class="currency">₹</span>
+              <span class="amount">{{ p.price | number }}</span>
+              <span class="original-strikethrough" *ngIf="p.originalPrice">₹{{ p.originalPrice | number }}</span>
+            </div>
+            <span class="production-badge">
+              <span class="pulse-dot"></span>
+              <span>Ready to 3D Print</span>
+            </span>
+          </div>
+
+          <!-- Actions: Move to Cart & Buy Now -->
+          <div class="card-actions-row">
+            <button type="button" class="btn-wishlist-cart" (click)="moveToCart(p, $event)">
+              <i class="pi pi-shopping-bag"></i>
+              <span>Add to Cart</span>
+            </button>
+
+            <button type="button" class="btn-wishlist-buy" (click)="buyNow(p, $event)">
+              <i class="pi pi-bolt"></i>
+              <span>Buy Now</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Empty Wishlist State -->
+  <section class="container empty-wishlist-stage" *ngIf="!isLoading && products.length === 0">
+    <div class="empty-glass-card">
+      <div class="empty-heart-icon-box">
+        <i class="pi pi-heart"></i>
+      </div>
+      <h2 class="empty-title">Your Wishlist is Empty</h2>
+      <p class="empty-desc">
+        Explore our handcrafted 3D creations, architectural lamps, and custom sculptures. 
+        Tap the heart icon on any design you adore to curate your personal collection.
+      </p>
+      
+      <div class="empty-action-buttons">
+        <a routerLink="/shop" class="btn-primary-explore">
+          <i class="pi pi-compass"></i>
+          <span>Explore 3D Collection</span>
+        </a>
+        <a routerLink="/custom-order" class="btn-secondary-custom">
+          <i class="pi pi-palette"></i>
+          <span>Custom 3D Printing</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Curated Suggestions when empty -->
+    <div class="trending-suggestions-block" *ngIf="trendingProducts.length > 0">
+      <div class="suggestions-header">
+        <span class="suggestions-eyebrow">POPULAR ATELIER DESIGNS</span>
+        <h3 class="suggestions-title">Trending Creations to Discover</h3>
+      </div>
+
+      <div class="trending-grid">
+        <div class="trending-mini-card" *ngFor="let tp of trendingProducts" [routerLink]="['/product', tp.id]">
+          <div class="mini-img-wrap">
+            <img [src]="tp.image || tp.imageUrl || tp.images?.[0]?.url" [alt]="tp.name" />
+          </div>
+          <div class="mini-meta">
+            <strong class="mini-title">{{ tp.name }}</strong>
+            <span class="mini-price">₹{{ tp.price | number }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Clear All Confirmation Modal -->
+  <div class="clear-modal-backdrop" *ngIf="showClearModal" (click)="closeClearModal()" role="dialog" aria-modal="true">
+    <div class="clear-modal-card" (click)="$event.stopPropagation()">
+      <div class="clear-modal-icon">
+        <i class="pi pi-exclamation-triangle"></i>
+      </div>
+      <h3 class="clear-modal-title">Clear your entire wishlist?</h3>
+      <p class="clear-modal-desc">
+        Are you sure you want to remove all saved creations from your wishlist? This action cannot be undone.
+      </p>
+      <div class="clear-modal-actions">
+        <button type="button" class="btn-cancel-clear" (click)="closeClearModal()">
+          Cancel
+        </button>
+        <button type="button" class="btn-confirm-clear" (click)="confirmClear()">
+          Clear All Items
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Alert Notification -->
+  <div class="wishlist-toast-banner" *ngIf="toastMessage">
+    <i class="pi pi-check-circle"></i>
+    <span>{{ toastMessage }}</span>
+  </div>
+
+</div>

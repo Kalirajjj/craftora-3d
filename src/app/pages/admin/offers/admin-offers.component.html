@@ -1,0 +1,353 @@
+<section class="admin-page-content">
+  <div class="offers-header-row">
+    <div>
+      <span class="eyebrow">MARKETING &amp; PROMOTIONS</span>
+      <h1>Offers &amp; Home Banners</h1>
+      <p class="page-lead">
+        Configure discounts, first-order rules, and upload promotional banners displayed in a single row on the home page.
+      </p>
+    </div>
+    <div class="header-action-btns" *ngIf="!isEditing">
+      <button type="button" class="button primary" (click)="startCreateNew()">
+        <i class="pi pi-plus"></i> Create Custom Offer
+      </button>
+    </div>
+  </div>
+
+  <!-- Success / Error Notice Alerts -->
+  <div class="notice success" *ngIf="successMessage">
+    <i class="pi pi-check-circle"></i>
+    <span>{{ successMessage }}</span>
+  </div>
+  <div class="notice error" *ngIf="errorMessage">
+    <i class="pi pi-exclamation-triangle"></i>
+    <span>{{ errorMessage }}</span>
+  </div>
+
+  <!-- Quick Presets Bar (Shown when creating/editing) -->
+  <div class="preset-cards-strip" *ngIf="isEditing">
+    <span class="preset-label"><i class="pi pi-bolt"></i> Quick Rule Presets:</span>
+    <button type="button" class="preset-chip" (click)="applyPreset('FREE_DELIVERY_299')">
+      <i class="pi pi-truck"></i> 1st Time Customer Free Delivery (>₹299)
+    </button>
+    <button type="button" class="preset-chip" (click)="applyPreset('FLAT_50_OFF')">
+      <i class="pi pi-tag"></i> 1st Time Customer Flat ₹50 Off
+    </button>
+  </div>
+
+  <!-- =========================================================================
+       OFFER FORM (CREATE / EDIT)
+       ========================================================================= -->
+  <div class="offer-form-card" *ngIf="isEditing">
+    <div class="form-card-header">
+      <h2>{{ currentOffer.id ? 'Edit Offer & Banner' : 'Create New Offer & Banner' }}</h2>
+      <button type="button" class="close-form-btn" (click)="cancelEdit()" aria-label="Cancel">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <form (ngSubmit)="saveOffer()" #offerNgForm="ngForm">
+      <!-- Title & Code -->
+      <div class="two-column">
+        <label>
+          <span>Offer Title * <small>(e.g. 1st Order Special: Free Delivery above ₹299)</small></span>
+          <input
+            type="text"
+            name="title"
+            [(ngModel)]="currentOffer.title"
+            required
+            placeholder="e.g. First Order Special: Free Delivery"
+          />
+        </label>
+
+        <label>
+          <span>Coupon Code * <small>(Customers can copy/apply this at checkout)</small></span>
+          <input
+            type="text"
+            name="code"
+            [(ngModel)]="currentOffer.code"
+            required
+            placeholder="e.g. FIRST299"
+            style="text-transform: uppercase; font-family: monospace; font-weight: 700;"
+          />
+        </label>
+      </div>
+
+      <!-- Description -->
+      <label>
+        <span>Offer Description <small>(Brief benefit explanation shown to buyers)</small></span>
+        <textarea
+          name="description"
+          [(ngModel)]="currentOffer.description"
+          rows="2"
+          placeholder="New customers enjoy 100% Free Shipping on their first 3D order when your cart total exceeds ₹299."
+        ></textarea>
+      </label>
+
+      <!-- Rule Configuration: Type, Audience, Min Order, Discount -->
+      <div class="two-column">
+        <label>
+          <span>Offer Type *</span>
+          <select name="type" [(ngModel)]="currentOffer.type" class="admin-select">
+            <option value="FREE_DELIVERY">Free Delivery (100% Shipping Waiver)</option>
+            <option value="FLAT_DISCOUNT">Flat Discount (₹ Amount Off)</option>
+            <option value="PERCENTAGE_DISCOUNT">Percentage Discount (% Off)</option>
+          </select>
+        </label>
+
+        <label>
+          <span>Target Customer Group *</span>
+          <select name="targetAudience" [(ngModel)]="currentOffer.targetAudience" class="admin-select">
+            <option value="FIRST_TIME_BUYERS">1st Time Customers Only (First Order)</option>
+            <option value="ALL_CUSTOMERS">All Customers (Any Order)</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="two-column">
+        <label>
+          <span>Minimum Order Amount (₹) <small>(e.g. 299 for free delivery above ₹299)</small></span>
+          <input
+            type="number"
+            name="minOrderAmount"
+            [(ngModel)]="currentOffer.minOrderAmount"
+            min="0"
+            placeholder="299"
+          />
+        </label>
+
+        <label *ngIf="currentOffer.type !== 'FREE_DELIVERY'">
+          <span>Discount Value {{ currentOffer.type === 'PERCENTAGE_DISCOUNT' ? '(%)' : '(₹)' }} *</span>
+          <input
+            type="number"
+            name="discountAmount"
+            [(ngModel)]="currentOffer.discountAmount"
+            min="1"
+            placeholder="50"
+          />
+        </label>
+        <div *ngIf="currentOffer.type === 'FREE_DELIVERY'" class="free-shipping-note-box">
+          <i class="pi pi-info-circle"></i>
+          <span>Delivery charge (₹99) will be completely waived for orders meeting the minimum amount.</span>
+        </div>
+      </div>
+
+      <!-- Badge, Button & Active Toggle -->
+      <div class="three-column">
+        <label>
+          <span>Badge Text <small>(e.g. 1ST ORDER SPECIAL)</small></span>
+          <input
+            type="text"
+            name="badgeText"
+            [(ngModel)]="currentOffer.badgeText"
+            placeholder="1ST ORDER PERK"
+          />
+        </label>
+
+        <label>
+          <span>Button Text</span>
+          <input
+            type="text"
+            name="buttonText"
+            [(ngModel)]="currentOffer.buttonText"
+            placeholder="Shop Now"
+          />
+        </label>
+
+        <label>
+          <span>Button Target URL</span>
+          <input
+            type="text"
+            name="buttonLink"
+            [(ngModel)]="currentOffer.buttonLink"
+            placeholder="/shop"
+          />
+        </label>
+      </div>
+
+      <!-- =====================================================================
+           BANNER IMAGE UPLOAD & SIZING GUIDELINES
+           ===================================================================== -->
+      <div class="image-upload-section">
+        <div class="section-label-row">
+          <span class="upload-title">
+            <i class="pi pi-image"></i>
+            <span>Promotional Banner Image *</span>
+          </span>
+          <span class="size-guideline-badge">
+            <i class="pi pi-check"></i> Recommended Size: 1200 × 380 px (3:1 Widescreen)
+          </span>
+        </div>
+        <p class="upload-help-text">
+          Upload an image with optimal dimensions of <strong>1200 × 380 px</strong> (or 800 × 320 px) so it renders sharply in the single-row banner container on the home page. Formats: PNG, JPG, WebP, SVG.
+        </p>
+
+        <!-- Dropzone / Picker -->
+        <div class="banner-dropzone">
+          <input
+            type="file"
+            id="bannerFileInput"
+            accept="image/*"
+            (change)="onFileSelected($event)"
+            class="hidden-file-input"
+          />
+          <label for="bannerFileInput" class="dropzone-label">
+            <i class="pi pi-cloud-upload upload-icon"></i>
+            <span class="dropzone-text">Click or drag &amp; drop an image here to upload</span>
+            <small class="file-specs">Supports PNG, JPG, WebP, SVG · Optimal 1200×380 px · Max 4MB</small>
+          </label>
+        </div>
+
+        <!-- Preset Banners Selector -->
+        <div class="preset-banners-selector">
+          <span class="sub-label">Or choose a pre-designed vector banner:</span>
+          <div class="preset-thumbs-row">
+            <button
+              type="button"
+              *ngFor="let p of presetBanners"
+              class="preset-thumb-btn"
+              [class.active]="currentOffer.bannerImageUrl === p.url"
+              (click)="selectPresetBanner(p.url)">
+              <img [src]="p.url" [alt]="p.label" />
+              <span>{{ p.label }}</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Live Banner Preview Card -->
+        <div class="live-preview-box" *ngIf="bannerImagePreview">
+          <div class="preview-header">
+            <span>
+              <i class="pi pi-desktop"></i>
+              <strong>Home Page Single-Row Live Preview</strong>
+            </span>
+            <span class="preview-dimensions-tag" *ngIf="bannerImageDimensions">
+              {{ bannerImageDimensions }}
+            </span>
+          </div>
+
+          <div class="home-banner-simulation">
+            <div class="simulated-banner-card">
+              <img [src]="bannerImagePreview" alt="Banner Preview" class="sim-banner-img" />
+              <div class="sim-content-overlay">
+                <span class="sim-badge">{{ currentOffer.badgeText || 'SPECIAL OFFER' }}</span>
+                <h3 class="sim-title">{{ currentOffer.title || 'Special Promotion' }}</h3>
+                <p class="sim-desc">{{ currentOffer.description }}</p>
+                <div class="sim-bottom-row">
+                  <div class="sim-code-pill">
+                    <span>CODE:</span>
+                    <strong>{{ currentOffer.code || 'CODE' }}</strong>
+                  </div>
+                  <button type="button" class="sim-cta-btn">{{ currentOffer.buttonText || 'Shop Now' }}</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Active Status Checkbox -->
+      <div class="status-toggle-row">
+        <label class="toggle-switch-label">
+          <input type="checkbox" name="active" [(ngModel)]="currentOffer.active" />
+          <span><strong>Active &amp; Visible on Home Page</strong> (Buyers can claim this offer)</span>
+        </label>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions-bar">
+        <button type="button" class="button cancel-btn" (click)="cancelEdit()">Cancel</button>
+        <button type="submit" class="button primary" [disabled]="!currentOffer.title || !currentOffer.code">
+          <i class="pi pi-check"></i> {{ currentOffer.id ? 'Save Changes' : 'Create &amp; Publish Offer' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- =========================================================================
+       OFFERS LIST TABLE & CARDS
+       ========================================================================= -->
+  <div class="offers-list-container" *ngIf="!isEditing">
+    <div class="list-heading-bar">
+      <h2>Configured Offers ({{ offers.length }})</h2>
+      <span class="live-count-badge">
+        {{ (offers | slice:0).length }} Active in Store
+      </span>
+    </div>
+
+    <div class="empty-offers-state" *ngIf="offers.length === 0 && !isLoading">
+      <i class="pi pi-tag empty-icon"></i>
+      <h3>No offers created yet</h3>
+      <p>Create your first offer to incentivize new buyers with free delivery or instant discounts.</p>
+      <button type="button" class="button primary" (click)="startCreateNew()">Create Offer Now</button>
+    </div>
+
+    <!-- Offers Grid -->
+    <div class="offers-grid" *ngIf="offers.length > 0">
+      <div class="offer-admin-card" *ngFor="let offer of offers" [class.is-inactive]="!offer.active">
+        <!-- Banner Thumbnail -->
+        <div class="card-banner-thumb">
+          <img [src]="offer.bannerImageUrl" [alt]="offer.title" onerror="this.src='/images/offers/free-delivery-299.svg'" />
+          <span class="status-pill" [class.active-pill]="offer.active" [class.inactive-pill]="!offer.active">
+            {{ offer.active ? '● Live on Home' : '○ Disabled' }}
+          </span>
+          <span class="audience-tag">
+            {{ offer.targetAudience === 'FIRST_TIME_BUYERS' ? '1st Order Only' : 'All Customers' }}
+          </span>
+        </div>
+
+        <!-- Details -->
+        <div class="card-body">
+          <div class="card-badge-row">
+            <span class="offer-code-pill"><i class="pi pi-ticket"></i> {{ offer.code }}</span>
+            <span class="badge-text-tag">{{ offer.badgeText }}</span>
+          </div>
+
+          <h3 class="offer-card-title">{{ offer.title }}</h3>
+          <p class="offer-card-desc">{{ offer.description }}</p>
+
+          <div class="rule-metrics-row">
+            <div class="metric-item">
+              <span class="m-label">Benefit</span>
+              <strong class="m-val text-accent" *ngIf="offer.type === 'FREE_DELIVERY'">Free Delivery</strong>
+              <strong class="m-val text-magenta" *ngIf="offer.type === 'FLAT_DISCOUNT'">₹{{ offer.discountAmount }} Off</strong>
+              <strong class="m-val text-magenta" *ngIf="offer.type === 'PERCENTAGE_DISCOUNT'">{{ offer.discountAmount }}% Off</strong>
+            </div>
+
+            <div class="metric-item">
+              <span class="m-label">Min Spend</span>
+              <strong class="m-val">{{ offer.minOrderAmount > 0 ? '₹' + offer.minOrderAmount : 'None' }}</strong>
+            </div>
+
+            <div class="metric-item">
+              <span class="m-label">Audience</span>
+              <strong class="m-val">{{ offer.targetAudience === 'FIRST_TIME_BUYERS' ? '1st Buyers' : 'All' }}</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card Actions -->
+        <div class="card-footer-actions">
+          <button
+            type="button"
+            class="action-btn toggle-btn"
+            [class.btn-active-state]="offer.active"
+            (click)="toggleActive(offer)"
+            [title]="offer.active ? 'Disable offer' : 'Enable offer'">
+            <i class="pi" [ngClass]="offer.active ? 'pi-eye-slash' : 'pi-eye'"></i>
+            <span>{{ offer.active ? 'Disable' : 'Enable' }}</span>
+          </button>
+
+          <button type="button" class="action-btn edit-btn" (click)="editOffer(offer)" title="Edit Offer">
+            <i class="pi pi-pencil"></i>
+            <span>Edit</span>
+          </button>
+
+          <button type="button" class="action-btn delete-btn" (click)="deleteOffer(offer)" title="Delete Offer">
+            <i class="pi pi-trash"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

@@ -5,7 +5,9 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
-    "watch": "ng build --watch --configuration development"
+    "watch": "ng build --watch --configuration development",
+    "type-check": "tsc --noEmit",
+    "test": "npx tsc src/app/utils/razorpay-options-builder.ts src/app/utils/payment-lifecycle.ts --target es2022 --module es2022 --outDir ./dist-test --skipLibCheck true && node --test tests/razorpay-options.test.mjs tests/payment-lifecycle.test.mjs"
   },
   "private": true,
   "dependencies": {
@@ -17,9 +19,11 @@
     "@angular/platform-browser": "^18.2.0",
     "@angular/platform-browser-dynamic": "^18.2.0",
     "@angular/router": "^18.2.0",
+    "@types/three": "^0.186.0",
     "primeicons": "^7.0.0",
     "primeng": "^17.18.11",
     "rxjs": "~7.8.0",
+    "three": "^0.186.1",
     "tslib": "^2.3.0",
     "zone.js": "~0.14.10"
   },

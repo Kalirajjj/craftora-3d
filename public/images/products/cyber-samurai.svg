@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="100%" height="100%">
+  <defs>
+    <radialGradient id="sam-bg" cx="50%" cy="40%" r="65%">
+      <stop offset="0%" stop-color="#1a1c29"/>
+      <stop offset="55%" stop-color="#0e1017"/>
+      <stop offset="100%" stop-color="#050608"/>
+    </radialGradient>
+    <linearGradient id="neon-crimson" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff0055"/>
+      <stop offset="100%" stop-color="#990033"/>
+    </linearGradient>
+    <linearGradient id="armor-dark" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#334155"/>
+      <stop offset="50%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="gold-crest" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fde047"/>
+      <stop offset="50%" stop-color="#eab308"/>
+      <stop offset="100%" stop-color="#854d0e"/>
+    </linearGradient>
+    <filter id="glow-red">
+      <feGaussianBlur stdDeviation="9" result="coloredBlur"/>
+      <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="800" height="800" fill="url(#sam-bg)"/>
+  <ellipse cx="400" cy="690" rx="220" ry="45" fill="#000000" opacity="0.75"/>
+  <ellipse cx="400" cy="680" rx="140" ry="24" fill="#1e293b" stroke="#ff0055" stroke-width="2" filter="url(#glow-red)" opacity="0.6"/>
+
+  <!-- Shoulders & Pauldrons -->
+  <path d="M 220 560 L 320 480 L 400 520 L 480 480 L 580 560 L 530 650 L 270 650 Z" fill="url(#armor-dark)" stroke="#475569" stroke-width="3"/>
+  <path d="M 180 570 L 280 510 L 290 560 L 210 630 Z" fill="url(#neon-crimson)" opacity="0.85"/>
+  <path d="M 620 570 L 520 510 L 510 560 L 590 630 Z" fill="url(#neon-crimson)" opacity="0.85"/>
+
+  <!-- Neck & Gorget -->
+  <path d="M 330 460 L 470 460 L 450 510 L 350 510 Z" fill="#0f172a" stroke="#ff0055" stroke-width="1.5"/>
+
+  <!-- Cybernetic Facemask / Mempo -->
+  <path d="M 310 360 L 400 440 L 490 360 L 480 470 C 440 500, 360 500, 320 470 Z" fill="url(#armor-dark)" stroke="#64748b" stroke-width="2"/>
+  <!-- Mask Ventilation Slots / Hex Mesh -->
+  <path d="M 360 420 L 440 420 M 370 435 L 430 435 M 380 450 L 420 450" stroke="#ff0055" stroke-width="3" stroke-linecap="round" filter="url(#glow-red)"/>
+
+  <!-- Cyber Eyes/Visor Glow -->
+  <polygon points="340,340 390,345 385,360 335,355" fill="#00f0ff" filter="url(#glow-red)"/>
+  <polygon points="460,340 410,345 415,360 465,355" fill="#00f0ff" filter="url(#glow-red)"/>
+
+  <!-- Kabuto Helmet Dome -->
+  <path d="M 280 340 C 260 220, 540 220, 520 340 L 540 370 C 500 390, 300 390, 260 370 Z" fill="url(#armor-dark)" stroke="#334155" stroke-width="3"/>
+  <!-- Helmet Plates (Shikoro) -->
+  <path d="M 250 370 C 240 430, 270 470, 290 490 L 310 460 C 290 440, 270 410, 275 370 Z" fill="url(#armor-dark)"/>
+  <path d="M 550 370 C 560 430, 530 470, 510 490 L 490 460 C 510 440, 530 410, 525 370 Z" fill="url(#armor-dark)"/>
+
+  <!-- Golden Crest (Maedate) Horns -->
+  <path d="M 400 280 C 430 180, 510 130, 560 110 C 540 160, 480 230, 420 290 Z" fill="url(#gold-crest)"/>
+  <path d="M 400 280 C 370 180, 290 130, 240 110 C 260 160, 320 230, 380 290 Z" fill="url(#gold-crest)"/>
+  <circle cx="400" cy="270" r="22" fill="#ff0055" stroke="#fde047" stroke-width="4" filter="url(#glow-red)"/>
+</svg>

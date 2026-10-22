@@ -1,94 +1,765 @@
 <div class="shop-page">
-  <div class="shop-header">
-    <div class="container">
-      <h1 class="shop-title">3D Printed Collection</h1>
-      <p class="shop-subtitle">Artisan home pieces, geometric planters, desk accoutrements, and custom memorabilia.</p>
+  <!-- Toast Notification -->
+  <div class="shop-toast" *ngIf="toastMessage" role="status" aria-live="polite">
+    <i class="pi pi-check-circle"></i>
+    <span>{{ toastMessage }}</span>
+  </div>
+
+  <!-- =========================================================================
+       1 · Shop Page Header
+       ========================================================================== -->
+  <header class="shop-header">
+    <div class="header-bg-decor" aria-hidden="true">
+      <div class="glow-orb orb-1"></div>
+      <div class="glow-orb orb-2"></div>
+      <!-- Subtle Floating 3D Geometric Accents -->
+      <div class="floating-geo geo-1"><i class="pi pi-box"></i></div>
+      <div class="floating-geo geo-2"><i class="pi pi-compass"></i></div>
+      <div class="floating-geo geo-3"><i class="pi pi-sliders-h"></i></div>
+    </div>
+
+    <div class="container header-inner">
+      <div class="header-badge">
+        <i class="pi pi-sparkles"></i>
+        <span>Craftora 3D Atelier & Studio</span>
+      </div>
+
+      <h1 class="shop-title">Explore Our Creations</h1>
+      <p class="shop-subtitle">
+        Discover beautifully designed 3D creations, crafted with precision and imagination.
+      </p>
+
+      <!-- Trust & Spec Bar -->
+      <div class="header-stats">
+        <div class="stat-chip">
+          <i class="pi pi-check-circle"></i>
+          <span><strong>0.12mm</strong> Micro Precision</span>
+        </div>
+        <span class="stat-divider"></span>
+        <div class="stat-chip">
+          <i class="pi pi-shield"></i>
+          <span>Eco-PLA & 8K Resin</span>
+        </div>
+        <span class="stat-divider"></span>
+        <div class="stat-chip">
+          <i class="pi pi-truck"></i>
+          <span>Free Shipping &gt; ₹999</span>
+        </div>
+        <span class="stat-divider"></span>
+        <div class="stat-chip">
+          <i class="pi pi-sync"></i>
+          <span>100% Quality Guaranteed</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="container shop-body">
+    <!-- =========================================================================
+         2 · Featured Creations (Editorial Spotlight)
+         ========================================================================== -->
+    <section class="featured-editorial-section" *ngIf="!isLoading && featuredHero && selectedCategory === 'All' && !searchQuery">
+      <div class="section-title-wrap">
+        <div>
+          <span class="section-eyebrow">EDITORIAL SPOTLIGHT</span>
+          <h2 class="section-heading">Featured Creations</h2>
+        </div>
+        <span class="editorial-hint">Artisan 3D works selected for master craftsmanship</span>
+      </div>
+
+      <div class="editorial-grid">
+        <!-- Hero Spotlight Card (Left) -->
+        <article class="hero-spotlight-card" (click)="openQuickView(featuredHero)">
+          <div class="spotlight-image-box">
+            <img [src]="featuredHero.image || featuredHero.imageUrl" [alt]="featuredHero.name" />
+            <div class="spotlight-badges">
+              <span class="spotlight-badge hero-tag">MASTERPIECE</span>
+              <span class="spotlight-badge badge-3d"><i class="pi pi-box"></i> 3D Interactive</span>
+            </div>
+            <button
+              type="button"
+              class="spotlight-wishlist"
+              (click)="toggleWishlist(featuredHero); $event.stopPropagation()"
+              [class.active]="isWishlisted(featuredHero)"
+              aria-label="Save to wishlist">
+              <i class="pi" [ngClass]="isWishlisted(featuredHero) ? 'pi-heart-fill' : 'pi-heart'"></i>
+            </button>
+          </div>
+
+          <div class="spotlight-content">
+            <div class="spotlight-meta">
+              <span class="spotlight-cat">{{ featuredHero.category }}</span>
+              <div class="spotlight-rating" *ngIf="featuredHero.rating">
+                <i class="pi pi-star-fill"></i>
+                <span>{{ featuredHero.rating }}</span>
+                <small>({{ featuredHero.reviewCount || 40 }} reviews)</small>
+              </div>
+            </div>
+
+            <h3 class="spotlight-title">{{ featuredHero.name }}</h3>
+            <p class="spotlight-desc">{{ featuredHero.description }}</p>
+
+            <div class="spotlight-specs">
+              <span class="spec-item"><i class="pi pi-sliders-h"></i> {{ featuredHero.material || 'Silk Polymer' }}</span>
+              <span class="spec-item"><i class="pi pi-arrows-alt"></i> {{ featuredHero.dimensions || '180mm height' }}</span>
+              <span class="spec-item"><i class="pi pi-box"></i> 20% Gyroid Infill</span>
+            </div>
+
+            <div class="spotlight-footer">
+              <div class="spotlight-price">
+                <span class="currency">₹</span>
+                <span class="amount">{{ featuredHero.price }}</span>
+                <span class="old-price" *ngIf="featuredHero.originalPrice">₹{{ featuredHero.originalPrice }}</span>
+              </div>
+
+              <div class="spotlight-actions">
+                <button type="button" class="btn-spotlight-inspect" (click)="openQuickView(featuredHero); $event.stopPropagation()">
+                  <i class="pi pi-eye"></i>
+                  <span>Inspect 3D</span>
+                </button>
+                <button
+                  type="button"
+                  class="btn-spotlight-buy"
+                  (click)="addHeroToCart(featuredHero); $event.stopPropagation()"
+                  [disabled]="isHeroAdded"
+                  [class.added]="isHeroAdded">
+                  <i class="pi" [ngClass]="isHeroAdded ? 'pi-check' : 'pi-shopping-cart'"></i>
+                  <span>{{ isHeroAdded ? 'Added' : 'Add to Cart' }}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Secondary Editorial Cards (Right) -->
+        <div class="editorial-secondary-column">
+          <article
+            class="secondary-spotlight-card"
+            *ngFor="let prod of featuredSecondary"
+            (click)="openQuickView(prod)">
+            <div class="sec-image-wrap">
+              <img [src]="prod.image || prod.imageUrl" [alt]="prod.name" />
+              <span class="sec-badge">{{ prod.badge || 'CURATED' }}</span>
+            </div>
+            <div class="sec-details">
+              <span class="sec-cat">{{ prod.category }}</span>
+              <h4 class="sec-title">{{ prod.name }}</h4>
+              <div class="sec-price-row">
+                <span class="sec-price">₹{{ prod.price }}</span>
+                <button
+                  type="button"
+                  class="sec-quick-view-btn"
+                  (click)="openQuickView(prod); $event.stopPropagation()">
+                  <i class="pi pi-eye"></i> Quick View
+                </button>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         3 · Category Navigation (Modern Horizontal Pills)
+         ========================================================================== -->
+    <nav class="category-nav-bar" aria-label="Product categories">
+      <div class="category-scroll-container">
+        <button
+          *ngFor="let cat of categoryPills"
+          type="button"
+          class="cat-pill"
+          [class.active]="selectedCategory === cat.name"
+          (click)="setCategory(cat.name)"
+          role="tab"
+          [attr.aria-selected]="selectedCategory === cat.name">
+          <i class="pi {{ cat.icon }}"></i>
+          <span class="cat-pill-name">{{ cat.name }}</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- =========================================================================
+         4 · Search & Filters Hub
+         ========================================================================== -->
+    <section class="discovery-hub" aria-label="Search and product filters">
+      <div class="discovery-main-row">
+        <!-- Modern Search Input -->
+        <div class="search-box">
+          <i class="pi pi-search search-icon" aria-hidden="true"></i>
+          <input
+            type="text"
+            placeholder="Search astronaut, samurai, lamp, planter, dragon..."
+            [(ngModel)]="searchQuery"
+            (input)="applyFilters()"
+            aria-label="Search creations"
+          />
+          <button
+            *ngIf="searchQuery"
+            type="button"
+            class="btn-clear-search"
+            (click)="searchQuery = ''; applyFilters()"
+            aria-label="Clear search query">
+            <i class="pi pi-times"></i>
+          </button>
+        </div>
+
+        <!-- Desktop Quick Filters -->
+        <div class="desktop-filters-group">
+          <!-- Price Range Slider -->
+          <div class="filter-item-slider">
+            <div class="slider-labels">
+              <span class="slider-title"><i class="pi pi-wallet"></i> Max:</span>
+              <span class="slider-val">₹{{ maxPrice }}</span>
+            </div>
+            <input
+              type="range"
+              min="250"
+              max="3000"
+              step="50"
+              [(ngModel)]="maxPrice"
+              (input)="applyFilters()"
+              class="styled-range"
+              aria-label="Maximum price filter"
+            />
+          </div>
+
+          <!-- Material Select -->
+          <div class="select-wrapper">
+            <select [(ngModel)]="selectedMaterial" (change)="applyFilters()" aria-label="Material filter">
+              <option value="All">Material: All</option>
+              <option *ngFor="let m of materials.slice(1)" [value]="m">{{ m }}</option>
+            </select>
+            <i class="pi pi-chevron-down select-arrow"></i>
+          </div>
+
+          <!-- In-Stock Toggle -->
+          <label class="toggle-pill" [class.checked]="inStockOnly">
+            <input type="checkbox" [(ngModel)]="inStockOnly" (change)="applyFilters()" />
+            <i class="pi pi-check" *ngIf="inStockOnly"></i>
+            <span>In Stock Only</span>
+          </label>
+
+          <!-- Sort Select -->
+          <div class="select-wrapper sort-select">
+            <i class="pi pi-sort-alt select-prefix"></i>
+            <select [(ngModel)]="sortBy" (change)="applyFilters()" aria-label="Sort products">
+              <option value="popular">Popularity</option>
+              <option value="price-low">Price: Low → High</option>
+              <option value="price-high">Price: High → Low</option>
+              <option value="rating">Top Rated</option>
+              <option value="newest">New Arrivals</option>
+            </select>
+            <i class="pi pi-chevron-down select-arrow"></i>
+          </div>
+
+          <!-- Desktop Advanced Filters Toggle -->
+          <button
+            type="button"
+            class="btn-advanced-toggle"
+            [class.active]="showDesktopFilters"
+            (click)="toggleDesktopFilters()"
+            title="More filters">
+            <i class="pi pi-sliders-h"></i>
+            <span>Filters</span>
+            <span class="active-dot" *ngIf="activeFilterCount > 0">{{ activeFilterCount }}</span>
+          </button>
+        </div>
+
+        <!-- Mobile Filter Button Trigger -->
+        <button
+          type="button"
+          class="btn-mobile-filter-trigger"
+          (click)="toggleMobileFilters()"
+          aria-label="Open filter options">
+          <i class="pi pi-sliders-h"></i>
+          <span>Filters</span>
+          <span class="filter-count-badge" *ngIf="activeFilterCount > 0">{{ activeFilterCount }}</span>
+        </button>
+      </div>
+
+      <!-- Expandable Desktop Filters Panel -->
+      <div class="expanded-filters-panel" *ngIf="showDesktopFilters">
+        <div class="panel-section">
+          <span class="panel-title">Model Size</span>
+          <div class="panel-pill-group">
+            <button
+              *ngFor="let sz of sizeOptions"
+              type="button"
+              class="panel-filter-pill"
+              [class.active]="selectedSize === sz"
+              (click)="selectedSize = sz; applyFilters()">
+              {{ sz }}
+            </button>
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <span class="panel-title">Color Palette</span>
+          <div class="color-swatches-row">
+            <button
+              *ngFor="let col of colorOptions"
+              type="button"
+              class="color-swatch-btn"
+              [class.active]="selectedColor === col.label"
+              (click)="selectedColor = col.label; applyFilters()"
+              [title]="col.label">
+              <span class="swatch-circle" [style.backgroundColor]="col.hex || 'transparent'" [class.all-circle]="col.label === 'All'"></span>
+              <span class="swatch-name">{{ col.label }}</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <span class="panel-title">Customer Rating</span>
+          <div class="panel-pill-group">
+            <button
+              type="button"
+              class="panel-filter-pill"
+              [class.active]="minRating === 0"
+              (click)="minRating = 0; applyFilters()">
+              Any
+            </button>
+            <button
+              type="button"
+              class="panel-filter-pill"
+              [class.active]="minRating === 4.0"
+              (click)="minRating = 4.0; applyFilters()">
+              ★ 4.0 & above
+            </button>
+            <button
+              type="button"
+              class="panel-filter-pill"
+              [class.active]="minRating === 4.8"
+              (click)="minRating = 4.8; applyFilters()">
+              ★ 4.8 & above
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Active Filter Chips Bar -->
+      <div class="active-chips-strip" *ngIf="hasActiveFilters">
+        <span class="chips-label">Filters Applied:</span>
+
+        <span class="active-chip" *ngIf="selectedCategory !== 'All'">
+          <span>Category: {{ selectedCategory }}</span>
+          <button type="button" (click)="setCategory('All')" aria-label="Remove category filter"><i class="pi pi-times"></i></button>
+        </span>
+
+        <span class="active-chip" *ngIf="maxPrice < 3000">
+          <span>Max ₹{{ maxPrice }}</span>
+          <button type="button" (click)="maxPrice = 3000; applyFilters()" aria-label="Remove price filter"><i class="pi pi-times"></i></button>
+        </span>
+
+        <span class="active-chip" *ngIf="selectedMaterial !== 'All'">
+          <span>Material: {{ selectedMaterial }}</span>
+          <button type="button" (click)="selectedMaterial = 'All'; applyFilters()"><i class="pi pi-times"></i></button>
+        </span>
+
+        <span class="active-chip" *ngIf="selectedSize !== 'All'">
+          <span>Size: {{ selectedSize }}</span>
+          <button type="button" (click)="selectedSize = 'All'; applyFilters()"><i class="pi pi-times"></i></button>
+        </span>
+
+        <span class="active-chip" *ngIf="selectedColor !== 'All'">
+          <span>Color: {{ selectedColor }}</span>
+          <button type="button" (click)="selectedColor = 'All'; applyFilters()"><i class="pi pi-times"></i></button>
+        </span>
+
+        <span class="active-chip" *ngIf="inStockOnly">
+          <span>In Stock Only</span>
+          <button type="button" (click)="inStockOnly = false; applyFilters()"><i class="pi pi-times"></i></button>
+        </span>
+
+        <span class="active-chip" *ngIf="minRating > 0">
+          <span>Rating: ≥ {{ minRating }}★</span>
+          <button type="button" (click)="minRating = 0; applyFilters()"><i class="pi pi-times"></i></button>
+        </span>
+
+        <span class="active-chip" *ngIf="searchQuery.trim()">
+          <span>"{{ searchQuery }}"</span>
+          <button type="button" (click)="searchQuery = ''; applyFilters()"><i class="pi pi-times"></i></button>
+        </span>
+
+        <button type="button" class="btn-clear-all" (click)="resetFilters()">
+          Clear All Filters
+        </button>
+      </div>
+    </section>
+
+    <!-- Results Status Count -->
+    <div class="results-header-bar">
+      <div class="results-count-text">
+        Showing <strong>{{ filteredProducts.length }}</strong> of {{ allProducts.length }} creations
+      </div>
+    </div>
+
+    <!-- =========================================================================
+         5 · Product Grid
+         ========================================================================== -->
+    <main class="products-container" role="main">
+      <!-- Loading Skeleton -->
+      <div class="products-grid skeleton-grid" *ngIf="isLoading">
+        <div class="skeleton-card" *ngFor="let i of [1,2,3,4,5,6,7,8]">
+          <div class="skeleton-thumb"></div>
+          <div class="skeleton-info">
+            <div class="skeleton-bar bar-xs"></div>
+            <div class="skeleton-bar bar-lg"></div>
+            <div class="skeleton-bar bar-md"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Product Grid -->
+      <div class="products-grid" *ngIf="!isLoading && filteredProducts.length > 0">
+        <app-product-card
+          *ngFor="let prod of filteredProducts; let i = index"
+          [product]="prod"
+          [isWishlisted]="isWishlisted(prod)"
+          (quickView)="openQuickView($event)"
+          (toggleWishlist)="toggleWishlist($event)">
+        </app-product-card>
+      </div>
+
+      <!-- Empty Results State -->
+      <div class="empty-state-box" *ngIf="!isLoading && filteredProducts.length === 0">
+        <div class="empty-icon-wrap">
+          <i class="pi pi-search"></i>
+        </div>
+        <h3 class="empty-title">No matching creations found</h3>
+        <p class="empty-desc">
+          Try expanding your price range, clearing specific filters, or searching for other 3D items.
+        </p>
+        <button type="button" class="btn-reset-all-primary" (click)="resetFilters()">
+          <i class="pi pi-refresh"></i>
+          <span>Reset All Filters</span>
+        </button>
+      </div>
+    </main>
+
+    <!-- =========================================================================
+         6 · "Make It Yours" (Personalized Products Showcase)
+         ========================================================================== -->
+    <section class="make-it-yours-section">
+      <div class="make-it-yours-inner">
+        <div class="yours-content">
+          <span class="yours-badge"><i class="pi pi-star"></i> BESPOKE 3D FABRICATION</span>
+          <h2 class="yours-title">Make It Yours</h2>
+          <p class="yours-subtitle">
+            Need custom dimensions, embossed names, corporate logos, or your own 3D model printed?
+            Our engineers craft custom one-of-a-kind physical creations to your exact specifications.
+          </p>
+
+          <div class="yours-features-grid">
+            <div class="yours-feat">
+              <i class="pi pi-tag"></i>
+              <span>Custom Name Plates</span>
+            </div>
+            <div class="yours-feat">
+              <i class="pi pi-key"></i>
+              <span>Dual-Color Keychains</span>
+            </div>
+            <div class="yours-feat">
+              <i class="pi pi-user"></i>
+              <span>Bespoke Miniatures</span>
+            </div>
+            <div class="yours-feat">
+              <i class="pi pi-image"></i>
+              <span>Backlit Lithophanes</span>
+            </div>
+          </div>
+
+          <div class="yours-cta-row">
+            <a routerLink="/new-order" class="btn-yours-cta">
+              <span>Create Your Own</span>
+              <i class="pi pi-arrow-right"></i>
+            </a>
+            <span class="yours-subtext">Upload STL / OBJ / STEP or request custom 3D CAD design</span>
+          </div>
+        </div>
+
+        <div class="yours-visual-showcase" aria-hidden="true">
+          <div class="yours-card card-a">
+            <img src="/images/products/custom-keychain.svg" alt="Custom Keychain" />
+            <span class="yours-card-label">Monogram Tags</span>
+          </div>
+          <div class="yours-card card-b">
+            <img src="/images/products/executive-nameplate.svg" alt="Executive Nameplate" />
+            <span class="yours-card-label">Executive Desk Plates</span>
+          </div>
+          <div class="yours-card card-c">
+            <img src="/images/products/lithophane-frame.svg" alt="Lithophane Frame" />
+            <span class="yours-card-label">Photo Lithophanes</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- =========================================================================
+       7 · Interactive 3D Quick View Modal
+       ========================================================================== -->
+  <div
+    class="modal-backdrop"
+    *ngIf="isQuickViewOpen && selectedQuickProduct"
+    (click)="closeQuickView()">
+    <div
+      class="modal-dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="quick-view-title"
+      (click)="$event.stopPropagation()">
+
+      <!-- Modal Close Button -->
+      <button
+        type="button"
+        class="modal-close-btn"
+        (click)="closeQuickView()"
+        aria-label="Close dialog">
+        <i class="pi pi-times"></i>
+      </button>
+
+      <div class="modal-body-grid">
+        <!-- 3D Canvas / Visual Section -->
+        <div class="modal-3d-pane">
+          <div class="canvas-wrapper">
+            <canvas
+              #modal3dCanvas
+              class="interactive-3d-canvas"
+              (mousedown)="on3DMouseDown($event)"
+              (mousemove)="on3DMouseMove($event)"
+              (mouseup)="on3DMouseUp()"
+              (mouseleave)="on3DMouseUp()"
+              (touchstart)="on3DTouchStart($event)"
+              (touchmove)="on3DTouchMove($event)"
+              (touchend)="on3DTouchEnd()">
+            </canvas>
+
+            <!-- 3D Controls Overlay Hint -->
+            <div class="canvas-hint">
+              <i class="pi pi-sync"></i>
+              <span>Drag to rotate 360° · Real-time 3D simulation</span>
+            </div>
+
+            <!-- 3D Tech Badge -->
+            <div class="canvas-badge">
+              <i class="pi pi-box"></i>
+              <span>Interactive 3D Preview</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Details & Configuration Section -->
+        <div class="modal-info-pane">
+          <div class="modal-meta-row">
+            <span class="modal-category">{{ selectedQuickProduct.category }}</span>
+            <div class="modal-rating" *ngIf="selectedQuickProduct.rating">
+              <i class="pi pi-star-fill"></i>
+              <span>{{ selectedQuickProduct.rating }}</span>
+              <small>({{ selectedQuickProduct.reviewCount || 35 }} reviews)</small>
+            </div>
+          </div>
+
+          <h2 id="quick-view-title" class="modal-title">{{ selectedQuickProduct.name }}</h2>
+          <p class="modal-desc">{{ selectedQuickProduct.description }}</p>
+
+          <!-- Price Display -->
+          <div class="modal-price-box">
+            <span class="modal-currency">₹</span>
+            <span class="modal-amount">{{ selectedQuickProduct.price }}</span>
+            <span class="modal-original" *ngIf="selectedQuickProduct.originalPrice">
+              ₹{{ selectedQuickProduct.originalPrice }}
+            </span>
+            <span class="modal-badge-save" *ngIf="selectedQuickProduct.originalPrice">
+              SAVE ₹{{ selectedQuickProduct.originalPrice - selectedQuickProduct.price }}
+            </span>
+          </div>
+
+          <!-- Color Swatches Selector -->
+          <div class="modal-section" *ngIf="selectedQuickProduct.availableColors?.length">
+            <label class="modal-label">
+              <span>Finish Color:</span>
+              <strong>{{ quickViewColor }}</strong>
+            </label>
+            <div class="swatches-list">
+              <button
+                *ngFor="let col of selectedQuickProduct.availableColors"
+                type="button"
+                class="swatch-btn"
+                [class.active]="quickViewColor === col"
+                (click)="selectColor(col)">
+                {{ col }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Technical 3D Specifications Grid -->
+          <div class="modal-specs-grid">
+            <div class="spec-cell">
+              <span class="cell-label">Material</span>
+              <span class="cell-val">{{ selectedQuickProduct.material || 'Eco-PLA+' }}</span>
+            </div>
+            <div class="spec-cell">
+              <span class="cell-label">Dimensions</span>
+              <span class="cell-val">{{ selectedQuickProduct.dimensions || 'Standard' }}</span>
+            </div>
+            <div class="spec-cell">
+              <span class="cell-label">Layer Height</span>
+              <span class="cell-val">0.12 mm</span>
+            </div>
+            <div class="spec-cell">
+              <span class="cell-label">Infill Density</span>
+              <span class="cell-val">20% Gyroid</span>
+            </div>
+          </div>
+
+          <!-- Actions Row: Quantity & Add to Cart -->
+          <div class="modal-actions-row">
+            <div class="qty-stepper">
+              <button
+                type="button"
+                (click)="quickViewQty = quickViewQty > 1 ? quickViewQty - 1 : 1"
+                aria-label="Decrease quantity">
+                -
+              </button>
+              <span class="qty-num">{{ quickViewQty }}</span>
+              <button
+                type="button"
+                (click)="quickViewQty = quickViewQty + 1"
+                aria-label="Increase quantity">
+                +
+              </button>
+            </div>
+
+            <button
+              type="button"
+              class="btn-modal-add-cart"
+              (click)="addModalToCart()"
+              [disabled]="isModalAdded"
+              [class.added]="isModalAdded">
+              <i class="pi" [ngClass]="isModalAdded ? 'pi-check' : 'pi-shopping-cart'"></i>
+              <span>{{ isModalAdded ? 'Added to Cart' : 'Add to Cart' }}</span>
+            </button>
+          </div>
+
+          <!-- Link to Full Details Page -->
+          <div class="modal-full-link-wrap">
+            <a [routerLink]="['/product', selectedQuickProduct.id]" (click)="closeQuickView()">
+              <span>View full product specifications and reviews</span>
+              <i class="pi pi-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <div class="container shop-body">
-    <!-- FILTERS SIDEBAR -->
-    <aside class="filters-sidebar">
-      <div class="filter-header">
-        <h3>Filters</h3>
-        <button class="btn-text" (click)="resetFilters()">Reset All</button>
+  <!-- =========================================================================
+       8 · Mobile Filter Drawer Modal
+       ========================================================================== -->
+  <div class="drawer-backdrop" *ngIf="isMobileFilterOpen" (click)="toggleMobileFilters()">
+    <aside class="mobile-drawer" (click)="$event.stopPropagation()">
+      <div class="drawer-header">
+        <h3>Filter Creations</h3>
+        <button type="button" class="drawer-close" (click)="toggleMobileFilters()" aria-label="Close filters">
+          <i class="pi pi-times"></i>
+        </button>
       </div>
 
-      <!-- Categories -->
-      <div class="filter-group">
-        <h4>Category</h4>
-        <div class="category-pills">
-          <button 
-            class="pill-btn" 
-            [class.active]="selectedCategory === 'All'"
-            (click)="setCategory('All')">
-            All Products
-          </button>
-          <button 
-            *ngFor="let c of categories" 
-            class="pill-btn" 
-            [class.active]="selectedCategory === c.name"
-            (click)="setCategory(c.name)">
-            {{ c.name }}
-          </button>
+      <div class="drawer-body">
+        <!-- Price Slider -->
+        <div class="drawer-group">
+          <div class="drawer-group-title">
+            <span>Price Range</span>
+            <strong>Up to ₹{{ maxPrice }}</strong>
+          </div>
+          <input
+            type="range"
+            min="250"
+            max="3000"
+            step="50"
+            [(ngModel)]="maxPrice"
+            (input)="applyFilters()"
+            class="styled-range"
+          />
+        </div>
+
+        <!-- Material Filter -->
+        <div class="drawer-group">
+          <span class="drawer-group-title">Material</span>
+          <div class="drawer-chips">
+            <button
+              *ngFor="let m of materials"
+              type="button"
+              class="drawer-chip"
+              [class.active]="selectedMaterial === m"
+              (click)="selectedMaterial = m; applyFilters()">
+              {{ m }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Size Filter -->
+        <div class="drawer-group">
+          <span class="drawer-group-title">Model Size</span>
+          <div class="drawer-chips">
+            <button
+              *ngFor="let sz of sizeOptions"
+              type="button"
+              class="drawer-chip"
+              [class.active]="selectedSize === sz"
+              (click)="selectedSize = sz; applyFilters()">
+              {{ sz }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Rating Filter -->
+        <div class="drawer-group">
+          <span class="drawer-group-title">Minimum Rating</span>
+          <div class="drawer-chips">
+            <button
+              type="button"
+              class="drawer-chip"
+              [class.active]="minRating === 0"
+              (click)="minRating = 0; applyFilters()">
+              All Ratings
+            </button>
+            <button
+              type="button"
+              class="drawer-chip"
+              [class.active]="minRating === 4.0"
+              (click)="minRating = 4.0; applyFilters()">
+              ★ 4.0+
+            </button>
+            <button
+              type="button"
+              class="drawer-chip"
+              [class.active]="minRating === 4.8"
+              (click)="minRating = 4.8; applyFilters()">
+              ★ 4.8+
+            </button>
+          </div>
+        </div>
+
+        <!-- In-Stock Toggle -->
+        <div class="drawer-group">
+          <label class="toggle-pill" [class.checked]="inStockOnly">
+            <input type="checkbox" [(ngModel)]="inStockOnly" (change)="applyFilters()" />
+            <i class="pi pi-check" *ngIf="inStockOnly"></i>
+            <span>Show In-Stock Only</span>
+          </label>
         </div>
       </div>
 
-      <!-- Price Slider -->
-      <div class="filter-group">
-        <h4>Max Price: ₹{{ maxPrice }}</h4>
-        <input 
-          type="range" 
-          min="300" 
-          max="2500" 
-          step="50" 
-          [(ngModel)]="maxPrice" 
-          (input)="applyFilters()" 
-          class="price-range" />
-        <div class="range-labels">
-          <span>₹300</span>
-          <span>₹2500</span>
-        </div>
+      <div class="drawer-footer">
+        <button type="button" class="btn-drawer-reset" (click)="resetFilters()">
+          Reset
+        </button>
+        <button type="button" class="btn-drawer-apply" (click)="toggleMobileFilters()">
+          Show {{ filteredProducts.length }} Results
+        </button>
       </div>
     </aside>
-
-    <!-- MAIN PRODUCT LIST -->
-    <main class="products-main">
-      <div class="toolbar">
-        <div class="search-input-wrapper">
-          <i class="pi pi-search"></i>
-          <input 
-            type="text" 
-            placeholder="Search geometric vase, planter, lamp..." 
-            [(ngModel)]="searchQuery" 
-            (input)="applyFilters()" />
-        </div>
-
-        <div class="sort-wrapper">
-          <label>Sort By:</label>
-          <select [(ngModel)]="sortBy" (change)="applyFilters()">
-            <option value="popular">Popularity</option>
-            <option value="price-low">Price: Low to High</option>
-            <option value="price-high">Price: High to Low</option>
-            <option value="rating">Top Rated</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="results-count">
-        Showing <strong>{{ filteredProducts.length }}</strong> products
-      </div>
-
-      <div class="products-grid" *ngIf="filteredProducts.length > 0">
-        <app-product-card *ngFor="let prod of filteredProducts" [product]="prod"></app-product-card>
-      </div>
-
-      <div class="no-products" *ngIf="filteredProducts.length === 0">
-        <i class="pi pi-info-circle"></i>
-        <h3>No matching products found</h3>
-        <p>Try modifying your keyword search or adjusting the price threshold.</p>
-        <button class="btn btn-primary" (click)="resetFilters()">Clear Filters</button>
-      </div>
-    </main>
   </div>
 </div>

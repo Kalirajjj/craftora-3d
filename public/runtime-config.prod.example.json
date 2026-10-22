@@ -1,0 +1,5 @@
+{
+  "apiGatewayUrl": "https://api.craftora3d.com",
+  "razorpayKeyId": "rzp_live_YOUR_KEY_ID_HERE",
+  "environment": "production"
+}

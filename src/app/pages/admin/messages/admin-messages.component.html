@@ -1,0 +1,499 @@
+<section class="admin-messages-page">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-eyebrow">
+        <span class="eyebrow-pill">
+          <i class="pi pi-inbox" aria-hidden="true"></i>
+          <span>Inbox & Inquiries</span>
+        </span>
+      </div>
+      <h1 class="page-title">Customer Messages</h1>
+      <p class="page-subtitle">
+        Review, manage, and respond to incoming inquiries submitted through your website's contact form.
+      </p>
+    </div>
+
+    <div class="header-actions">
+      <button
+        type="button"
+        class="btn-refresh"
+        (click)="loadMessages()"
+        [disabled]="isLoading"
+        title="Refresh messages"
+      >
+        <i class="pi pi-refresh" [class.pi-spin]="isLoading" aria-hidden="true"></i>
+        <span>Refresh</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Alerts -->
+  <div class="alert alert-success" *ngIf="successMessage">
+    <i class="pi pi-check-circle" aria-hidden="true"></i>
+    <span>{{ successMessage }}</span>
+  </div>
+
+  <div class="alert alert-error" *ngIf="errorMessage">
+    <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
+    <span>{{ errorMessage }}</span>
+  </div>
+
+  <!-- Filter & Search Bar in a single neat row -->
+  <div class="toolbar-card">
+    <div class="filter-tabs-row">
+      <button
+        type="button"
+        class="filter-tab-btn"
+        [class.active]="currentFilter === 'ALL'"
+        (click)="setFilter('ALL')"
+      >
+        <i class="pi pi-list" aria-hidden="true"></i>
+        <span>All Messages</span>
+        <span class="tab-badge">{{ totalCount }}</span>
+      </button>
+
+      <button
+        type="button"
+        class="filter-tab-btn"
+        [class.active]="currentFilter === 'UNREAD'"
+        (click)="setFilter('UNREAD')"
+      >
+        <i class="pi pi-envelope" aria-hidden="true"></i>
+        <span>Unread</span>
+        <span class="tab-badge unread-badge">{{ unreadCount }}</span>
+      </button>
+
+      <button
+        type="button"
+        class="filter-tab-btn"
+        [class.active]="currentFilter === 'READ'"
+        (click)="setFilter('READ')"
+      >
+        <i class="pi pi-envelope-open" aria-hidden="true"></i>
+        <span>Read</span>
+        <span class="tab-badge read-badge">{{ readCount }}</span>
+      </button>
+    </div>
+
+    <!-- Search box -->
+    <div class="search-box-wrap">
+      <i class="pi pi-search search-icon" aria-hidden="true"></i>
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Search by customer name, email, phone, or keyword…"
+        [(ngModel)]="searchQuery"
+        (ngModelChange)="currentPage = 1"
+        aria-label="Search messages"
+      />
+      <button
+        *ngIf="searchQuery"
+        type="button"
+        class="btn-clear-search"
+        (click)="searchQuery = ''; currentPage = 1"
+        title="Clear search"
+        aria-label="Clear search"
+      >
+        <i class="pi pi-times" aria-hidden="true"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="state-card loading-state" *ngIf="isLoading && messages.length === 0">
+    <i class="pi pi-spin pi-spinner state-spinner"></i>
+    <p>Loading customer messages…</p>
+  </div>
+
+  <!-- Empty State -->
+  <div class="state-card empty-state" *ngIf="!isLoading && filteredMessages.length === 0">
+    <div class="empty-icon-wrap">
+      <i class="pi pi-inbox"></i>
+    </div>
+    <h3>No messages found</h3>
+    <p *ngIf="searchQuery">
+      No messages match "<strong>{{ searchQuery }}</strong>". Try searching with different keywords or clear the search.
+    </p>
+    <p *ngIf="!searchQuery && currentFilter === 'UNREAD'">
+      You have read all customer inquiries! Great job keeping your inbox clear.
+    </p>
+    <p *ngIf="!searchQuery && currentFilter === 'READ'">
+      No archived or read messages yet.
+    </p>
+    <p *ngIf="!searchQuery && currentFilter === 'ALL'">
+      No customer messages received yet. New submissions from your Contact page will appear here.
+    </p>
+  </div>
+
+  <!-- Messages Table Card -->
+  <div class="table-card" *ngIf="!isLoading && filteredMessages.length > 0">
+    <div class="table-responsive">
+      <table class="messages-table">
+        <thead>
+          <tr>
+            <th class="col-status">Status</th>
+            <th class="col-customer">Customer</th>
+            <th class="col-contact">Contact Details</th>
+            <th class="col-date">Received</th>
+            <th class="col-message">Customer Message</th>
+            <th class="col-actions">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let msg of pagedMessages"
+            [class.row-unread]="!isRead(msg)"
+            [class.row-read]="isRead(msg)"
+          >
+            <!-- Status Badge -->
+            <td class="col-status">
+              <span class="status-indicator" [class.is-unread]="!isRead(msg)" [class.is-read]="isRead(msg)">
+                <span class="status-dot"></span>
+                <span>{{ isRead(msg) ? 'Read' : 'New' }}</span>
+              </span>
+            </td>
+
+            <!-- Customer -->
+            <td class="col-customer">
+              <div class="customer-cell">
+                <div class="customer-avatar" [class.avatar-unread]="!isRead(msg)">
+                  {{ getInitials(msg.name) }}
+                </div>
+                <div class="customer-meta">
+                  <strong class="customer-name">{{ msg.name }}</strong>
+                  <span class="customer-sub" *ngIf="!isRead(msg)">Requires attention</span>
+                </div>
+              </div>
+            </td>
+
+            <!-- Contact Details -->
+            <td class="col-contact">
+              <div class="contact-links">
+                <a [href]="'mailto:' + msg.email" class="contact-link" (click)="$event.stopPropagation()" title="Send email">
+                  <i class="pi pi-envelope"></i>
+                  <span>{{ msg.email }}</span>
+                </a>
+                <a *ngIf="msg.phone" [href]="'tel:' + msg.phone" class="contact-link phone-link" (click)="$event.stopPropagation()" title="Call customer">
+                  <i class="pi pi-phone"></i>
+                  <span>{{ msg.phone }}</span>
+                </a>
+                <span *ngIf="!msg.phone" class="text-muted-dash">—</span>
+              </div>
+            </td>
+
+            <!-- Received Date -->
+            <td class="col-date">
+              <div class="date-cell">
+                <span class="date-main">{{ msg.createdAt | date:'MMM d, y' }}</span>
+                <span class="date-time">{{ msg.createdAt | date:'h:mm a' }}</span>
+              </div>
+            </td>
+
+            <!-- Customer Message Snippet -->
+            <td class="col-message">
+              <div class="message-snippet-wrap" (click)="openViewModal(msg)" title="Click to view full message">
+                <p class="message-snippet">{{ msg.message }}</p>
+              </div>
+            </td>
+
+            <!-- Actions -->
+            <td class="col-actions">
+              <div class="actions-group">
+                <!-- View Icon Button -->
+                <button
+                  type="button"
+                  class="action-btn btn-view"
+                  (click)="openViewModal(msg)"
+                  title="View full message"
+                  [attr.aria-label]="'View message from ' + msg.name"
+                >
+                  <i class="pi pi-eye" aria-hidden="true"></i>
+                  <span>View</span>
+                </button>
+
+                <!-- Mark Read/Unread Toggle Button -->
+                <button
+                  type="button"
+                  class="action-btn btn-toggle"
+                  [class.is-read-btn]="isRead(msg)"
+                  (click)="toggleRead(msg)"
+                  [title]="isRead(msg) ? 'Mark as Unread' : 'Mark as Read'"
+                  [attr.aria-label]="isRead(msg) ? 'Mark as Unread' : 'Mark as Read'"
+                >
+                  <i [class]="isRead(msg) ? 'pi pi-envelope' : 'pi pi-check'" aria-hidden="true"></i>
+                </button>
+
+                <!-- Delete Button -->
+                <button
+                  type="button"
+                  class="action-btn btn-delete"
+                  (click)="openDeleteModal(msg)"
+                  title="Delete message"
+                  [attr.aria-label]="'Delete message from ' + msg.name"
+                >
+                  <i class="pi pi-trash" aria-hidden="true"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Table Footer with Pagination -->
+    <div class="table-footer">
+      <div class="footer-meta">
+        Showing <strong>{{ (currentPage - 1) * pageSize + 1 }}</strong> to
+        <strong>{{ (currentPage * pageSize) > filteredMessages.length ? filteredMessages.length : (currentPage * pageSize) }}</strong>
+        of <strong>{{ filteredMessages.length }}</strong>
+        {{ filteredMessages.length === 1 ? 'message' : 'messages' }}
+      </div>
+
+      <div class="pagination-controls" *ngIf="totalPages > 1">
+        <button
+          type="button"
+          class="page-nav-btn"
+          (click)="previousPage()"
+          [disabled]="currentPage === 1"
+          aria-label="Previous Page"
+          title="Previous Page"
+        >
+          <i class="pi pi-chevron-left" aria-hidden="true"></i>
+        </button>
+
+        <div class="page-pills">
+          <button
+            *ngFor="let p of pages"
+            type="button"
+            class="page-pill"
+            [class.active]="p === currentPage"
+            (click)="goToPage(p)"
+          >
+            {{ p }}
+          </button>
+        </div>
+
+        <button
+          type="button"
+          class="page-nav-btn"
+          (click)="nextPage()"
+          [disabled]="currentPage === totalPages"
+          aria-label="Next Page"
+          title="Next Page"
+        >
+          <i class="pi pi-chevron-right" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       VIEW FULL MESSAGE MODAL (Super Professional Modal)
+       ========================================================================= -->
+  <div
+    class="modal-backdrop"
+    *ngIf="selectedMessage"
+    (click)="closeViewModal()"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="view-dialog-title"
+  >
+    <div class="modal-dialog view-modal-dialog" (click)="$event.stopPropagation()">
+      <!-- Modal Top Header -->
+      <div class="modal-header">
+        <div class="modal-title-row">
+          <div class="customer-avatar-large">
+            {{ getInitials(selectedMessage.name) }}
+          </div>
+          <div class="customer-header-info">
+            <div class="header-name-row">
+              <h2 id="view-dialog-title">{{ selectedMessage.name }}</h2>
+              <span
+                class="status-pill-modal"
+                [class.pill-unread]="!isRead(selectedMessage)"
+                [class.pill-read]="isRead(selectedMessage)"
+              >
+                {{ isRead(selectedMessage) ? 'Read' : 'New Inquiry' }}
+              </span>
+            </div>
+            <p class="modal-timestamp">
+              <i class="pi pi-clock"></i>
+              <span>Received {{ selectedMessage.createdAt | date:'fullDate' }} at {{ selectedMessage.createdAt | date:'h:mm:ss a' }}</span>
+            </p>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          class="btn-modal-close"
+          (click)="closeViewModal()"
+          aria-label="Close dialog"
+          title="Close dialog"
+        >
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body view-modal-body">
+        <!-- Contact Cards Row -->
+        <div class="contact-details-grid">
+          <!-- Email Box -->
+          <div class="contact-badge-card">
+            <span class="badge-label"><i class="pi pi-envelope"></i> Email Address</span>
+            <div class="badge-content-row">
+              <a [href]="'mailto:' + selectedMessage.email" class="contact-value-link">
+                {{ selectedMessage.email }}
+              </a>
+              <button
+                type="button"
+                class="btn-copy-tiny"
+                (click)="copyToClipboard(selectedMessage.email, 'email')"
+                title="Copy email"
+              >
+                <i [class]="copiedField === 'email' ? 'pi pi-check' : 'pi pi-copy'"></i>
+                <span>{{ copiedField === 'email' ? 'Copied!' : 'Copy' }}</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Phone Box -->
+          <div class="contact-badge-card">
+            <span class="badge-label"><i class="pi pi-phone"></i> Phone / WhatsApp</span>
+            <div class="badge-content-row" *ngIf="selectedMessage.phone">
+              <a [href]="'tel:' + selectedMessage.phone" class="contact-value-link">
+                {{ selectedMessage.phone }}
+              </a>
+              <button
+                type="button"
+                class="btn-copy-tiny"
+                (click)="copyToClipboard(selectedMessage.phone, 'phone')"
+                title="Copy phone"
+              >
+                <i [class]="copiedField === 'phone' ? 'pi pi-check' : 'pi pi-copy'"></i>
+                <span>{{ copiedField === 'phone' ? 'Copied!' : 'Copy' }}</span>
+              </button>
+            </div>
+            <div class="badge-content-row" *ngIf="!selectedMessage.phone">
+              <span class="text-secondary">Not provided by customer</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Full Customer Message Content -->
+        <div class="message-content-section">
+          <div class="section-label-row">
+            <span class="section-label">
+              <i class="pi pi-comment"></i> Customer Message
+            </span>
+            <button
+              type="button"
+              class="btn-copy-tiny"
+              (click)="copyToClipboard(selectedMessage.message, 'message')"
+              title="Copy message text"
+            >
+              <i [class]="copiedField === 'message' ? 'pi pi-check' : 'pi pi-copy'"></i>
+              <span>{{ copiedField === 'message' ? 'Message Copied!' : 'Copy Text' }}</span>
+            </button>
+          </div>
+
+          <div class="message-quote-box">
+            <i class="pi pi-quote-left quote-decoration" aria-hidden="true"></i>
+            <div class="quote-text-body">{{ selectedMessage.message }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Actions Footer -->
+      <div class="modal-footer view-modal-footer">
+        <div class="footer-left">
+          <button
+            type="button"
+            class="btn-secondary-action"
+            (click)="toggleRead(selectedMessage)"
+          >
+            <i [class]="isRead(selectedMessage) ? 'pi pi-envelope' : 'pi pi-check'"></i>
+            <span>{{ isRead(selectedMessage) ? 'Mark as Unread' : 'Mark as Read' }}</span>
+          </button>
+        </div>
+
+        <div class="footer-right">
+          <button
+            type="button"
+            class="btn-modal-cancel"
+            (click)="closeViewModal()"
+          >
+            Close
+          </button>
+          <a
+            [href]="'mailto:' + selectedMessage.email + '?subject=Craftora%203D%20-%20Regarding%20your%20message&body=Hi%20' + selectedMessage.name + ',%0D%0A%0D%0AThank%20you%20for%20reaching%20out%20to%20Craftora%203D.%0D%0A%0D%0A'"
+            class="btn-modal-primary"
+            target="_blank"
+            rel="noopener"
+          >
+            <i class="pi pi-reply" aria-hidden="true"></i>
+            <span>Reply via Email</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       DELETE CONFIRMATION MODAL (Matching User's Favorite Yes/No Dialog)
+       ========================================================================= -->
+  <div
+    class="modal-backdrop"
+    *ngIf="messageToDelete"
+    (click)="closeDeleteModal()"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="delete-dialog-title"
+  >
+    <div class="modal-dialog delete-dialog" (click)="$event.stopPropagation()">
+      <div class="modal-danger-icon">
+        <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+      </div>
+
+      <div class="modal-header-danger">
+        <h2 id="delete-dialog-title">Delete Customer Message?</h2>
+        <p class="modal-lead">
+          Are you sure you want to permanently delete the message from <strong>{{ messageToDelete.name }}</strong>? This action cannot be undone.
+        </p>
+      </div>
+
+      <!-- Message preview card -->
+      <div class="delete-preview-card">
+        <div class="preview-avatar">
+          <i class="pi pi-envelope"></i>
+        </div>
+        <div class="preview-info">
+          <strong>{{ messageToDelete.name }} ({{ messageToDelete.email }})</strong>
+          <span class="preview-sub">{{ messageToDelete.message | slice:0:90 }}{{ messageToDelete.message.length > 90 ? '…' : '' }}</span>
+        </div>
+      </div>
+
+      <div class="modal-actions danger-actions">
+        <button
+          type="button"
+          class="btn-modal-cancel"
+          (click)="closeDeleteModal()"
+          [disabled]="isDeleting"
+        >
+          No, Cancel
+        </button>
+        <button
+          type="button"
+          class="btn-modal-delete"
+          (click)="confirmDelete()"
+          [disabled]="isDeleting"
+        >
+          <i class="pi pi-spin pi-spinner" *ngIf="isDeleting" aria-hidden="true"></i>
+          <i class="pi pi-trash" *ngIf="!isDeleting" aria-hidden="true"></i>
+          <span>{{ isDeleting ? 'Deleting…' : 'Yes, Delete' }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>

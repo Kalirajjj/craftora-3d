@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { CustomOrderRequest } from '../models/order.model';
 import { AdminAuthService } from './admin-auth.service';
 import { CustomerAuthService } from './customer-auth.service';
+import { AppConfigService } from './app-config.service';
 
 export type CustomRequestStatus = 'PENDING' | 'IN_PROGRESS' | 'COMPLETED';
 
@@ -12,7 +13,10 @@ export class CustomRequestService {
   private http = inject(HttpClient);
   private adminAuth = inject(AdminAuthService);
   private customerAuth = inject(CustomerAuthService);
-  private readonly apiUrl = 'http://localhost:8080/api';
+  private config = inject(AppConfigService);
+  private get apiUrl(): string {
+    return `${this.config.apiGatewayUrl}/api`;
+  }
 
   submit(request: CustomOrderRequest, attachment: File | null): Observable<CustomOrderRequest> {
     const formData = new FormData();

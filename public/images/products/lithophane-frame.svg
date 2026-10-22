@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="100%" height="100%">
+  <defs>
+    <radialGradient id="lit-bg" cx="50%" cy="40%" r="65%">
+      <stop offset="0%" stop-color="#2a241b"/>
+      <stop offset="55%" stop-color="#14110c"/>
+      <stop offset="100%" stop-color="#050403"/>
+    </radialGradient>
+    <radialGradient id="light-box-glow" cx="50%" cy="45%" r="60%">
+      <stop offset="0%" stop-color="#fffbeb"/>
+      <stop offset="40%" stop-color="#fef3c7"/>
+      <stop offset="80%" stop-color="#fde68a"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </radialGradient>
+    <filter id="lit-glow">
+      <feGaussianBlur stdDeviation="22" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="800" height="800" fill="url(#lit-bg)"/>
+  <ellipse cx="400" cy="680" rx="250" ry="45" fill="#000000" opacity="0.6"/>
+
+  <!-- Solid Walnut Wood Base -->
+  <g id="wood-base">
+    <rect x="220" y="600" width="360" height="50" rx="12" fill="#78350f" stroke="#451a03" stroke-width="2"/>
+    <rect x="240" y="605" width="320" height="8" rx="4" fill="#92400e" opacity="0.7"/>
+  </g>
+
+  <!-- Glowing Lithophane Panel (Translucent 3D print) -->
+  <g filter="url(#lit-glow)">
+    <rect x="250" y="220" width="300" height="390" rx="10" fill="url(#light-box-glow)" stroke="#fef3c7" stroke-width="4"/>
+    <!-- Organic Lithophane Mountain & Moon Relief Carvings -->
+    <ellipse cx="400" cy="310" rx="45" ry="45" fill="#fef08a" opacity="0.7"/>
+    <path d="M 260 520 L 340 430 L 400 480 L 480 390 L 540 500 L 540 600 L 260 600 Z" fill="#b45309" opacity="0.35"/>
+    <path d="M 280 550 L 370 470 L 430 510 L 510 440 L 530 560 L 530 600 L 280 600 Z" fill="#92400e" opacity="0.45"/>
+  </g>
+</svg>

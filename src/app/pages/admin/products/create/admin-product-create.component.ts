@@ -26,8 +26,10 @@ export class AdminProductCreateComponent implements OnInit, OnDestroy {
   selectedImages: File[] = [];
   imagePreviews: string[] = [];
   isImageDialogOpen = false;
-  productForm = { name: '', category: '', description: '', price: 0, dimensions: '',
-    weightGrams: null as number | null, availableColors: '', featured: false, inStock: true };
+  productForm = {
+    name: '', category: '', description: '', price: 0, dimensions: '',
+    weightGrams: null as number | null, availableColors: '', featured: false, inStock: true
+  };
 
   ngOnInit(): void {
     this.productId = this.route.snapshot.paramMap.get('id');
@@ -35,10 +37,12 @@ export class AdminProductCreateComponent implements OnInit, OnDestroy {
     this.isLoadingProduct = true;
     this.productsApi.getProductById(this.productId).subscribe({
       next: product => {
-        this.productForm = { name: product.name || '', category: product.category || '',
+        this.productForm = {
+          name: product.name || '', category: product.category || '',
           description: product.description || '', price: Number(product.price) || 0, dimensions: product.dimensions || '',
           weightGrams: product.weightGrams ?? null, availableColors: (product.availableColors || []).join(', '),
-          featured: Boolean(product.featured), inStock: product.inStock !== false };
+          featured: Boolean(product.featured), inStock: product.inStock !== false
+        };
         this.currentImages = (product.images?.map(image => image.url).filter(Boolean) || []);
         if (!this.currentImages.length && (product.image || product.imageUrl)) this.currentImages = [product.image || product.imageUrl!];
         this.isLoadingProduct = false;
@@ -93,8 +97,10 @@ export class AdminProductCreateComponent implements OnInit, OnDestroy {
           return;
         }
         this.successMessage = 'Product saved to the catalogue.';
-        this.productForm = { name: '', category: '', description: '', price: 0, dimensions: '',
-          weightGrams: null, availableColors: '', featured: false, inStock: true };
+        this.productForm = {
+          name: '', category: '', description: '', price: 0, dimensions: '',
+          weightGrams: null, availableColors: '', featured: false, inStock: true
+        };
         form.resetForm(this.productForm);
         this.clearImages();
       },

@@ -1,86 +1,736 @@
-<div class="product-detail-page" *ngIf="product">
-  <div class="container breadcrumbs">
-    <a routerLink="/">Home</a> / <a routerLink="/shop">Shop</a> / <span>{{ product.name }}</span>
+<div class="product-page-root" *ngIf="product">
+  
+  <!-- Toast Notification Alert -->
+  <div class="atelier-toast" *ngIf="toastMessage" role="status">
+    <div class="toast-content">
+      <i class="pi pi-check-circle"></i>
+      <span>{{ toastMessage }}</span>
+    </div>
   </div>
 
-  <div class="container details-container">
-    <!-- Gallery -->
-    <div class="gallery-wrapper">
-      <img [src]="selectedImageUrl || product.image" [alt]="product.name" class="main-image" />
-      <div class="gallery-thumbnails" *ngIf="product.images?.length"><button type="button" *ngFor="let photo of product.images; let i = index" class="thumbnail-button" [class.active]="selectedImageUrl === photo.url" [attr.aria-label]="'Show product image ' + (i + 1)" (click)="selectImage(photo.url)"><img [src]="photo.url" [alt]="product.name + ' view ' + (i + 1)" /></button></div>
+  <!-- Breadcrumbs & Quick Back -->
+  <nav class="atelier-breadcrumbs-wrap container" aria-label="Breadcrumbs">
+    <div class="breadcrumbs-path">
+      <a routerLink="/" class="crumb-link">Home</a>
+      <span class="crumb-separator">/</span>
+      <a routerLink="/shop" class="crumb-link">Shop</a>
+      <span class="crumb-separator" *ngIf="product.category">/</span>
+      <a [routerLink]="['/shop']" [queryParams]="{ category: product.category }" class="crumb-link" *ngIf="product.category">
+        {{ product.category }}
+      </a>
+      <span class="crumb-separator">/</span>
+      <span class="crumb-current" aria-current="page">{{ product.name }}</span>
     </div>
 
-    <!-- Product Info -->
-    <div class="details-info">
-      <span class="badge badge-accent">{{ product.category }}</span>
-      <h1 class="product-name">{{ product.name }}</h1>
+    <a routerLink="/shop" class="back-catalog-link">
+      <i class="pi pi-arrow-left"></i>
+      <span>Back to Catalog</span>
+    </a>
+  </nav>
 
-      <div class="rating-badge">
-        <i class="pi pi-star-fill"></i>
-        <span>{{ product.rating }} (Verified Studio Rating)</span>
-      </div>
-
-      <div class="price-tag">
-        <span class="currency">₹</span>{{ product.price }}
-        <span class="tax-note">Inclusive of all taxes & packing</span>
-      </div>
-
-      <p class="description">{{ product.description }}</p>
-
-      <!-- Color selection -->
-      <div class="option-block">
-        <label>Available Finishes / Filament:</label>
-        <div class="color-options">
+  <!-- ========================================================================= -->
+  <!-- 1. MAIN PRODUCT SHOWCASE HERO (GALLERY + INFORMATION)                     -->
+  <!-- ========================================================================= -->
+  <main class="container atelier-hero-layout">
+    
+    <!-- LEFT: MASTER PRODUCT GALLERY -->
+    <section class="gallery-column" aria-label="Product Showcase Gallery">
+      
+      <!-- PHOTOGRAPHY MODE STAGE -->
+      <div class="photo-gallery-master">
+        
+        <!-- Desktop Vertical Thumbnail Rail -->
+        <aside class="desktop-thumbnails-rail" *ngIf="imagesList.length > 1" aria-label="Product Angles">
           <button 
-            *ngFor="let color of product.availableColors" 
-            class="color-pill"
-            [class.selected]="selectedColor === color"
-            (click)="selectColor(color)">
-            {{ color }}
+            type="button"
+            class="thumb-tile-btn"
+            *ngFor="let img of imagesList; let i = index"
+            [class.selected]="selectedImageUrl === img"
+            (click)="selectImage(img)"
+            [title]="product.name + ' image ' + (i + 1)"
+            [attr.aria-label]="product.name + ' image ' + (i + 1)">
+            <img [src]="img" [alt]="product.name + ' image ' + (i + 1)" loading="lazy" />
+          </button>
+        </aside>
+
+        <!-- Main Photographic Viewport -->
+        <div 
+          class="main-viewport-stage"
+          (mousemove)="onImageMouseMove($event)"
+          (mouseenter)="onImageMouseEnter()"
+          (mouseleave)="onImageMouseLeave()">
+
+          <!-- Main Zoomable Image -->
+          <div class="stage-image-wrapper" (click)="openLightbox()">
+            <img 
+              [src]="selectedImageUrl" 
+              [alt]="product.name" 
+              class="primary-display-image"
+              [class.zooming]="isHoverZooming"
+              [style.transform-origin]="zoomOriginX + '% ' + zoomOriginY + '%'"
+              loading="eager"
+            />
+          </div>
+
+          <!-- Fullscreen & Hover Zoom Hint -->
+          <button 
+            type="button" 
+            class="btn-expand-lightbox" 
+            (click)="openLightbox()" 
+            title="Expand Fullscreen Lightbox"
+            aria-label="Expand image to fullscreen">
+            <i class="pi pi-arrows-alt"></i>
+          </button>
+
+          <!-- Navigation Chevrons (if multiple images) -->
+          <div class="stage-nav-arrows" *ngIf="imagesList.length > 1">
+            <button type="button" class="stage-nav-btn prev" (click)="previousImage()" aria-label="Previous photo">
+              <i class="pi pi-chevron-left"></i>
+            </button>
+            <button type="button" class="stage-nav-btn next" (click)="nextImage()" aria-label="Next photo">
+              <i class="pi pi-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Mobile Horizontal Thumbnails Strip -->
+        <div class="mobile-thumbnails-strip" *ngIf="imagesList.length > 1">
+          <button 
+            type="button"
+            class="mobile-thumb-pill"
+            *ngFor="let img of imagesList; let i = index"
+            [class.active]="selectedImageUrl === img"
+            (click)="selectImage(img)">
+            <img [src]="img" [alt]="product.name + ' thumbnail ' + (i + 1)" />
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT: EDITORIAL PRODUCT INFORMATION & CUSTOMIZATION STUDIO -->
+    <section class="info-column" aria-label="Product Information and Ordering">
+      
+      <!-- Collection Eyebrow & Badges Row -->
+      <div class="brand-eyebrow-row">
+        <span class="atelier-collection-badge">
+          <span class="badge-dot"></span>
+          <span>CRAFTORA ATELIER · {{ (product.category || 'ORIGINALS') | uppercase }}</span>
+        </span>
+
+        <span class="feature-badge" *ngIf="product.badge">
+          {{ product.badge }}
+        </span>
+      </div>
+
+      <!-- Product Title -->
+      <div class="product-title-row">
+        <h1 class="atelier-product-title">{{ product.name }}</h1>
+        
+        <!-- Subtle Share Action Button -->
+        <div class="title-action-wrap">
+          <button 
+            type="button" 
+            class="btn-icon-soft" 
+            (click)="shareNativeOrToggle()" 
+            title="Share this creation" 
+            aria-label="Share product">
+            <i class="pi pi-share-alt"></i>
           </button>
         </div>
       </div>
 
-      <!-- Quantity -->
-      <div class="option-block">
-        <label>Quantity:</label>
-        <div class="quantity-controller">
-          <button (click)="decrementQty()"><i class="pi pi-minus"></i></button>
-          <span>{{ quantity }}</span>
-          <button (click)="incrementQty()"><i class="pi pi-plus"></i></button>
+      <!-- Rating & Customer Reviews Pill -->
+      <div class="rating-anchor-row">
+        <button 
+          type="button" 
+          class="rating-review-pill" 
+          [class.has-reviews]="reviewSummary && reviewSummary.totalReviews > 0"
+          [class.zero-reviews]="!reviewSummary || reviewSummary.totalReviews === 0"
+          (click)="scrollToReviews()" 
+          [title]="reviewSummary && reviewSummary.totalReviews > 0 ? 'Jump to ' + reviewSummary.totalReviews + ' customer reviews' : 'Be the first to review this creation'">
+          
+          <ng-container *ngIf="reviewSummary && reviewSummary.totalReviews > 0; else zeroReviewsHeader">
+            <div class="stars-stars-mini" aria-hidden="true">
+              <i class="pi pi-star-fill star-icon" *ngFor="let s of [1,2,3,4,5]"></i>
+            </div>
+            <span class="score-text">{{ reviewSummary.averageRating | number:'1.1-1' }}</span>
+            <span class="reviews-count-label">({{ reviewSummary.totalReviews }} {{ reviewSummary.totalReviews === 1 ? 'Review' : 'Reviews' }})</span>
+          </ng-container>
+
+          <ng-template #zeroReviewsHeader>
+            <div class="stars-stars-mini stars-unrated" aria-hidden="true">
+              <i class="pi pi-star star-icon-dim" *ngFor="let s of [1,2,3,4,5]"></i>
+            </div>
+            <span class="no-reviews-tag">No reviews yet</span>
+            <span class="be-first-text">· Be the first to review</span>
+          </ng-template>
+
+          <i class="pi pi-arrow-down-right scroll-icon"></i>
+        </button>
+
+        <span class="sku-label">{{ skuCode }}</span>
+      </div>
+
+      <!-- Price Architecture -->
+      <div class="price-hierarchy-block">
+        <div class="primary-price-line">
+          <span class="currency-symbol">₹</span>
+          <span class="price-amount">{{ calculatedUnitPrice | number }}</span>
+          
+          <span class="original-strikethrough" *ngIf="calculatedOriginalPrice">
+            ₹{{ calculatedOriginalPrice | number }}
+          </span>
+
+          <span class="discount-pill" *ngIf="discountPercent > 0">
+            Save {{ discountPercent }}% · Studio Direct
+          </span>
+        </div>
+
+        <p class="tax-shipping-subtext">
+          <i class="pi pi-check"></i>
+          <span>Inclusive of all taxes &amp; Atelier precision packing. Free delivery on orders over ₹499.</span>
+        </p>
+      </div>
+
+      <!-- In Stock & Atelier Production Beacon -->
+      <div class="stock-production-beacon">
+        <div class="pulse-beacon">
+          <span class="beacon-circle"></span>
+          <span class="beacon-pulse"></span>
+        </div>
+        <div class="beacon-text">
+          <strong>In Stock · Ready for Immediate 3D Slicing</strong>
+          <span>Estimated Dispatch: Within 24–48 Hours</span>
         </div>
       </div>
 
-      <!-- Buttons -->
-      <div class="cta-actions">
-        <button class="btn btn-primary btn-block" (click)="addToCart()">
-          <i class="pi pi-shopping-bag"></i> Add to Cart
-        </button>
-        <button class="btn btn-dark btn-block" (click)="buyNow()">
+      <!-- Short Editorial Description -->
+      <p class="product-editorial-summary">
+        {{ product.description }}
+      </p>
+
+      <div class="divider-line"></div>
+
+      <!-- ===================================================================== -->
+      <!-- 4. PRECISION 3D CUSTOMIZATION STUDIO                                  -->
+      <!-- ===================================================================== -->
+      <div class="customization-studio-card">
+        
+        <!-- COLOR / FILAMENT SWATCHES -->
+        <div class="custom-block">
+          <div class="custom-block-header">
+            <label class="block-label">1. Filament Color / Finish</label>
+            <span class="selected-meta-tag">{{ selectedColor }}</span>
+          </div>
+
+          <div class="swatches-palette" role="radiogroup" aria-label="Select filament color">
+            <button 
+              type="button" 
+              class="swatch-btn" 
+              *ngFor="let color of (product.availableColors || ['Titanium White', 'Matte Black', 'Neon Teal', 'Cyberpunk Red'])"
+              [class.active]="selectedColor === color"
+              (click)="selectColor(color)"
+              [title]="color"
+              role="radio"
+              [attr.aria-checked]="selectedColor === color">
+              
+              <span class="swatch-circle" [style.background]="getColorHex(color)"></span>
+              <span class="swatch-name">{{ color }}</span>
+              <i class="pi pi-check swatch-check" *ngIf="selectedColor === color"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- SCALE / PRINT SIZE SELECTOR -->
+        <div class="custom-block">
+          <div class="custom-block-header">
+            <label class="block-label">2. Scale &amp; Dimensions</label>
+            <span class="selected-meta-tag">{{ selectedSize.scaleDesc }}</span>
+          </div>
+
+          <div class="scale-options-row">
+            <button 
+              type="button"
+              class="scale-pill-btn"
+              *ngFor="let size of sizeOptions"
+              [class.active]="selectedSize.id === size.id"
+              (click)="selectSize(size)">
+              <span class="size-title">{{ size.label }}</span>
+              <span class="size-diff" *ngIf="size.priceDelta !== 0">
+                {{ size.priceDelta > 0 ? '+₹' + size.priceDelta : '-₹' + (-size.priceDelta) }}
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <!-- MATERIAL GRADE SELECTOR -->
+        <div class="custom-block">
+          <div class="custom-block-header">
+            <label class="block-label">3. Printing Material Grade</label>
+            <span class="selected-meta-tag">{{ selectedMaterial.label }}</span>
+          </div>
+
+          <div class="material-grid">
+            <button 
+              type="button"
+              class="material-card-btn"
+              *ngFor="let mat of materialOptions"
+              [class.active]="selectedMaterial.id === mat.id"
+              (click)="selectMaterial(mat)">
+              <div class="mat-top">
+                <span class="mat-name">{{ mat.label }}</span>
+                <span class="mat-badge">{{ mat.badge }}</span>
+              </div>
+              <p class="mat-desc">{{ mat.description }}</p>
+            </button>
+          </div>
+        </div>
+
+        <!-- PERSONALIZED EMBOSSING / CUSTOM ENGRAVED TEXT -->
+        <div class="custom-block engraving-block">
+          <div class="engraving-toggle-row" (click)="toggleCustomEngraving()">
+            <div class="engraving-checkbox-circle" [class.checked]="hasCustomEngraving">
+              <i class="pi pi-check" *ngIf="hasCustomEngraving"></i>
+            </div>
+            <div class="engraving-label-text">
+              <strong>Personalized Base Engraving (+₹50)</strong>
+              <span>Custom recessed typography embossed onto the base platform.</span>
+            </div>
+          </div>
+
+          <div class="engraving-input-box" *ngIf="hasCustomEngraving">
+            <div class="input-with-counter">
+              <input 
+                type="text" 
+                maxlength="20"
+                [(ngModel)]="engravingText" 
+                placeholder="e.g. CRAFTORA · 2026" 
+                class="engrave-text-input" 
+                aria-label="Engraved text"
+              />
+              <span class="char-count">{{ engravingText.length }}/20</span>
+            </div>
+            <span class="engrave-hint">Preview: Infill will be rendered with high-contrast dual-tone finish.</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ===================================================================== -->
+      <!-- 5. QUANTITY & HERO PURCHASE ACTIONS                                   -->
+      <!-- ===================================================================== -->
+      <div class="purchase-actions-section">
+        
+        <div class="quantity-and-wishlist-row">
+          <!-- Quantity Control Pill -->
+          <div class="quantity-stepper" aria-label="Select quantity">
+            <button type="button" class="step-btn" (click)="decrementQty()" [disabled]="quantity <= 1" aria-label="Decrease quantity">
+              <i class="pi pi-minus"></i>
+            </button>
+            <span class="qty-number">{{ quantity }}</span>
+            <button type="button" class="step-btn" (click)="incrementQty()" aria-label="Increase quantity">
+              <i class="pi pi-plus"></i>
+            </button>
+          </div>
+
+          <!-- Wishlist Action Button -->
+          <button 
+            type="button" 
+            class="btn-wishlist-hero" 
+            [class.active]="isWishlisted" 
+            (click)="toggleWishlist()"
+            [attr.aria-label]="isWishlisted ? 'Remove from Wishlist' : 'Save to Wishlist'">
+            <i class="pi" [ngClass]="isWishlisted ? 'pi-heart-fill' : 'pi-heart'"></i>
+            <span>{{ isWishlisted ? 'Saved in Wishlist' : 'Add to Wishlist' }}</span>
+          </button>
+        </div>
+
+        <!-- Primary CTA Actions -->
+        <div class="primary-ctas-grid">
+          
+          <!-- Buy Now (Primary High-End Action) -->
+          <button type="button" class="btn-hero-buy-now" (click)="buyNow()">
+            <div class="btn-glow-layer"></div>
+            <i class="pi pi-bolt"></i>
+            <span class="btn-text">Buy Now · Instant Checkout</span>
+            <span class="btn-price-tag">₹{{ calculatedUnitPrice * quantity | number }}</span>
+          </button>
+
+          <!-- Add to Cart (Secondary Action) -->
+          <button type="button" class="btn-hero-add-cart" (click)="addToCart()">
+            <i class="pi pi-shopping-bag"></i>
+            <span>Add to Cart</span>
+          </button>
+        </div>
+
+        <!-- Success Toast under CTAs -->
+        <div class="cart-added-inline-banner" *ngIf="addedAlert">
+          <i class="pi pi-check-circle"></i>
+          <span>{{ quantity }} item(s) added to cart. Continue shopping or proceed to checkout.</span>
+        </div>
+      </div>
+
+      <!-- 4-Pillar Trust Grid -->
+      <div class="atelier-trust-grid">
+        <div class="trust-item">
+          <div class="trust-icon-box"><i class="pi pi-shield"></i></div>
+          <div class="trust-text">
+            <strong>Secure Checkout</strong>
+            <span>256-Bit Encrypted</span>
+          </div>
+        </div>
+
+        <div class="trust-item">
+          <div class="trust-icon-box"><i class="pi pi-sliders-h"></i></div>
+          <div class="trust-text">
+            <strong>0.16mm Precision</strong>
+            <span>High-Detail FDM</span>
+          </div>
+        </div>
+
+        <div class="trust-item">
+          <div class="trust-icon-box"><i class="pi pi-leaf"></i></div>
+          <div class="trust-text">
+            <strong>Eco Bio-Polymer</strong>
+            <span>Safe &amp; Recyclable</span>
+          </div>
+        </div>
+
+        <div class="trust-item">
+          <div class="trust-icon-box"><i class="pi pi-box"></i></div>
+          <div class="trust-text">
+            <strong>Atelier Guarantee</strong>
+            <span>Cushioned Transit</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Social / Quick Share Bar -->
+      <div class="product-share-bar">
+        <span class="share-header-label">
+          <i class="pi pi-share-alt"></i>
+          <span>Share:</span>
+        </span>
+        <div class="share-actions-group">
+          <button type="button" class="share-pill share-whatsapp" (click)="shareOnWhatsApp()" title="Share on WhatsApp">
+            <i class="pi pi-whatsapp"></i>
+            <span>WhatsApp</span>
+          </button>
+          <button type="button" class="share-pill share-twitter" (click)="shareOnTwitter()" title="Share on X">
+            <i class="pi pi-twitter"></i>
+            <span>X</span>
+          </button>
+          <button type="button" class="share-pill share-telegram" (click)="shareOnTelegram()" title="Share on Telegram">
+            <i class="pi pi-send"></i>
+            <span>Telegram</span>
+          </button>
+          <button type="button" class="share-pill share-copy" [class.is-copied]="copiedLink" (click)="copyLink()" title="Copy Product Link">
+            <i class="pi" [ngClass]="copiedLink ? 'pi-check' : 'pi-copy'"></i>
+            <span>{{ copiedLink ? 'Copied!' : 'Copy Link' }}</span>
+          </button>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- ========================================================================= -->
+  <!-- 6. EDITORIAL CONTENT TABS (SPECIFICATIONS, MATERIALS & CARE)              -->
+  <!-- ========================================================================= -->
+  <section class="container atelier-tabs-section" aria-label="Product Deep Dive">
+    
+    <!-- Tab Navigation Bar -->
+    <div class="tabs-nav-bar" role="tablist">
+      <button 
+        type="button" 
+        class="tab-nav-btn" 
+        [class.active]="activeTab === 'overview'" 
+        (click)="activeTab = 'overview'"
+        role="tab"
+        [attr.aria-selected]="activeTab === 'overview'">
+        <i class="pi pi-compass"></i>
+        <span>Overview &amp; Story</span>
+      </button>
+
+      <button 
+        type="button" 
+        class="tab-nav-btn" 
+        [class.active]="activeTab === 'specs'" 
+        (click)="activeTab = 'specs'"
+        role="tab"
+        [attr.aria-selected]="activeTab === 'specs'">
+        <i class="pi pi-sliders-v"></i>
+        <span>Technical Specifications</span>
+      </button>
+
+      <button 
+        type="button" 
+        class="tab-nav-btn" 
+        [class.active]="activeTab === 'material'" 
+        (click)="activeTab = 'material'"
+        role="tab"
+        [attr.aria-selected]="activeTab === 'material'">
+        <i class="pi pi-palette"></i>
+        <span>Materials &amp; Finish</span>
+      </button>
+
+      <button 
+        type="button" 
+        class="tab-nav-btn" 
+        [class.active]="activeTab === 'care'" 
+        (click)="activeTab = 'care'"
+        role="tab"
+        [attr.aria-selected]="activeTab === 'care'">
+        <i class="pi pi-heart"></i>
+        <span>Care Instructions</span>
+      </button>
+
+      <button 
+        type="button" 
+        class="tab-nav-btn" 
+        [class.active]="activeTab === 'shipping'" 
+        (click)="activeTab = 'shipping'"
+        role="tab"
+        [attr.aria-selected]="activeTab === 'shipping'">
+        <i class="pi pi-truck"></i>
+        <span>Dispatch &amp; Delivery</span>
+      </button>
+    </div>
+
+    <!-- Tab Panels Container -->
+    <div class="tab-content-panel">
+      
+      <!-- TAB 1: OVERVIEW -->
+      <div class="tab-pane-card" *ngIf="activeTab === 'overview'">
+        <div class="overview-grid">
+          <div class="overview-text-block">
+            <h3>Architectural Craftsmanship</h3>
+            <p>
+              Each <strong>{{ product.name }}</strong> is individually prepared using high-resolution parametric slicing profiles. Our studio prioritizes organic geometric stability, smooth surface transitions, and balanced mass distribution for a tangible luxury feel.
+            </p>
+            <p>
+              Printed with zero-waste additive manufacturing principles, this design balances sculptural presence on modern desks, curated display shelves, or design collections.
+            </p>
+          </div>
+          <div class="overview-highlights">
+            <div class="highlight-item">
+              <span class="highlight-num">0.16<small>mm</small></span>
+              <span class="highlight-label">Ultra-Fine Layer Height</span>
+            </div>
+            <div class="highlight-item">
+              <span class="highlight-num">100<small>%</small></span>
+              <span class="highlight-label">Pure Biodegradable Resin</span>
+            </div>
+            <div class="highlight-item">
+              <span class="highlight-num">4.5<small>h</small></span>
+              <span class="highlight-label">Average Print Duration</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: TECHNICAL SPECIFICATIONS -->
+      <div class="tab-pane-card" *ngIf="activeTab === 'specs'">
+        <div class="specs-table-grid">
+          <div class="spec-row">
+            <span class="spec-prop">Print Technology</span>
+            <strong class="spec-val">Precision Fused Deposition Modeling (FDM)</strong>
+          </div>
+          <div class="spec-row">
+            <span class="spec-prop">Layer Resolution</span>
+            <strong class="spec-val">0.16mm Ultra-Detail Layer Height</strong>
+          </div>
+          <div class="spec-row">
+            <span class="spec-prop">Dimensions</span>
+            <strong class="spec-val">{{ product.dimensions || '120 × 90 × 160 mm' }}</strong>
+          </div>
+          <div class="spec-row">
+            <span class="spec-prop">Finished Weight</span>
+            <strong class="spec-val">~{{ product.weightGrams || 260 }} grams</strong>
+          </div>
+          <div class="spec-row">
+            <span class="spec-prop">Infill Density</span>
+            <strong class="spec-val">20% Gyroid Structural Matrix</strong>
+          </div>
+          <div class="spec-row">
+            <span class="spec-prop">Nozzle Diameter</span>
+            <strong class="spec-val">0.4mm Hardened Micro-Swiss Nozzle</strong>
+          </div>
+          <div class="spec-row">
+            <span class="spec-prop">Thermal Tolerance</span>
+            <strong class="spec-val">Up to 60°C (140°F)</strong>
+          </div>
+          <div class="spec-row">
+            <span class="spec-prop">Studio Origin</span>
+            <strong class="spec-val">Craftora 3D Studio, Tamil Nadu, India</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: MATERIALS & FINISH -->
+      <div class="tab-pane-card" *ngIf="activeTab === 'material'">
+        <div class="editorial-copy-block">
+          <h3>Sustainable Bio-Polymer Formulation</h3>
+          <p>
+            We use premium PLA+ extracted from renewable plant sources such as sugarcane and non-GMO cornstarch. Unlike conventional petroleum-derived plastics, our formulation emits zero toxic fumes during production and has an extremely low carbon footprint.
+          </p>
+          <div class="material-features-list">
+            <div class="mat-feat">
+              <i class="pi pi-check"></i>
+              <span>High impact toughness and refined layer adhesion</span>
+            </div>
+            <div class="mat-feat">
+              <i class="pi pi-check"></i>
+              <span>Matte light absorption for photographic aesthetics</span>
+            </div>
+            <div class="mat-feat">
+              <i class="pi pi-check"></i>
+              <span>Non-toxic, odorless, and safe for family living spaces</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 4: CARE INSTRUCTIONS -->
+      <div class="tab-pane-card" *ngIf="activeTab === 'care'">
+        <div class="editorial-copy-block">
+          <h3>Caring for Your 3D Creation</h3>
+          <p>
+            To preserve the pristine tactile matte finish and structural geometry of your piece:
+          </p>
+          <ul class="care-steps-list">
+            <li><strong>Temperature:</strong> Keep away from prolonged intense direct sunlight or hot vehicle interiors (temperatures exceeding 60°C).</li>
+            <li><strong>Dusting:</strong> Gently dust using a soft dry microfiber cloth or soft synthetic bristle brush.</li>
+            <li><strong>Washing:</strong> If needed, rinse with cool water and mild organic hand soap. Avoid abrasive scrubbers or solvents.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- TAB 5: SHIPPING & GUARANTEE -->
+      <div class="tab-pane-card" *ngIf="activeTab === 'shipping'">
+        <div class="editorial-copy-block">
+          <h3>Hand-Finished &amp; Securely Packaged</h3>
+          <p>
+            Every order is inspected and hand-packaged inside custom-cut shock-absorbent foam enclosures to ensure it reaches you in showroom condition.
+          </p>
+          <div class="shipping-pillars">
+            <div class="ship-pillar">
+              <i class="pi pi-clock"></i>
+              <strong>24–48h Dispatch</strong>
+              <span>Individual print verification</span>
+            </div>
+            <div class="ship-pillar">
+              <i class="pi pi-map-marker"></i>
+              <strong>Tracked Express Courier</strong>
+              <span>Bluedart / Delhivery / XpressBees</span>
+            </div>
+            <div class="ship-pillar">
+              <i class="pi pi-shield"></i>
+              <strong>Transit Guarantee</strong>
+              <span>Free instant replacement if damaged</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========================================================================= -->
+  <!-- 7. CUSTOMER REVIEWS SECTION                                               -->
+  <!-- ========================================================================= -->
+  <section class="container reviews-integrated-container" id="customerReviewsSection">
+    <app-product-reviews 
+      [productId]="product.id" 
+      [productName]="product.name" 
+      (summaryChange)="onReviewsSummaryUpdated($event)">
+    </app-product-reviews>
+  </section>
+
+  <!-- ========================================================================= -->
+  <!-- 8. RELATED PRODUCTS ("YOU MAY ALSO LIKE")                                 -->
+  <!-- ========================================================================= -->
+  <section class="container related-curated-section" *ngIf="relatedProducts.length > 0">
+    <div class="related-section-header">
+      <div class="eyebrow-accent">CURATED STUDIO SELECTIONS</div>
+      <h2 class="related-title">You May Also Like</h2>
+      <p class="related-subtitle">Handcrafted 3D creations designed to complement this piece.</p>
+    </div>
+
+    <div class="products-curated-grid">
+      <app-product-card *ngFor="let p of relatedProducts" [product]="p"></app-product-card>
+    </div>
+  </section>
+
+  <!-- ========================================================================= -->
+  <!-- 9. STICKY MOBILE PURCHASE BAR                                             -->
+  <!-- ========================================================================= -->
+  <div class="mobile-sticky-purchase-bar" [class.visible]="showMobileStickyBar">
+    <div class="mobile-sticky-inner">
+      <div class="sticky-thumb-info">
+        <img [src]="selectedImageUrl" [alt]="product.name" class="sticky-thumb" />
+        <div class="sticky-texts">
+          <strong class="sticky-name">{{ product.name }}</strong>
+          <span class="sticky-meta">{{ selectedColor }} · {{ selectedSize.label }}</span>
+        </div>
+      </div>
+
+      <div class="sticky-actions">
+        <div class="sticky-price">₹{{ calculatedUnitPrice * quantity | number }}</div>
+        <button type="button" class="btn-sticky-buy-now" (click)="buyNow()">
           Buy Now
         </button>
-      </div>
-
-      <div class="alert-box" *ngIf="addedAlert">
-        <i class="pi pi-check"></i> Added {{ quantity }} item(s) to cart successfully!
-      </div>
-
-      <!-- Tech specs table -->
-      <div class="specs-card">
-        <h3>Specifications</h3>
-        <div class="spec-row"><span>Layer Resolution:</span> <strong>0.16mm High Detail</strong></div>
-        <div class="spec-row"><span>Dimensions:</span> <strong>{{ product.dimensions || 'Custom scaled' }}</strong></div>
-        <div class="spec-row"><span>Weight:</span> <strong>~{{ product.weightGrams }} grams</strong></div>
-        <div class="spec-row"><span>Material:</span> <strong>Eco-Friendly Matte PLA</strong></div>
       </div>
     </div>
   </div>
 
-  <!-- Related Products -->
-  <section class="container related-section" *ngIf="relatedProducts.length > 0">
-    <h2 class="section-title text-left">Pairs Well With</h2>
-    <div class="products-grid">
-      <app-product-card *ngFor="let p of relatedProducts" [product]="p"></app-product-card>
+  <!-- ========================================================================= -->
+  <!-- 10. FULLSCREEN LIGHTBOX GALLERY MODAL                                     -->
+  <!-- ========================================================================= -->
+  <div class="gallery-lightbox-backdrop" *ngIf="lightboxOpen" (click)="closeLightbox()" role="dialog" aria-modal="true">
+    <div class="lightbox-content-box" (click)="$event.stopPropagation()">
+      <button type="button" class="lightbox-close-btn" (click)="closeLightbox()" aria-label="Close modal">
+        <i class="pi pi-times"></i>
+      </button>
+
+      <div class="lightbox-img-wrap">
+        <img [src]="imagesList[lightboxIndex]" [alt]="product.name + ' Large Preview'" />
+      </div>
+
+      <button type="button" class="lb-arrow prev" *ngIf="imagesList.length > 1" (click)="lightboxPrev()" aria-label="Previous">
+        <i class="pi pi-chevron-left"></i>
+      </button>
+      <button type="button" class="lb-arrow next" *ngIf="imagesList.length > 1" (click)="lightboxNext()" aria-label="Next">
+        <i class="pi pi-chevron-right"></i>
+      </button>
+
+      <div class="lightbox-counter">
+        {{ lightboxIndex + 1 }} / {{ imagesList.length }}
+      </div>
     </div>
-  </section>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 11. SIGN IN REQUIRED PROMPT MODAL (BUY NOW FLOW)                          -->
+  <!-- ========================================================================= -->
+  <div class="auth-prompt-backdrop" *ngIf="showSignInPrompt" (click)="onCancelSignIn()" role="dialog" aria-modal="true">
+    <div class="auth-prompt-card" (click)="$event.stopPropagation()">
+      <div class="auth-prompt-icon-ring">
+        <i class="pi pi-lock"></i>
+      </div>
+      <h3 class="auth-prompt-title">Sign In Required for Purchase</h3>
+      <p class="auth-prompt-desc">
+        Please sign in to your Craftora account to proceed directly with your order.
+      </p>
+      <div class="auth-prompt-actions">
+        <button type="button" class="btn btn-secondary auth-btn-cancel" (click)="onCancelSignIn()">
+          Cancel
+        </button>
+        <button type="button" class="btn btn-primary auth-btn-ok" (click)="onConfirmSignIn()">
+          <i class="pi pi-sign-in"></i> Sign In / OK
+        </button>
+      </div>
+    </div>
+  </div>
+
 </div>

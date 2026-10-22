@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="100%" height="100%">
+  <defs>
+    <radialGradient id="lamp-ambient" cx="50%" cy="45%" r="65%">
+      <stop offset="0%" stop-color="#2a1f17"/>
+      <stop offset="45%" stop-color="#17120e"/>
+      <stop offset="100%" stop-color="#080605"/>
+    </radialGradient>
+    <radialGradient id="core-glow" cx="50%" cy="48%" r="45%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="25%" stop-color="#fed7aa"/>
+      <stop offset="60%" stop-color="#f97316"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
+    <linearGradient id="shade-mat" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="50%" stop-color="#e2e8f0"/>
+      <stop offset="100%" stop-color="#94a3b8"/>
+    </linearGradient>
+    <filter id="lamp-blur">
+      <feGaussianBlur stdDeviation="35"/>
+    </filter>
+    <filter id="glow-warm">
+      <feGaussianBlur stdDeviation="15" result="coloredBlur"/>
+      <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="800" height="800" fill="url(#lamp-ambient)"/>
+  
+  <!-- Glowing floor halo -->
+  <ellipse cx="400" cy="680" rx="300" ry="70" fill="#f97316" opacity="0.35" filter="url(#lamp-blur)"/>
+  <ellipse cx="400" cy="670" rx="160" ry="30" fill="#000000" opacity="0.6"/>
+
+  <!-- Lamp Wooden/Metal Base -->
+  <cylinder>
+    <ellipse cx="400" cy="650" rx="110" ry="22" fill="#78350f"/>
+    <path d="M 290 650 L 510 650 L 510 670 L 290 670 Z" fill="#451a03"/>
+    <ellipse cx="400" cy="670" rx="110" ry="22" fill="#291002"/>
+  </cylinder>
+
+  <!-- Glowing Internal LED Column -->
+  <ellipse cx="400" cy="450" rx="140" ry="190" fill="url(#core-glow)" filter="url(#glow-warm)" opacity="0.85"/>
+  <rect x="385" y="270" width="30" height="360" rx="15" fill="#ffedd5" filter="url(#glow-warm)"/>
+
+  <!-- 3D Voronoi Cellular Lattice Structure -->
+  <g fill="none" stroke="url(#shade-mat)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" opacity="0.95">
+    <!-- Outer Contour -->
+    <path d="M 330 220 Q 250 380 280 540 Q 320 630 400 640 Q 480 630 520 540 Q 550 380 470 220 Q 400 180 330 220 Z"/>
+    <!-- Voronoi Cells (Hand-sculpted organic polygon rings) -->
+    <polygon points="360,250 420,240 450,280 410,310 350,290" />
+    <polygon points="310,310 360,300 370,360 320,380 290,340" />
+    <polygon points="430,300 480,310 500,370 460,390 420,350" />
+    <polygon points="360,370 430,360 440,430 380,450 340,420" />
+    <polygon points="280,390 330,390 340,460 290,480 270,430" />
+    <polygon points="470,390 520,400 530,470 480,480 460,430" />
+    <polygon points="350,470 420,460 430,530 370,540 330,510" />
+    <polygon points="290,500 340,490 350,560 300,580 280,540" />
+    <polygon points="460,500 510,490 510,560 460,570 440,530" />
+    <polygon points="350,560 420,550 430,610 380,620 340,600" />
+  </g>
+</svg>

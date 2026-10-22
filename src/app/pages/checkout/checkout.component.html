@@ -1,107 +1,1061 @@
 <div class="checkout-page">
   <div class="container">
-    <div class="success-screen" *ngIf="placedOrder">
-      <div class="icon"><i class="pi pi-check-circle"></i></div>
-      <h1>Order Placed Successfully!</h1>
-      <p class="order-id">Order Reference: <strong>{{ placedOrder.id }}</strong></p>
-      <p class="status-note">Our studio has queued your items for 3D slicing & printing. We will update you via WhatsApp & Email.</p>
 
-      <div class="order-details-box">
-        <h3>Shipping Destination</h3>
-        <p><strong>{{ placedOrder.customer.fullName }}</strong></p>
-        <p>{{ placedOrder.customer.address }}, {{ placedOrder.customer.city }}, {{ placedOrder.customer.state }} - {{ placedOrder.customer.pincode }}</p>
-        <p>Phone: {{ placedOrder.customer.phone }}</p>
+    <!-- PAGE HEADER -->
+    <header class="checkout-header">
+      <div class="checkout-eyebrow">
+        <i class="pi pi-shield"></i>
+        <span>{{ isBuyNowMode ? 'CRAFTORA 3D · DIRECT PURCHASE' : 'CRAFTORA 3D · SECURE CHECKOUT' }}</span>
+      </div>
+      <h1 class="checkout-title">{{ placedOrder ? 'Order Confirmation' : 'Complete Your Order' }}</h1>
+      <p class="checkout-subtitle">
+        {{ placedOrder 
+          ? 'Thank you for choosing Craftora 3D. Your order is confirmed and queued for production.' 
+          : 'Review your selected creation, delivery destination, and complete payment securely.' }}
+      </p>
+
+      <!-- 4-STEP PROGRESS INDICATOR -->
+      <nav class="checkout-stepper" aria-label="Checkout Progress">
+        <div class="step-item" [class.active]="currentStep === 1" [class.completed]="currentStep > 1">
+          <div class="step-circle">
+            <i class="pi pi-check" *ngIf="currentStep > 1"></i>
+            <span *ngIf="currentStep <= 1">1</span>
+          </div>
+          <span class="step-label">Order Details</span>
+        </div>
+
+        <div class="step-connector" [class.completed]="currentStep > 1"></div>
+
+        <div class="step-item" [class.active]="currentStep === 2 || (currentStep === 1 && selectedAddress)" [class.completed]="currentStep > 2">
+          <div class="step-circle">
+            <i class="pi pi-check" *ngIf="currentStep > 2"></i>
+            <span *ngIf="currentStep <= 2">2</span>
+          </div>
+          <span class="step-label">Delivery</span>
+        </div>
+
+        <div class="step-connector" [class.completed]="currentStep > 2"></div>
+
+        <div class="step-item" [class.active]="currentStep === 3" [class.completed]="currentStep > 3">
+          <div class="step-circle">
+            <i class="pi pi-check" *ngIf="currentStep > 3"></i>
+            <span *ngIf="currentStep <= 3">3</span>
+          </div>
+          <span class="step-label">Payment</span>
+        </div>
+
+        <div class="step-connector" [class.completed]="currentStep === 4"></div>
+
+        <div class="step-item" [class.active]="currentStep === 4" [class.completed]="currentStep === 4">
+          <div class="step-circle">
+            <i class="pi pi-check" *ngIf="currentStep === 4"></i>
+            <span *ngIf="currentStep < 4">4</span>
+          </div>
+          <span class="step-label">Confirmation</span>
+        </div>
+      </nav>
+    </header>
+
+    <!-- ========================================================================= -->
+    <!-- STEP 1 & 2: ORDER DETAILS, DELIVERY ADDRESS & SHIPPING (MAIN CHECKOUT) -->
+    <!-- ========================================================================= -->
+    <div class="checkout-grid" *ngIf="currentStep <= 2 && !placedOrder">
+
+      <!-- LEFT MAIN AREA -->
+      <div class="checkout-main-col">
+
+        <!-- 1. SELECTED PRODUCT DETAILS (BUY NOW OR CART) -->
+        <section class="checkout-card product-details-card">
+          <div class="card-header-row">
+            <div class="card-title-group">
+              <span class="card-step-badge">Step 1</span>
+              <h2>{{ isBuyNowMode ? 'Selected 3D Creation' : 'Order Items' }}</h2>
+            </div>
+            <span class="buy-now-pill" *ngIf="isBuyNowMode">
+              <i class="pi pi-bolt"></i> Direct Purchase
+            </span>
+          </div>
+
+          <!-- Direct Buy Single Product Display -->
+          <div class="direct-product-box" *ngIf="isBuyNowMode && directItem">
+            <div class="direct-img-wrap">
+              <img 
+                [src]="directItem.product.image || directItem.product.imageUrl || '/images/products/astronaut.svg'" 
+                [alt]="directItem.product.name" 
+                class="direct-product-img"
+              />
+              <span class="badge-3d-micro" *ngIf="directItem.product.has3dModel">3D</span>
+            </div>
+
+            <div class="direct-details">
+              <div class="direct-top">
+                <span class="direct-category">{{ directItem.product.category || 'Custom 3D Decor' }}</span>
+                <h3 class="direct-title">{{ directItem.product.name }}</h3>
+              </div>
+
+              <div class="direct-specs">
+                <span class="spec-tag" *ngIf="directItem.selectedColor">
+                  <span class="color-dot"></span> Finish: <strong>{{ directItem.selectedColor }}</strong>
+                </span>
+                <span class="spec-tag" *ngIf="directItem.product.material">
+                  <i class="pi pi-sliders-h"></i> {{ directItem.product.material }}
+                </span>
+                <span class="spec-tag" *ngIf="directItem.product.dimensions">
+                  <i class="pi pi-arrows-alt"></i> {{ directItem.product.dimensions }}
+                </span>
+              </div>
+
+              <div class="direct-action-row">
+                <!-- Quantity Controls Right on Checkout -->
+                <div class="qty-control-pill">
+                  <button 
+                    type="button" 
+                    (click)="decreaseQuantity(directItem)" 
+                    [disabled]="directItem.quantity <= 1"
+                    title="Decrease quantity"
+                    aria-label="Decrease quantity">
+                    <i class="pi pi-minus"></i>
+                  </button>
+                  <span class="qty-number">{{ directItem.quantity }}</span>
+                  <button 
+                    type="button" 
+                    (click)="increaseQuantity(directItem)" 
+                    title="Increase quantity"
+                    aria-label="Increase quantity">
+                    <i class="pi pi-plus"></i>
+                  </button>
+                </div>
+
+                <!-- Unit & Subtotal Price -->
+                <div class="direct-price-group">
+                  <div class="unit-price-label">₹{{ directItem.product.price }} each</div>
+                  <div class="subtotal-val">₹{{ directItem.product.price * directItem.quantity }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Regular Cart Items (if arrived via Cart) -->
+          <div class="cart-items-list" *ngIf="!isBuyNowMode">
+            <div class="cart-line-item" *ngFor="let item of activeCheckoutItems">
+              <img 
+                [src]="item.product.image || item.product.imageUrl || '/images/products/astronaut.svg'" 
+                [alt]="item.product.name" 
+                class="cart-line-img" 
+              />
+              <div class="cart-line-info">
+                <h4>{{ item.product.name }}</h4>
+                <div class="cart-line-meta">
+                  <span class="meta-color">{{ item.selectedColor }}</span>
+                  <span class="meta-dot">·</span>
+                  <span class="meta-price">₹{{ item.product.price }}</span>
+                </div>
+              </div>
+
+              <!-- Quantity Controls -->
+              <div class="qty-control-pill mini">
+                <button type="button" (click)="decreaseQuantity(item)" [disabled]="item.quantity <= 1" aria-label="Decrease">
+                  <i class="pi pi-minus"></i>
+                </button>
+                <span class="qty-number">{{ item.quantity }}</span>
+                <button type="button" (click)="increaseQuantity(item)" aria-label="Increase">
+                  <i class="pi pi-plus"></i>
+                </button>
+              </div>
+
+              <div class="cart-line-total">
+                ₹{{ item.product.price * item.quantity }}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. DELIVERY ADDRESS SECTION -->
+        <section class="checkout-card address-card" id="addressSection">
+          <div class="card-header-row">
+            <div class="card-title-group">
+              <span class="card-step-badge">Step 2</span>
+              <h2>Delivery Address</h2>
+            </div>
+            <button 
+              type="button" 
+              class="btn-text-action" 
+              *ngIf="savedAddresses.length > 0"
+              (click)="openAddAddressModal()">
+              <i class="pi pi-plus"></i> Add New Address
+            </button>
+          </div>
+
+          <!-- Inline Error if user tries to continue without an address -->
+          <div class="inline-error-banner" *ngIf="addressError">
+            <i class="pi pi-exclamation-circle"></i>
+            <span>{{ addressError }}</span>
+          </div>
+
+          <!-- SAVED ADDRESSES EXIST: CLEAN SELECTABLE CARDS -->
+          <div class="addresses-grid" *ngIf="savedAddresses.length > 0">
+            <div 
+              class="address-card-item" 
+              *ngFor="let addr of savedAddresses" 
+              [class.is-selected]="selectedAddress?.id === addr.id"
+              (click)="selectAddress(addr)">
+              
+              <div class="addr-top">
+                <div class="addr-radio">
+                  <div class="radio-ring" [class.checked]="selectedAddress?.id === addr.id"></div>
+                  <span class="addr-type-tag" [attr.data-type]="addr.type">
+                    <i class="pi" [ngClass]="addr.type === 'Work' ? 'pi-briefcase' : (addr.type === 'Other' ? 'pi-map-marker' : 'pi-home')"></i>
+                    {{ addr.type }}
+                  </span>
+                  <span class="default-badge" *ngIf="addr.isDefault">Default</span>
+                </div>
+
+                <div class="addr-actions-menu">
+                  <button type="button" class="btn-icon-subtle" (click)="openEditAddressModal(addr, $event)" title="Edit Address" aria-label="Edit Address">
+                    <i class="pi pi-pencil"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div class="addr-body">
+                <div class="addr-name">{{ addr.fullName }}</div>
+                <div class="addr-lines">
+                  {{ addr.doorNo }}, {{ addr.street }}<span *ngIf="addr.landmark">, {{ addr.landmark }}</span>
+                </div>
+                <div class="addr-city">{{ addr.city }}, {{ addr.state }} - <strong>{{ addr.pincode }}</strong></div>
+                <div class="addr-phone">
+                  <i class="pi pi-phone"></i> {{ addr.phone }}
+                </div>
+              </div>
+
+              <div class="addr-bottom-status">
+                <span class="use-addr-text" *ngIf="selectedAddress?.id === addr.id">
+                  <i class="pi pi-check"></i> Deliver to this address
+                </span>
+                <span class="select-addr-prompt" *ngIf="selectedAddress?.id !== addr.id">
+                  Click to select
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- NO SAVED ADDRESSES: FRIENDLY EMPTY STATE -->
+          <div class="empty-address-state" *ngIf="savedAddresses.length === 0">
+            <div class="empty-icon-box">
+              <i class="pi pi-map-marker"></i>
+            </div>
+            <h3>Where should we deliver your order?</h3>
+            <p>Add a delivery address to continue with your purchase. We deliver across India with safe packaging.</p>
+            <button type="button" class="btn-primary-action" (click)="openAddAddressModal()">
+              <i class="pi pi-plus"></i> Add Delivery Address
+            </button>
+          </div>
+        </section>
+
+        <!-- 3. SHIPPING & DELIVERY METHOD -->
+        <section class="checkout-card shipping-card">
+          <div class="card-header-row">
+            <div class="card-title-group">
+              <span class="card-step-badge">Step 3</span>
+              <h2>Delivery Options</h2>
+            </div>
+            <span class="delivery-est-badge">
+              <i class="pi pi-clock"></i> Est. Delivery: <strong>{{ estimatedDeliveryDateText }}</strong>
+            </span>
+          </div>
+
+          <div class="shipping-options-group">
+            <!-- Standard Delivery Option -->
+            <label class="shipping-option-card" [class.is-selected]="selectedShippingMethod === 'STANDARD'">
+              <input 
+                type="radio" 
+                name="shippingMethod" 
+                value="STANDARD" 
+                [checked]="selectedShippingMethod === 'STANDARD'"
+                (change)="onShippingMethodChange('STANDARD')" 
+              />
+              <div class="shipping-option-content">
+                <div class="shipping-title-row">
+                  <span class="shipping-name">Standard Delivery (Pan-India)</span>
+                  <span class="shipping-cost" [class.free]="shippingFee === 0 && selectedShippingMethod === 'STANDARD'">
+                    {{ (shippingFee === 0 && selectedShippingMethod === 'STANDARD') ? 'FREE' : '₹99' }}
+                  </span>
+                </div>
+                <p class="shipping-desc">
+                  Estimated delivery in 3–5 business days. Safe protective packaging & door-to-door courier tracking.
+                </p>
+                <span class="free-sub-note" *ngIf="subtotal >= 999">
+                  <i class="pi pi-sparkles"></i> Free delivery applied for orders above ₹999!
+                </span>
+                <span class="free-sub-note" *ngIf="appliedOffer?.type === 'FREE_DELIVERY'">
+                  <i class="pi pi-tag"></i> Free delivery promo ({{ appliedOffer?.code }}) applied!
+                </span>
+              </div>
+            </label>
+
+            <!-- Express Studio Dispatch Option -->
+            <label class="shipping-option-card" [class.is-selected]="selectedShippingMethod === 'EXPRESS'">
+              <input 
+                type="radio" 
+                name="shippingMethod" 
+                value="EXPRESS" 
+                [checked]="selectedShippingMethod === 'EXPRESS'"
+                (change)="onShippingMethodChange('EXPRESS')" 
+              />
+              <div class="shipping-option-content">
+                <div class="shipping-title-row">
+                  <span class="shipping-name">
+                    Express 3D Studio Dispatch
+                    <span class="speed-pill"><i class="pi pi-bolt"></i> Priority Print</span>
+                  </span>
+                  <span class="shipping-cost">₹199</span>
+                </div>
+                <p class="shipping-desc">
+                  Estimated delivery in 1–2 business days. Slicing priority at top of print farm queue & express air courier.
+                </p>
+              </div>
+            </label>
+          </div>
+        </section>
+
       </div>
 
-      <a routerLink="/" class="btn btn-primary">Return to Storefront</a>
+      <!-- RIGHT SIDEBAR: ORDER SUMMARY (STICKY) -->
+      <aside class="checkout-summary-sidebar">
+        <div class="summary-box">
+          <h3 class="summary-heading">Order Summary</h3>
+
+          <!-- Compact items recap -->
+          <div class="summary-items-recap">
+            <div class="recap-item" *ngFor="let it of activeCheckoutItems">
+              <img [src]="it.product.image || it.product.imageUrl || '/images/products/astronaut.svg'" [alt]="it.product.name" class="recap-img" />
+              <div class="recap-info">
+                <div class="recap-title">{{ it.product.name }}</div>
+                <div class="recap-qty">Qty: {{ it.quantity }} · {{ it.selectedColor }}</div>
+              </div>
+              <div class="recap-price">₹{{ it.product.price * it.quantity }}</div>
+            </div>
+          </div>
+
+          <!-- Promo Code Box -->
+          <div class="promo-section">
+            <label class="promo-label" for="promoInput">Have a promo code?</label>
+            <div class="promo-input-row" *ngIf="!appliedOffer">
+              <input 
+                id="promoInput"
+                type="text" 
+                class="promo-input" 
+                placeholder="e.g. FIRST299, OFF499" 
+                [(ngModel)]="couponInput" 
+                (keyup.enter)="applyCoupon()"
+                autocomplete="off"
+              />
+              <button type="button" class="btn-apply-promo" (click)="applyCoupon()">Apply</button>
+            </div>
+
+            <!-- Applied Promo Badge -->
+            <div class="applied-promo-tag" *ngIf="appliedOffer">
+              <div class="promo-left">
+                <i class="pi pi-tag"></i>
+                <span class="promo-code-name">{{ appliedOffer.code }}</span>
+                <span class="promo-saving">Saved ₹{{ discountAmount }}</span>
+              </div>
+              <button type="button" class="btn-remove-promo" (click)="removeCoupon()" title="Remove coupon">
+                <i class="pi pi-times"></i>
+              </button>
+            </div>
+
+            <!-- Messages -->
+            <div class="promo-msg success" *ngIf="couponSuccess">{{ couponSuccess }}</div>
+            <div class="promo-msg error" *ngIf="couponError">{{ couponError }}</div>
+
+            <!-- Quick sample offer pills -->
+            <div class="quick-promo-chips" *ngIf="!appliedOffer">
+              <span class="quick-chip-hint">Available:</span>
+              <button 
+                type="button" 
+                class="quick-chip" 
+                *ngFor="let c of quickOffers" 
+                (click)="applyCoupon(c)">
+                {{ c }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Price Lines Breakdown -->
+          <div class="pricing-breakdown">
+            <div class="price-line">
+              <span class="line-label">Product Subtotal</span>
+              <span class="line-val">₹{{ subtotal }}</span>
+            </div>
+
+            <div class="price-line discount-line" *ngIf="discountAmount > 0">
+              <span class="line-label">Promo Discount ({{ appliedOffer?.code }})</span>
+              <span class="line-val">- ₹{{ discountAmount }}</span>
+            </div>
+
+            <div class="price-line">
+              <span class="line-label">Delivery / Shipping</span>
+              <span class="line-val" [class.free]="shippingFee === 0">
+                {{ shippingFee === 0 ? 'FREE' : '₹' + shippingFee }}
+              </span>
+            </div>
+
+            <div class="price-line tax-line">
+              <span class="line-label">GST & Taxes</span>
+              <span class="line-val">Included in price</span>
+            </div>
+
+            <div class="price-line total-line">
+              <span class="total-label">Total Amount</span>
+              <span class="total-val">₹{{ grandTotal }}</span>
+            </div>
+          </div>
+
+          <!-- Primary CTA Button -->
+          <button 
+            type="button" 
+            class="btn-continue-payment" 
+            (click)="continueToPayment()"
+            [disabled]="activeCheckoutItems.length === 0">
+            <span>Continue to Payment</span>
+            <i class="pi pi-arrow-right"></i>
+          </button>
+
+          <!-- Security Badges -->
+          <div class="security-strip">
+            <div class="sec-item"><i class="pi pi-lock"></i> 256-bit SSL Secure</div>
+            <div class="sec-item"><i class="pi pi-verified"></i> Quality Assured</div>
+          </div>
+        </div>
+      </aside>
+
     </div>
 
-    <div class="checkout-grid" *ngIf="!placedOrder">
-      <!-- Shipping Form -->
-      <form class="checkout-form" (ngSubmit)="placeOrder()" #chkForm="ngForm">
-        <h2>Delivery Address</h2>
+    <!-- ========================================================================= -->
+    <!-- STEP 3: SECURE PAYMENT & TRANSACTION -->
+    <!-- ========================================================================= -->
+    <div class="payment-step-view" *ngIf="currentStep === 3 && !placedOrder">
+      <div class="payment-layout-grid">
 
-        <div class="form-group" *ngIf="savedAddresses.length">
-          <label class="form-label" for="savedAddress">Use a saved address</label>
-          <select id="savedAddress" class="form-control" name="savedAddress" [(ngModel)]="selectedAddressId" (ngModelChange)="useSavedAddress($event)">
-            <option [ngValue]="null">Enter a different address</option>
-            <option *ngFor="let address of savedAddresses" [ngValue]="address.id">{{ address.label }} — {{ address.addressLine1 }}, {{ address.city }}</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Full Name *</label>
-          <input type="text" class="form-control" [(ngModel)]="customer.fullName" name="fullName" required placeholder="John Doe" />
-        </div>
-
-        <div class="form-grid">
-          <div class="form-group">
-            <label class="form-label">Email Address *</label>
-            <input type="email" class="form-control" [(ngModel)]="customer.email" name="email" required placeholder="john@example.com" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Phone Number *</label>
-            <input type="tel" class="form-control" [(ngModel)]="customer.phone" name="phone" required placeholder="+91 98765 43210" />
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Address Line *</label>
-          <input type="text" class="form-control" [(ngModel)]="customer.address" name="address" required placeholder="Apartment, Street address" />
-        </div>
-
-        <div class="form-grid-three">
-          <div class="form-group">
-            <label class="form-label">City *</label>
-            <input type="text" class="form-control" [(ngModel)]="customer.city" name="city" required placeholder="Chennai" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">State *</label>
-            <input type="text" class="form-control" [(ngModel)]="customer.state" name="state" required />
-          </div>
-          <div class="form-group">
-            <label class="form-label">PIN Code *</label>
-            <input type="text" class="form-control" [(ngModel)]="customer.pincode" name="pincode" required placeholder="600001" />
-          </div>
-        </div>
-
-        <h2 class="mt-4">Payment Method (Mock Sandbox)</h2>
-        <div class="payment-mock-badge">
-          <i class="pi pi-credit-card"></i> Cash on Delivery / UPI on Delivery Enabled
-        </div>
-
-        <button type="submit" class="btn btn-primary btn-block btn-lg" [disabled]="!chkForm.form.valid || cartService.cartItems().length === 0">
-          Place Order (₹{{ cartService.grandTotal() }})
-        </button>
-      </form>
-
-      <!-- Sidebar Order Review -->
-      <div class="order-summary-sidebar">
-        <h3>Order Items ({{ cartService.totalItemsCount() }})</h3>
-        <div class="mini-items-list">
-          <div class="mini-item" *ngFor="let item of cartService.cartItems()">
-            <img [src]="item.product.image" [alt]="item.product.name" />
-            <div class="mini-info">
-              <h4>{{ item.product.name }}</h4>
-              <small>{{ item.selectedColor }} x {{ item.quantity }}</small>
+        <!-- LEFT: PAYMENT METHODS -->
+        <div class="payment-methods-col">
+          <div class="checkout-card">
+            <div class="card-header-row">
+              <div class="card-title-group">
+                <span class="card-step-badge">Step 3</span>
+                <h2>Secure Payment</h2>
+              </div>
+              <span class="security-badge-top">
+                <i class="pi pi-shield"></i> PCI-DSS Encrypted
+              </span>
             </div>
-            <div class="mini-price">₹{{ item.product.price * item.quantity }}</div>
+            <p class="payment-intro-text">
+              Choose your preferred payment method. Transactions are authenticated with bank-grade encryption.
+            </p>
+
+            <!-- Inline Failure Banner if previous transaction failed -->
+            <div class="payment-failure-card" *ngIf="paymentFailed">
+              <div class="failure-icon"><i class="pi pi-exclamation-triangle"></i></div>
+              <div class="failure-content">
+                <h4>Payment Couldn't Be Completed</h4>
+                <p>{{ paymentFailureReason || 'Your transaction was declined by the bank or timed out. No amount has been deducted.' }}</p>
+                <div class="failure-actions">
+                  <button type="button" class="btn-retry-pay" (click)="retryPayment()">
+                    <i class="pi pi-refresh"></i> Try Again
+                  </button>
+                  <span class="or-text">or choose another method below</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Inline Cancellation Banner if previous transaction was dismissed -->
+            <div class="payment-failure-card" style="border-left-color: #f59e0b;" *ngIf="paymentCancelled">
+              <div class="failure-icon" style="color: #f59e0b;"><i class="pi pi-info-circle"></i></div>
+              <div class="failure-content">
+                <h4 style="color: #b45309;">Payment Window Closed</h4>
+                <p>{{ paymentFailureReason || 'The payment window was closed before completion. You can safely retry when ready.' }}</p>
+                <div class="failure-actions">
+                  <button type="button" class="btn-retry-pay" (click)="retryPayment()">
+                    <i class="pi pi-refresh"></i> Retry Payment
+                  </button>
+                  <span class="or-text">or choose another payment method below</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Inline Verification Timeout / Delayed Banner -->
+            <div class="payment-failure-card timeout" style="border-left: 4px solid #f59e0b;" *ngIf="isVerificationTimedOut">
+              <div class="failure-icon"><i class="pi pi-hourglass"></i></div>
+              <div class="failure-content">
+                <h4 style="color: #b45309;">Payment Verification Delayed</h4>
+                <p style="color: #92400e;">{{ paymentLifecycle.statusMessage }}</p>
+                <div class="failure-actions">
+                  <button type="button" class="btn-retry-pay" (click)="checkPendingPaymentStatus()" [disabled]="isReconciling">
+                    <i class="pi pi-spin pi-spinner" *ngIf="isReconciling"></i>
+                    <i class="pi pi-refresh" *ngIf="!isReconciling"></i>
+                    <span>{{ isReconciling ? 'Checking Server...' : 'Check Payment Status' }}</span>
+                  </button>
+                  <button type="button" class="btn-cancel-subtle" (click)="cancelPaymentAttempt()">
+                    Cancel Attempt
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- PAYMENT MODE OPTIONS (CLEAN & DIRECT) -->
+            <div class="payment-options-list">
+
+              <!-- OPTION 1: UPI / QR CODE -->
+              <div 
+                class="payment-mode-card" 
+                [class.is-selected]="selectedPaymentMethod === 'UPI'" 
+                (click)="selectedPaymentMethod = 'UPI'">
+                <div class="mode-radio">
+                  <input type="radio" name="paymentOption" [checked]="selectedPaymentMethod === 'UPI'" />
+                </div>
+                <div class="mode-icon-box upi">
+                  <i class="pi pi-qrcode"></i>
+                </div>
+                <div class="mode-text-group">
+                  <div class="mode-title-row">
+                    <span class="mode-title">UPI / QR Code</span>
+                    <span class="mode-badge green">Instant</span>
+                  </div>
+                  <p class="mode-desc">Pay via QR code or any UPI app in Razorpay</p>
+                </div>
+              </div>
+
+              <!-- OPTION 2: CREDIT OR DEBIT CARD -->
+              <div 
+                class="payment-mode-card" 
+                [class.is-selected]="selectedPaymentMethod === 'CARD'" 
+                (click)="selectedPaymentMethod = 'CARD'">
+                <div class="mode-radio">
+                  <input type="radio" name="paymentOption" [checked]="selectedPaymentMethod === 'CARD'" />
+                </div>
+                <div class="mode-icon-box card">
+                  <i class="pi pi-credit-card"></i>
+                </div>
+                <div class="mode-text-group">
+                  <div class="mode-title-row">
+                    <span class="mode-title">Credit or Debit Card</span>
+                    <span class="mode-badge blue">Bank-Grade 256-bit</span>
+                  </div>
+                  <p class="mode-desc">Pay securely with any credit or debit card in Razorpay</p>
+                </div>
+              </div>
+
+              <!-- OPTION 3: NET BANKING -->
+              <div 
+                class="payment-mode-card" 
+                [class.is-selected]="selectedPaymentMethod === 'NET_BANKING'" 
+                (click)="selectedPaymentMethod = 'NET_BANKING'">
+                <div class="mode-radio">
+                  <input type="radio" name="paymentOption" [checked]="selectedPaymentMethod === 'NET_BANKING'" />
+                </div>
+                <div class="mode-icon-box bank">
+                  <i class="pi pi-building"></i>
+                </div>
+                <div class="mode-text-group">
+                  <div class="mode-title-row">
+                    <span class="mode-title">Net Banking</span>
+                    <span class="mode-badge purple">50+ Banks</span>
+                  </div>
+                  <p class="mode-desc">Direct account transfer supported across all major banks in Razorpay</p>
+                </div>
+              </div>
+
+              <!-- OPTION 4: CASH / UPI ON DELIVERY -->
+              <div 
+                class="payment-mode-card" 
+                [class.is-selected]="selectedPaymentMethod === 'COD'" 
+                (click)="selectedPaymentMethod = 'COD'">
+                <div class="mode-radio">
+                  <input type="radio" name="paymentOption" [checked]="selectedPaymentMethod === 'COD'" />
+                </div>
+                <div class="mode-icon-box cod">
+                  <i class="pi pi-truck"></i>
+                </div>
+                <div class="mode-text-group">
+                  <div class="mode-title-row">
+                    <span class="mode-title">Cash / UPI on Delivery</span>
+                    <span class="mode-badge amber">Pay at Doorstep</span>
+                  </div>
+                  <p class="mode-desc">Pay securely with cash or UPI QR upon delivery at your doorstep</p>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- BACK TO DELIVERY LINK -->
+            <div class="back-link-wrap">
+              <button type="button" class="btn-back-step" (click)="backToDelivery()">
+                <i class="pi pi-arrow-left"></i> Change delivery address or items
+              </button>
+            </div>
           </div>
         </div>
 
-        <div class="sub-line">
-          <span>Subtotal</span>
-          <strong>₹{{ cartService.subtotal() }}</strong>
+        <!-- RIGHT: FINAL ORDER REVIEW & PAY BUTTON -->
+        <aside class="payment-review-col">
+          <div class="summary-box">
+            <h3 class="summary-heading">Final Order Review</h3>
+
+            <!-- Order Destination Snapshot -->
+            <div class="review-snapshot-box" *ngIf="selectedAddress">
+              <div class="snapshot-header">
+                <span class="snapshot-lbl">DELIVER TO</span>
+                <button type="button" class="btn-change-subtle" (click)="backToDelivery()">Change</button>
+              </div>
+              <div class="snapshot-name">{{ selectedAddress.fullName }}</div>
+              <div class="snapshot-addr">
+                {{ selectedAddress.doorNo }}, {{ selectedAddress.street }}, {{ selectedAddress.city }} - {{ selectedAddress.pincode }}
+              </div>
+              <div class="snapshot-phone"><i class="pi pi-phone"></i> {{ selectedAddress.phone }}</div>
+            </div>
+
+            <!-- Selected Method Snapshot -->
+            <div class="review-snapshot-box">
+              <div class="snapshot-header">
+                <span class="snapshot-lbl">PAYMENT METHOD</span>
+              </div>
+              <div class="snapshot-val">
+                <i class="pi pi-credit-card"></i> {{ getPaymentMethodLabel() }}
+              </div>
+            </div>
+
+            <!-- Total Amount -->
+            <div class="pricing-breakdown">
+              <div class="price-line">
+                <span>Items Subtotal</span>
+                <span>₹{{ subtotal }}</span>
+              </div>
+              <div class="price-line discount-line" *ngIf="discountAmount > 0">
+                <span>Discount</span>
+                <span>- ₹{{ discountAmount }}</span>
+              </div>
+              <div class="price-line">
+                <span>Delivery</span>
+                <span>{{ shippingFee === 0 ? 'FREE' : '₹' + shippingFee }}</span>
+              </div>
+              <div class="price-line total-line">
+                <span class="total-label">Total to Pay</span>
+                <span class="total-val">₹{{ grandTotal }}</span>
+              </div>
+            </div>
+
+            <!-- Primary Payment Button -->
+            <button 
+              type="button" 
+              class="btn-pay-now" 
+              (click)="submitPayment()"
+              [disabled]="isPayButtonDisabled">
+              <span *ngIf="!isProcessingPayment && !isVerificationTimedOut">
+                {{ selectedPaymentMethod === 'COD' ? 'Confirm Order (₹' + grandTotal + ' COD)' : 'Pay ₹' + grandTotal }}
+              </span>
+              <span *ngIf="isProcessingPayment" class="processing-spinner">
+                <i class="pi pi-spin pi-spinner"></i> Authorizing...
+              </span>
+              <span *ngIf="isVerificationTimedOut" class="processing-spinner">
+                <i class="pi pi-hourglass"></i> Verification Pending
+              </span>
+              <i class="pi pi-lock" *ngIf="!isProcessingPayment && !isVerificationTimedOut"></i>
+            </button>
+
+            <!-- Payment Cancellation or Failure Alert Banner -->
+            <div class="payment-alert-box cancelled" *ngIf="paymentCancelled">
+              <div class="alert-icon"><i class="pi pi-info-circle"></i></div>
+              <div class="alert-content">
+                <strong>Payment Window Closed</strong>
+                <p>{{ paymentFailureReason }}</p>
+              </div>
+              <button type="button" class="btn-alert-action" (click)="retryPayment()">Retry Payment</button>
+            </div>
+
+            <div class="payment-alert-box timeout" style="border-left: 4px solid #f59e0b; background-color: rgba(245, 158, 11, 0.08); color: #a16207;" *ngIf="isVerificationTimedOut">
+              <div class="alert-icon" style="color: #d97706;"><i class="pi pi-hourglass"></i></div>
+              <div class="alert-content">
+                <strong style="color: #b45309;">Verification Delayed</strong>
+                <p style="color: #92400e;">{{ paymentLifecycle.statusMessage }}</p>
+              </div>
+              <button type="button" class="btn-alert-action" (click)="checkPendingPaymentStatus()" [disabled]="isReconciling">
+                {{ isReconciling ? 'Checking...' : 'Check Status' }}
+              </button>
+            </div>
+
+            <div class="payment-alert-box failed" *ngIf="paymentFailed">
+              <div class="alert-icon"><i class="pi pi-exclamation-triangle"></i></div>
+              <div class="alert-content">
+                <strong>Payment Not Completed</strong>
+                <p>{{ paymentFailureReason }}</p>
+              </div>
+              <button type="button" class="btn-alert-action" (click)="retryPayment()">Try Again</button>
+            </div>
+
+            <div class="security-strip">
+              <div class="sec-item"><i class="pi pi-shield"></i> 100% Protected Transaction</div>
+            </div>
+          </div>
+        </aside>
+
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- STEP 4: ORDER CONFIRMATION SCREEN -->
+    <!-- ========================================================================= -->
+    <div class="order-confirmation-screen" *ngIf="placedOrder && currentStep === 4">
+      <div class="confirmation-card">
+        
+        <div class="success-glow-badge">
+          <div class="success-icon-ring">
+            <i class="pi" [ngClass]="(placedOrder.status === 'CONFIRMED' || placedOrder.status === 'Confirmed') ? 'pi-check' : 'pi-clock'"></i>
+          </div>
         </div>
-        <div class="sub-line">
-          <span>Shipping</span>
-          <span>{{ cartService.deliveryFee() === 0 ? 'FREE' : '₹' + cartService.deliveryFee() }}</span>
+
+        <h1 class="confirm-title" *ngIf="placedOrder.status === 'CONFIRMED' || placedOrder.status === 'Confirmed'">Order Confirmed!</h1>
+        <h1 class="confirm-title" *ngIf="placedOrder.status !== 'CONFIRMED' && placedOrder.status !== 'Confirmed'">Order Placed — Payment Pending</h1>
+        <p class="confirm-sub" *ngIf="placedOrder.status === 'CONFIRMED' || placedOrder.status === 'Confirmed'">
+          Thank you for choosing <strong>Craftora 3D</strong>. Your custom order has been successfully placed and forwarded to our 3D print lab.
+        </p>
+        <p class="confirm-sub" *ngIf="placedOrder.status !== 'CONFIRMED' && placedOrder.status !== 'Confirmed'">
+          Thank you for choosing <strong>Craftora 3D</strong>. Your order has been placed with inventory reserved. Razorpay payment order is initialized.
+        </p>
+
+        <!-- Order ID Pill -->
+        <div class="order-id-pill" (click)="copyOrderId(placedOrder.id)" title="Click to copy Order ID">
+          <span class="id-lbl">ORDER REFERENCE:</span>
+          <span class="id-val">#{{ placedOrder.id }}</span>
+          <i class="pi" [ngClass]="copiedOrderId ? 'pi-check' : 'pi-copy'"></i>
+          <span class="copied-tooltip" *ngIf="copiedOrderId">Copied!</span>
         </div>
-        <div class="sub-line total-highlight">
-          <span>Total</span>
-          <strong>₹{{ cartService.grandTotal() }}</strong>
+
+        <!-- Confirmation Grid -->
+        <div class="confirm-grid">
+          
+          <!-- Column 1: Items Purchased -->
+          <div class="confirm-box items-box">
+            <h3><i class="pi pi-box"></i> Items In This Order</h3>
+            <div class="confirm-items-list">
+              <div class="confirm-item-row" *ngFor="let it of placedOrder.items">
+                <img [src]="it.product.image || it.product.imageUrl || '/images/products/astronaut.svg'" [alt]="it.product.name" />
+                <div class="item-text">
+                  <strong>{{ it.product.name }}</strong>
+                  <div class="item-meta">
+                    <span>Finish: {{ it.selectedColor }}</span>
+                    <span>·</span>
+                    <span>Qty: {{ it.quantity }}</span>
+                  </div>
+                </div>
+                <div class="item-price">₹{{ it.product.price * it.quantity }}</div>
+              </div>
+            </div>
+
+            <div class="confirm-totals-breakdown">
+              <div class="c-line"><span>Subtotal:</span> <strong>₹{{ placedOrder.subtotal }}</strong></div>
+              <div class="c-line" *ngIf="placedOrder.discount"><span>Discount:</span> <strong class="text-green">- ₹{{ placedOrder.discount }}</strong></div>
+              <div class="c-line"><span>Delivery:</span> <strong>{{ placedOrder.deliveryFee === 0 ? 'FREE' : '₹' + placedOrder.deliveryFee }}</strong></div>
+              <div class="c-line grand"><span>{{ (placedOrder.paymentStatus === 'Paid' || placedOrder.paymentStatus === 'PAID') ? 'Total Paid:' : 'Total Amount:' }}</span> <strong>₹{{ placedOrder.total }}</strong></div>
+            </div>
+          </div>
+
+          <!-- Column 2: Delivery & Status -->
+          <div class="confirm-box delivery-box">
+            <h3><i class="pi pi-map-marker"></i> Delivery Destination</h3>
+            <div class="delivery-snapshot">
+              <strong>{{ placedOrder.customer.fullName }}</strong>
+              <p>{{ placedOrder.customer.address }}</p>
+              <p>{{ placedOrder.customer.city }}, {{ placedOrder.customer.state }} - {{ placedOrder.customer.pincode }}</p>
+              <p class="phone-line"><i class="pi pi-phone"></i> {{ placedOrder.customer.phone }}</p>
+            </div>
+
+            <hr class="confirm-divider" />
+
+            <div class="fulfillment-details">
+              <div class="detail-row">
+                <span class="detail-label">Status:</span>
+                <span class="status-chip" [class.confirmed]="placedOrder.status === 'CONFIRMED' || placedOrder.status === 'Confirmed'" [class.payment-pending]="placedOrder.status !== 'CONFIRMED' && placedOrder.status !== 'Confirmed'">
+                  <i class="pi" [ngClass]="(placedOrder.status === 'CONFIRMED' || placedOrder.status === 'Confirmed') ? 'pi-check-circle' : 'pi-clock'"></i>
+                  {{ placedOrder.status }}
+                </span>
+              </div>
+              <div class="detail-row" *ngIf="placedOrder.paymentOrderId">
+                <span class="detail-label">Payment Order ID:</span>
+                <span class="detail-val font-mono">{{ placedOrder.paymentOrderId }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Estimated Delivery:</span>
+                <span class="detail-val">{{ estimatedDeliveryDateText || '3 - 5 business days' }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Courier Partner:</span>
+                <span class="detail-val">{{ placedOrder.courierPartner || 'Express Studio Dispatch' }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Payment Method:</span>
+                <span class="detail-val">{{ placedOrder.paymentMethod || 'Prepaid' }}</span>
+              </div>
+              <div class="detail-row" *ngIf="placedOrder.paymentStatus">
+                <span class="detail-label">Payment Status:</span>
+                <span class="detail-val">{{ placedOrder.paymentStatus }}</span>
+              </div>
+            </div>
+          </div>
+
         </div>
+
+        <!-- Post-Order Navigation Buttons -->
+        <div class="confirmation-actions">
+          <a [routerLink]="['/track-order']" [queryParams]="{ orderId: placedOrder.id }" class="btn btn-primary btn-track-order">
+            <i class="pi pi-compass"></i>
+            <span>Track Order Status</span>
+          </a>
+          <a routerLink="/shop" class="btn btn-secondary btn-continue-shop">
+            <i class="pi pi-shopping-bag"></i>
+            <span>Continue Shopping</span>
+          </a>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- ADD / EDIT ADDRESS MODAL / DRAWER -->
+  <!-- ========================================================================= -->
+  <div class="address-modal-backdrop" *ngIf="isAddressModalOpen" (click)="closeAddressModal()">
+    <div class="address-modal-container" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <i class="pi pi-map-marker"></i>
+          <h3>{{ editingAddressId ? 'Edit Delivery Address' : 'Add New Delivery Address' }}</h3>
+        </div>
+        <button type="button" class="btn-close-modal" (click)="closeAddressModal()" aria-label="Close modal">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-error-alert" *ngIf="addressError">
+          <i class="pi pi-exclamation-circle"></i> {{ addressError }}
+        </div>
+
+        <form (ngSubmit)="saveAddressFromModal()">
+          <!-- Address Type Chips -->
+          <div class="form-group">
+            <label class="form-label">Address Type</label>
+            <div class="type-chips-group">
+              <button 
+                type="button" 
+                class="type-chip" 
+                [class.active]="addressForm.type === 'Home'" 
+                (click)="addressForm.type = 'Home'">
+                <i class="pi pi-home"></i> Home
+              </button>
+              <button 
+                type="button" 
+                class="type-chip" 
+                [class.active]="addressForm.type === 'Work'" 
+                (click)="addressForm.type = 'Work'">
+                <i class="pi pi-briefcase"></i> Work
+              </button>
+              <button 
+                type="button" 
+                class="type-chip" 
+                [class.active]="addressForm.type === 'Other'" 
+                (click)="addressForm.type = 'Other'">
+                <i class="pi pi-map-marker"></i> Other
+              </button>
+            </div>
+          </div>
+
+          <!-- Contact Fields -->
+          <div class="form-grid-two">
+            <div class="form-group">
+              <label class="form-label">Full Name *</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                [(ngModel)]="addressForm.fullName" 
+                name="fullName" 
+                placeholder="e.g. Kaliraj K" 
+                required 
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Mobile Number *</label>
+              <input 
+                type="tel" 
+                class="form-control" 
+                [(ngModel)]="addressForm.phone" 
+                name="phone" 
+                placeholder="e.g. 98765 43210" 
+                required 
+              />
+            </div>
+          </div>
+
+          <!-- Address Lines -->
+          <div class="form-group">
+            <label class="form-label">Flat / House / Door Number *</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              [(ngModel)]="addressForm.doorNo" 
+              name="doorNo" 
+              placeholder="e.g. Flat 3B, Sunshine Apartments, #42" 
+              required 
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Street / Area Name *</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              [(ngModel)]="addressForm.street" 
+              name="street" 
+              placeholder="e.g. 1st Cross Street, OMR IT Corridor" 
+              required 
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Landmark (Optional)</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              [(ngModel)]="addressForm.landmark" 
+              name="landmark" 
+              placeholder="e.g. Near Apollo Hospital" 
+            />
+          </div>
+
+          <!-- City, State, PIN -->
+          <div class="form-grid-three">
+            <div class="form-group">
+              <label class="form-label">City *</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                [(ngModel)]="addressForm.city" 
+                name="city" 
+                placeholder="e.g. Chennai" 
+                required 
+              />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">State *</label>
+              <select class="form-control select-state" [(ngModel)]="addressForm.state" name="state" required>
+                <option *ngFor="let s of indianStates" [value]="s">{{ s }}</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">PIN Code *</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                [(ngModel)]="addressForm.pincode" 
+                name="pincode" 
+                placeholder="e.g. 600096" 
+                maxlength="6"
+                required 
+              />
+            </div>
+          </div>
+
+          <!-- Save for Future checkbox -->
+          <div class="form-checkbox-row">
+            <label class="custom-checkbox-label">
+              <input type="checkbox" [(ngModel)]="addressForm.saveForFuture" name="saveForFuture" />
+              <span>Save this address for future purchases</span>
+            </label>
+          </div>
+
+          <div class="modal-footer-actions">
+            <button type="button" class="btn btn-secondary" (click)="closeAddressModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save & Use Address</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
+
+  <!-- ========================================================================= -->
+  <!-- PAYMENT PROCESSING OVERLAY -->
+  <!-- ========================================================================= -->
+  <div class="processing-modal-backdrop" *ngIf="isProcessingPayment">
+    <div class="processing-card">
+      <div class="processing-ring-wrap">
+        <div class="pulsing-shield"><i class="pi pi-lock"></i></div>
+        <div class="animated-spinner-ring"></div>
+      </div>
+      <h3>Processing Your Payment</h3>
+      <p class="status-live-text">{{ processingStatus }}</p>
+      <span class="processing-subnote">Please do not refresh, close, or navigate away from this screen.</span>
+      <button 
+        type="button" 
+        class="btn-cancel-processing" 
+        *ngIf="canManualCancelProcessing" 
+        (click)="cancelPaymentAttempt()">
+        Cancel & Return to Checkout
+      </button>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MOBILE STICKY BOTTOM BAR -->
+  <!-- ========================================================================= -->
+  <div class="mobile-sticky-bar" *ngIf="currentStep < 4 && !placedOrder">
+    <div class="mobile-bar-total">
+      <span class="mobile-bar-lbl">Total Amount</span>
+      <span class="mobile-bar-val">₹{{ grandTotal }}</span>
+    </div>
+    <button 
+      type="button" 
+      class="mobile-bar-btn" 
+      *ngIf="currentStep <= 2"
+      (click)="continueToPayment()"
+      [disabled]="activeCheckoutItems.length === 0">
+      <span>Continue to Payment</span>
+      <i class="pi pi-arrow-right"></i>
+    </button>
+    <button 
+      type="button" 
+      class="mobile-bar-btn pay" 
+      *ngIf="currentStep === 3"
+      (click)="submitPayment()"
+      [disabled]="isPayButtonDisabled">
+      <span *ngIf="!isVerificationTimedOut">Pay ₹{{ grandTotal }}</span>
+      <span *ngIf="isVerificationTimedOut">Verification Pending</span>
+      <i class="pi pi-lock" *ngIf="!isVerificationTimedOut"></i>
+      <i class="pi pi-hourglass" *ngIf="isVerificationTimedOut"></i>
+    </button>
+  </div>
+
+  <!-- SIGN IN REQUIRED MODAL ON CHECKOUT -->
+  <div class="auth-prompt-backdrop" *ngIf="showSignInPrompt" (click)="onCancelSignIn()">
+    <div class="auth-prompt-card" (click)="$event.stopPropagation()">
+      <div class="auth-prompt-icon-ring">
+        <i class="pi pi-lock"></i>
+      </div>
+      <h3 class="auth-prompt-title">Sign In Required for Purchase</h3>
+      <p class="auth-prompt-desc">
+        Please sign in to your Craftora account to proceed with your order.
+      </p>
+      <div class="auth-prompt-actions">
+        <button type="button" class="btn btn-secondary auth-btn-cancel" (click)="onCancelSignIn()">
+          Cancel
+        </button>
+        <button type="button" class="btn btn-primary auth-btn-ok" (click)="onConfirmSignIn()">
+          <i class="pi pi-sign-in"></i> Sign In / OK
+        </button>
+      </div>
+    </div>
+  </div>
+
 </div>

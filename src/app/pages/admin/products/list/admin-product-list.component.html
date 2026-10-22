@@ -1,57 +1,375 @@
 <section class="admin-page-content catalogue-page">
+  <!-- Page Header -->
   <header class="catalogue-header">
-    <div>
-      <span class="eyebrow">CATALOGUE MANAGEMENT</span>
-      <h1>Products</h1>
-      <p class="page-lead">Manage the products displayed in your store.</p>
+    <div class="header-titles">
+      <span class="eyebrow"><i class="pi pi-box" aria-hidden="true"></i> CATALOGUE MANAGEMENT</span>
+      <h1>Product List</h1>
+      <p class="page-lead">Manage your 3D printing store catalogue, inventory status, and pricing.</p>
     </div>
     <div class="header-actions">
-      <a class="create-button" routerLink="/admin/products/new">
-        <span aria-hidden="true">＋</span> Add product
-      </a>
-      <button type="button" class="refresh-button" (click)="refresh()" [disabled]="isLoading">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4.9 9a7 7 0 0 1 11.8-2L20 12M4 17v-5h5m10.1 3a7 7 0 0 1-11.8 2L4 12" /></svg>
-        Refresh
+      <button type="button" class="btn-refresh" (click)="refresh()" [disabled]="isLoading" title="Refresh product list">
+        <i class="pi pi-refresh" [class.pi-spin]="isLoading" aria-hidden="true"></i>
+        <span>Refresh</span>
       </button>
+      <a routerLink="/admin/products/new" class="btn-create">
+        <i class="pi pi-plus" aria-hidden="true"></i>
+        <span>Add Product</span>
+      </a>
     </div>
   </header>
 
-  <div class="catalogue-meta" *ngIf="!isLoading && products.length">
-    <span class="product-count">{{ products.length }} {{ products.length === 1 ? 'product' : 'products' }}</span>
-    <span class="meta-caption">Catalogue inventory</span>
+  <!-- Alerts -->
+  <div class="alert-banner success-banner" *ngIf="successMessage" role="alert">
+    <div class="alert-content">
+      <i class="pi pi-check-circle" aria-hidden="true"></i>
+      <span>{{ successMessage }}</span>
+    </div>
+    <button type="button" class="btn-alert-close" (click)="dismissAlert()" aria-label="Dismiss alert">
+      <i class="pi pi-times" aria-hidden="true"></i>
+    </button>
   </div>
 
-  <p class="error" *ngIf="errorMessage" role="alert">{{ errorMessage }}</p>
-  <div class="loading-state" *ngIf="isLoading"><span class="loading-dot"></span> Loading catalogue…</div>
-  <div class="empty-state" *ngIf="!isLoading && products.length === 0">
-    <div class="empty-icon" aria-hidden="true">◇</div>
-    <h2>No products yet</h2>
-    <p>Add your first item to start building the store catalogue.</p>
-    <a routerLink="/admin/products/new" class="create-button">＋ Add your first product</a>
+  <div class="alert-banner error-banner" *ngIf="errorMessage" role="alert">
+    <div class="alert-content">
+      <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
+      <span>{{ errorMessage }}</span>
+    </div>
+    <button type="button" class="btn-alert-close" (click)="dismissAlert()" aria-label="Dismiss alert">
+      <i class="pi pi-times" aria-hidden="true"></i>
+    </button>
   </div>
 
-  <div class="table-wrap" *ngIf="!isLoading && products.length">
-    <table>
-      <thead><tr><th class="image-column">Product</th><th>Category</th><th>Price</th><th>Availability</th><th class="actions-heading">Manage</th></tr></thead>
-      <tbody>
-        <tr *ngFor="let product of products">
-          <td class="product-cell">
-            <img [src]="product.image || product.imageUrl || 'assets/placeholder.png'" [alt]="product.name" />
-            <div class="product-copy"><strong>{{ product.name }}</strong><span *ngIf="product.description">{{ product.description }}</span></div>
-          </td>
-          <td><span class="category-label">{{ product.category || 'Uncategorised' }}</span></td>
-          <td class="price-cell">₹{{ product.price | number:'1.0-2' }}</td>
-          <td><span class="stock-status" [class.out-of-stock]="!product.inStock"><i></i>{{ product.inStock ? 'In stock' : 'Out of stock' }}</span></td>
-          <td class="actions-cell">
-            <a [routerLink]="['/admin/products', product.id, 'edit']" class="icon-action edit-action" [attr.aria-label]="'Edit ' + product.name" title="Edit product">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 5 5 5M4 20l4.2-.9L19 8.3a2.1 2.1 0 0 0-3-3L5.2 16.1 4 20Z" /></svg><span>Edit</span>
-            </a>
-            <button type="button" class="icon-action delete-action" [disabled]="deletingId === product.id" (click)="deleteProduct(product)" [attr.aria-label]="'Delete ' + product.name" title="Delete product">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6m4-6v6M6 7l1 13h10l1-13M9 7V4h6v3" /></svg><span>{{ deletingId === product.id ? 'Deleting' : 'Delete' }}</span>
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+  <!-- KPI Metric Overview Cards -->
+  <div class="kpi-grid" *ngIf="!isLoading">
+    <div class="kpi-card" [class.active]="selectedStock === 'ALL' && selectedCategory === 'ALL'" (click)="filterByStock('ALL')" role="button" tabindex="0">
+      <div class="kpi-icon-wrap total">
+        <i class="pi pi-box" aria-hidden="true"></i>
+      </div>
+      <div class="kpi-details">
+        <span class="kpi-label">Total Products</span>
+        <strong class="kpi-value">{{ products.length }}</strong>
+      </div>
+      <span class="kpi-sub">In database</span>
+    </div>
+
+    <div class="kpi-card" [class.active]="selectedStock === 'IN_STOCK'" (click)="filterByStock('IN_STOCK')" role="button" tabindex="0">
+      <div class="kpi-icon-wrap instock">
+        <i class="pi pi-check-circle" aria-hidden="true"></i>
+      </div>
+      <div class="kpi-details">
+        <span class="kpi-label">In Stock</span>
+        <strong class="kpi-value text-emerald">{{ inStockCount }}</strong>
+      </div>
+      <span class="kpi-sub">Available for sale</span>
+    </div>
+
+    <div class="kpi-card" [class.active]="selectedStock === 'OUT_OF_STOCK'" (click)="filterByStock('OUT_OF_STOCK')" role="button" tabindex="0">
+      <div class="kpi-icon-wrap outstock">
+        <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+      </div>
+      <div class="kpi-details">
+        <span class="kpi-label">Out of Stock</span>
+        <strong class="kpi-value text-rose">{{ outOfStockCount }}</strong>
+      </div>
+      <span class="kpi-sub">Needs restock</span>
+    </div>
+
+    <div class="kpi-card info-only">
+      <div class="kpi-icon-wrap categories">
+        <i class="pi pi-tags" aria-hidden="true"></i>
+      </div>
+      <div class="kpi-details">
+        <span class="kpi-label">Categories</span>
+        <strong class="kpi-value text-teal">{{ categories.length }}</strong>
+      </div>
+      <span class="kpi-sub">Active departments</span>
+    </div>
+  </div>
+
+  <!-- Search, Filter & Controls Toolbar -->
+  <div class="catalogue-toolbar" *ngIf="!isLoading && products.length > 0">
+    <div class="search-box">
+      <i class="pi pi-search search-icon" aria-hidden="true"></i>
+      <input
+        type="text"
+        [(ngModel)]="searchQuery"
+        placeholder="Search product name, category, ID..."
+        aria-label="Search products"
+      />
+      <button
+        type="button"
+        class="btn-clear-search"
+        *ngIf="searchQuery"
+        (click)="searchQuery = ''"
+        aria-label="Clear search"
+      >
+        <i class="pi pi-times" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    <div class="filters-row">
+      <!-- Category Filter -->
+      <div class="select-wrap">
+        <i class="pi pi-tag select-icon" aria-hidden="true"></i>
+        <select [(ngModel)]="selectedCategory" aria-label="Filter by category">
+          <option value="ALL">All Categories</option>
+          <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+        </select>
+        <i class="pi pi-chevron-down chevron-icon" aria-hidden="true"></i>
+      </div>
+
+      <!-- Stock Status Filter -->
+      <div class="select-wrap">
+        <i class="pi pi-filter select-icon" aria-hidden="true"></i>
+        <select [(ngModel)]="selectedStock" aria-label="Filter by availability">
+          <option value="ALL">All Stock Statuses</option>
+          <option value="IN_STOCK">In Stock Only</option>
+          <option value="OUT_OF_STOCK">Out of Stock Only</option>
+        </select>
+        <i class="pi pi-chevron-down chevron-icon" aria-hidden="true"></i>
+      </div>
+
+      <!-- Sort Filter -->
+      <div class="select-wrap">
+        <i class="pi pi-sort-alt select-icon" aria-hidden="true"></i>
+        <select [(ngModel)]="sortBy" aria-label="Sort products">
+          <option value="DEFAULT">Sort: Default</option>
+          <option value="PRICE_LOW">Price: Low to High</option>
+          <option value="PRICE_HIGH">Price: High to Low</option>
+          <option value="NAME_ASC">Name: A to Z</option>
+          <option value="NAME_DESC">Name: Z to A</option>
+        </select>
+        <i class="pi pi-chevron-down chevron-icon" aria-hidden="true"></i>
+      </div>
+
+      <!-- Reset Filters Button -->
+      <button
+        type="button"
+        class="btn-reset-filters"
+        *ngIf="hasActiveFilters"
+        (click)="resetFilters()"
+        title="Reset all search and filter conditions"
+      >
+        <i class="pi pi-filter-slash" aria-hidden="true"></i>
+        <span>Reset</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State Skeleton -->
+  <div class="loading-state" *ngIf="isLoading">
+    <div class="skeleton-header"></div>
+    <div class="skeleton-row" *ngFor="let i of [1, 2, 3, 4, 5]"></div>
+  </div>
+
+  <!-- Empty State (No Products in Catalogue) -->
+  <div class="empty-state" *ngIf="!isLoading && products.length === 0 && !errorMessage">
+    <div class="empty-icon-circle">
+      <i class="pi pi-box" aria-hidden="true"></i>
+    </div>
+    <h2>No products in catalogue</h2>
+    <p>Get started by adding your first 3D printed product to showcase in your store.</p>
+    <a routerLink="/admin/products/new" class="btn-create">
+      <i class="pi pi-plus" aria-hidden="true"></i>
+      <span>Add First Product</span>
+    </a>
+  </div>
+
+  <!-- No Search Results Found State -->
+  <div class="empty-state" *ngIf="!isLoading && products.length > 0 && filteredProducts.length === 0">
+    <div class="empty-icon-circle">
+      <i class="pi pi-search" aria-hidden="true"></i>
+    </div>
+    <h2>No matching products</h2>
+    <p>No products matched your current search and filter criteria.</p>
+    <button type="button" class="btn-create" (click)="resetFilters()">
+      <i class="pi pi-filter-slash" aria-hidden="true"></i>
+      <span>Clear Filters</span>
+    </button>
+  </div>
+
+  <!-- Products Table Card -->
+  <div class="table-card" *ngIf="!isLoading && filteredProducts.length > 0">
+    <div class="table-card-header">
+      <span class="results-badge">
+        Showing <strong>{{ filteredProducts.length }}</strong> of {{ products.length }} items
+      </span>
+      <span class="active-filter-hint" *ngIf="hasActiveFilters">
+        Filters applied
+      </span>
+    </div>
+
+    <div class="table-responsive">
+      <table class="catalogue-table">
+        <thead>
+          <tr>
+            <th class="col-product">Product</th>
+            <th class="col-category">Category</th>
+            <th class="col-price">Price</th>
+            <th class="col-stock">Availability</th>
+            <th class="col-actions">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let product of filteredProducts">
+            <!-- Product Column (Thumbnail + Details) -->
+            <td class="col-product">
+              <div class="product-info-cell">
+                <div class="thumbnail-wrapper">
+                  <img
+                    [src]="product.image || product.imageUrl || 'assets/placeholder.png'"
+                    [alt]="product.name"
+                    (error)="onImageError($event)"
+                    loading="lazy"
+                  />
+                  <span class="badge-featured" *ngIf="product.featured || product.badge" title="Featured item">
+                    <i class="pi pi-star-fill"></i>
+                  </span>
+                </div>
+                <div class="product-text">
+                  <a
+                    [routerLink]="['/admin/products', product.id, 'edit']"
+                    class="product-title"
+                    title="Click to edit product"
+                  >
+                    {{ product.name }}
+                  </a>
+                  <span class="product-desc" *ngIf="product.description">
+                    {{ product.description }}
+                  </span>
+                  <span class="product-id-tag">ID: #{{ product.id }}</span>
+                </div>
+              </div>
+            </td>
+
+            <!-- Category Column -->
+            <td class="col-category">
+              <span class="pill-category">
+                {{ product.category || 'Uncategorised' }}
+              </span>
+            </td>
+
+            <!-- Price Column -->
+            <td class="col-price">
+              <div class="price-wrapper">
+                <span class="currency">₹</span>
+                <span class="amount">{{ product.price | number:'1.0-2' }}</span>
+              </div>
+            </td>
+
+            <!-- Stock Column -->
+            <td class="col-stock">
+              <span
+                class="status-pill"
+                [class.in-stock]="product.inStock"
+                [class.out-of-stock]="!product.inStock"
+              >
+                <span class="status-dot"></span>
+                <span>{{ product.inStock ? 'In stock' : 'Out of stock' }}</span>
+              </span>
+            </td>
+
+            <!-- Actions Column -->
+            <td class="col-actions">
+              <div class="actions-group">
+                <!-- Edit Button -->
+                <a
+                  [routerLink]="['/admin/products', product.id, 'edit']"
+                  class="action-btn edit-btn"
+                  title="Edit product"
+                  [attr.aria-label]="'Edit ' + product.name"
+                >
+                  <i class="pi pi-pencil" aria-hidden="true"></i>
+                  <span>Edit</span>
+                </a>
+
+                <!-- View in Store Button -->
+                <a
+                  [href]="'/product/' + product.id"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="action-btn view-btn"
+                  title="View in store (opens in new tab)"
+                  [attr.aria-label]="'View ' + product.name + ' in store'"
+                >
+                  <i class="pi pi-external-link" aria-hidden="true"></i>
+                  <span>View</span>
+                </a>
+
+                <!-- Delete Button -->
+                <button
+                  type="button"
+                  class="action-btn delete-btn"
+                  (click)="openDeleteModal(product)"
+                  title="Delete product"
+                  [attr.aria-label]="'Delete ' + product.name"
+                >
+                  <i class="pi pi-trash" aria-hidden="true"></i>
+                  <span>Delete</span>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal Dialog -->
+  <div
+    class="modal-backdrop"
+    *ngIf="productToDelete"
+    (click)="closeDeleteModal()"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="delete-dialog-title"
+  >
+    <div class="modal-dialog" (click)="$event.stopPropagation()">
+      <div class="modal-danger-icon">
+        <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+      </div>
+
+      <div class="modal-header">
+        <h2 id="delete-dialog-title">Delete Product?</h2>
+        <p class="modal-lead">
+          Are you sure you want to permanently delete <strong>{{ productToDelete.name }}</strong>? This action cannot be undone and will permanently remove it from your store catalogue.
+        </p>
+      </div>
+
+      <!-- Preview of product being deleted -->
+      <div class="delete-preview-card">
+        <img
+          [src]="productToDelete.image || productToDelete.imageUrl || 'assets/placeholder.png'"
+          [alt]="productToDelete.name"
+          (error)="onImageError($event)"
+        />
+        <div class="preview-info">
+          <strong>{{ productToDelete.name }}</strong>
+          <span class="preview-cat">{{ productToDelete.category || 'Uncategorised' }}</span>
+          <span class="preview-price">₹{{ productToDelete.price | number:'1.0-2' }}</span>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button
+          type="button"
+          class="btn-modal-cancel"
+          (click)="closeDeleteModal()"
+          [disabled]="isDeleting"
+        >
+          No, Cancel
+        </button>
+        <button
+          type="button"
+          class="btn-modal-delete"
+          (click)="confirmDelete()"
+          [disabled]="isDeleting"
+        >
+          <i class="pi pi-spin pi-spinner" *ngIf="isDeleting" aria-hidden="true"></i>
+          <i class="pi pi-trash" *ngIf="!isDeleting" aria-hidden="true"></i>
+          <span>{{ isDeleting ? 'Deleting…' : 'Yes, Delete' }}</span>
+        </button>
+      </div>
+    </div>
   </div>
 </section>

@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="100%" height="100%">
+  <defs>
+    <radialGradient id="desk-bg" cx="50%" cy="40%" r="65%">
+      <stop offset="0%" stop-color="#334155"/>
+      <stop offset="55%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </radialGradient>
+    <linearGradient id="concrete-mat" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="50%" stop-color="#cbd5e1"/>
+      <stop offset="100%" stop-color="#64748b"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="800" fill="url(#desk-bg)"/>
+  <ellipse cx="400" cy="680" rx="190" ry="40" fill="#000000" opacity="0.6"/>
+  <!-- Base cylinder -->
+  <ellipse cx="400" cy="650" rx="130" ry="30" fill="#334155"/>
+  
+  <!-- Spiral Fluted Cylindrical Pen Pot -->
+  <g fill="url(#concrete-mat)" stroke="#475569" stroke-width="2">
+    <!-- Twisted lofted fins -->
+    <path d="M 310 320 C 330 460, 310 560, 290 640 L 330 650 C 350 570, 370 470, 350 320 Z"/>
+    <path d="M 350 320 C 370 460, 355 565, 340 652 L 380 655 C 395 570, 410 470, 390 320 Z"/>
+    <path d="M 390 320 C 410 460, 400 565, 390 655 L 430 655 C 440 570, 450 470, 430 320 Z"/>
+    <path d="M 430 320 C 450 460, 445 565, 440 652 L 480 648 C 485 570, 490 470, 470 320 Z"/>
+    <path d="M 470 320 C 490 460, 485 565, 485 645 L 520 635 C 520 565, 525 465, 505 320 Z"/>
+    <!-- Top Rim Opening -->
+    <ellipse cx="400" cy="320" rx="120" ry="35" fill="#1e293b"/>
+    <ellipse cx="400" cy="320" rx="100" ry="28" fill="#0f172a"/>
+  </g>
+  <!-- Stylized Pens & Stylus sticking out -->
+  <g transform="rotate(-12 400 320)">
+    <rect x="375" y="160" width="16" height="220" rx="4" fill="#00a896"/>
+    <polygon points="375,160 383,130 391,160" fill="#f8fafc"/>
+  </g>
+  <g transform="rotate(15 400 320)">
+    <rect x="415" y="140" width="14" height="230" rx="4" fill="#f59e0b"/>
+    <polygon points="415,140 422,110 429,140" fill="#1e293b"/>
+  </g>
+  <g transform="rotate(4 400 320)">
+    <rect x="395" y="120" width="12" height="240" rx="6" fill="#e2e8f0" stroke="#028090" stroke-width="2"/>
+  </g>
+</svg>

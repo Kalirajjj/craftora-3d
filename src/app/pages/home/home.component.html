@@ -1,69 +1,151 @@
-<section class="hero-section">
-  <div class="container hero-container">
-    <div class="hero-content">
-      <div class="hero-badge">
-        <i class="pi pi-sparkles"></i> Precision Craftsmanship & 3D Décor
+<app-hero-3d></app-hero-3d>
+
+<!-- PROMOTIONAL OFFERS BANNER CAROUSEL (AUTO-SLIDING EVERY 2S WITH PREV/NEXT CONTROLS) -->
+<section class="offers-strip-section" *ngIf="activeOffers && activeOffers.length > 0">
+  <div class="container">
+    <div class="offers-strip-header">
+      <div class="offers-header-left">
+        <div class="offers-badge">
+          <i class="pi pi-bolt"></i>
+          <span>Exclusive Offers</span>
+        </div>
+        <span class="offers-caption">First-time customers & special promotions</span>
       </div>
-      <h1 class="hero-title">
-        Where Ideas <br><span class="highlight">Take Shape.</span>
-      </h1>
-      <p class="hero-subtext">
-        Craftora 3D brings parametric elegance, bespoke customized gifts, and precision manufacturing straight to your space.
-      </p>
-      <div class="hero-actions">
-        <a routerLink="/shop" class="btn btn-primary">
-          <i class="pi pi-shopping-bag"></i> Explore Products
-        </a>
-        <a routerLink="/custom-order" class="btn btn-outline">
-          <i class="pi pi-cog"></i> Create Something Custom
-        </a>
-      </div>
-      <div class="hero-stats">
-        <div class="stat-item">
-          <span class="stat-num">500+</span>
-          <span class="stat-lbl">Prints Delivered</span>
-        </div>
-        <div class="stat-divider"></div>
-        <div class="stat-item">
-          <span class="stat-num">0.12mm</span>
-          <span class="stat-lbl">Layer Precision</span>
-        </div>
-        <div class="stat-divider"></div>
-        <div class="stat-item">
-          <span class="stat-num">4.9/5</span>
-          <span class="stat-lbl">Customer Rating</span>
-        </div>
+
+      <!-- Previous & Next manual icon buttons in the header -->
+      <div class="offers-nav-group" *ngIf="activeOffers.length > 1">
+        <button 
+          type="button" 
+          class="offer-nav-icon-btn" 
+          (click)="prevOffer(); restartTimer()" 
+          title="Previous offer"
+          aria-label="Previous offer"
+        >
+          <i class="pi pi-chevron-left"></i>
+        </button>
+        <span class="offer-counter-indicator">{{ activeOfferIndex + 1 }} / {{ activeOffers.length }}</span>
+        <button 
+          type="button" 
+          class="offer-nav-icon-btn" 
+          (click)="nextOffer(); restartTimer()" 
+          title="Next offer"
+          aria-label="Next offer"
+        >
+          <i class="pi pi-chevron-right"></i>
+        </button>
       </div>
     </div>
 
-    <div class="hero-visual">
-      <div class="visual-card">
-        <img src="https://images.unsplash.com/photo-1581783342308-f792dbdd27c5?w=800&auto=format&fit=crop&q=80" alt="3D Printed Geometric Vase" />
-        <div class="visual-floating-badge">
-          <i class="pi pi-check-circle"></i>
-          <div>
-            <strong>Eco Matte PLA</strong>
-            <small>Biodegradable Polymer</small>
+    <!-- CAROUSEL VIEWPORT (ZERO SCROLLBAR, ZERO PAGE OVERFLOW, 2.5 CARDS VISIBLE) -->
+    <div 
+      class="offers-carousel-viewport"
+      (mouseenter)="stopAutoSlide()"
+      (mouseleave)="startAutoSlide()"
+    >
+      <!-- Floating Side Left Arrow -->
+      <button 
+        type="button" 
+        class="floating-nav-arrow float-prev" 
+        *ngIf="activeOffers.length > 1"
+        (click)="prevOffer(); restartTimer()" 
+        title="Previous offer"
+        aria-label="Previous offer"
+      >
+        <i class="pi pi-chevron-left"></i>
+      </button>
+
+      <!-- Carousel Sliding Track -->
+      <div 
+        class="offers-carousel-track" 
+        [class.no-transition]="noTransition"
+        [style.--current-index]="currentOfferIndex"
+      >
+        <div class="offer-carousel-slide" *ngFor="let offer of displayOffers; let i = index">
+          <div class="offer-banner-card">
+            <div class="offer-banner-visual">
+              <img [src]="offer.bannerImageUrl" [alt]="offer.title" class="offer-banner-img" />
+              <div class="offer-banner-overlay" [style.--glow-color]="offer.highlightColor || '#00A896'">
+                <div class="offer-top-row">
+                  <span class="offer-badge-tag" [style.background-color]="offer.highlightColor || '#00A896'">
+                    <i class="pi pi-tag"></i> {{ offer.badgeText || 'SPECIAL' }}
+                  </span>
+                  <span class="audience-tag" *ngIf="offer.targetAudience === 'FIRST_TIME_BUYERS'">
+                    <i class="pi pi-sparkles"></i> 1st Time Customer
+                  </span>
+                </div>
+
+                <div class="offer-info-wrap">
+                  <h3 class="offer-card-title">{{ offer.title }}</h3>
+                  <p class="offer-card-desc">{{ offer.description }}</p>
+                </div>
+
+                <div class="offer-action-bar">
+                  <button type="button" class="coupon-pill-btn" (click)="copyOfferCode(offer.code, $event)" [title]="'Click to copy code ' + offer.code">
+                    <span class="coupon-lbl">CODE:</span>
+                    <span class="coupon-val">{{ offer.code }}</span>
+                    <i class="pi" [ngClass]="copiedCode === offer.code ? 'pi-check' : 'pi-copy'"></i>
+                    <span class="copied-tooltip" *ngIf="copiedCode === offer.code">Copied!</span>
+                  </button>
+
+                  <a [routerLink]="offer.buttonLink || '/shop'" class="offer-cta-link">
+                    {{ offer.buttonText || 'Shop Now' }} <i class="pi pi-arrow-right"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
+
+      <!-- Floating Side Right Arrow -->
+      <button 
+        type="button" 
+        class="floating-nav-arrow float-next" 
+        *ngIf="activeOffers.length > 1"
+        (click)="nextOffer(); restartTimer()" 
+        title="Next offer"
+        aria-label="Next offer"
+      >
+        <i class="pi pi-chevron-right"></i>
+      </button>
+    </div>
+
+    <!-- Carousel Progress Dots -->
+    <div class="carousel-dots-bar" *ngIf="activeOffers.length > 1">
+      <button 
+        type="button" 
+        class="carousel-dot-btn" 
+        *ngFor="let o of activeOffers; let i = index" 
+        [class.active]="i === activeOfferIndex"
+        (click)="goToOffer(i)"
+        [attr.aria-label]="'Go to slide ' + (i + 1)"
+      ></button>
     </div>
   </div>
 </section>
 
+
 <!-- CATEGORIES SECTION -->
 <section class="section categories-section">
   <div class="container">
-    <h2 class="section-title">Shop by Category</h2>
-    <p class="section-subtitle">Curated modern essentials for your desk, living space, and gifting occasions.</p>
+    <div class="section-heading">
+      <span class="section-badge">
+        <i class="pi pi-th-large" aria-hidden="true"></i>
+        Collections
+      </span>
+      <h2 class="section-title">Shop by Category</h2>
+      <p class="section-subtitle">Curated modern essentials for your desk, living space, and gifting occasions.</p>
+    </div>
     <div class="category-grid">
-      <a [routerLink]="['/shop']" [queryParams]="{category: cat.name}" class="category-card" *ngFor="let cat of categories">
+      <a [routerLink]="['/shop']" [queryParams]="{category: cat.name}" class="category-card" *ngFor="let cat of categories; let i = index" [style.animationDelay]="(i * 80) + 'ms'">
         <div class="cat-icon-box">
           <i class="pi {{ cat.icon }}"></i>
         </div>
         <h3>{{ cat.name }}</h3>
         <p>{{ cat.description }}</p>
-        <span class="cat-link">Explore items <i class="pi pi-arrow-right"></i></span>
+        <span class="cat-link">
+          Explore items <i class="pi pi-arrow-right"></i>
+        </span>
       </a>
     </div>
   </div>
@@ -74,40 +156,79 @@
   <div class="container">
     <div class="section-header-flex">
       <div>
+        <span class="section-badge">
+          <i class="pi pi-star" aria-hidden="true"></i>
+          Bestsellers
+        </span>
         <h2 class="section-title text-left">Featured Creations</h2>
         <p class="section-subtitle text-left">Our most loved parametric and functional items.</p>
       </div>
-      <a routerLink="/shop" class="btn btn-outline">View All Collection</a>
+      <a routerLink="/shop" class="btn btn-view-all">
+        View All Collection <i class="pi pi-arrow-right"></i>
+      </a>
     </div>
 
     <div class="products-grid">
-      <app-product-card *ngFor="let prod of featuredProducts" [product]="prod"></app-product-card>
+      <app-product-card *ngFor="let prod of featuredProducts; let i = index" [product]="prod" [style.animationDelay]="(i * 80) + 'ms'"></app-product-card>
     </div>
   </div>
 </section>
 
 <!-- CUSTOM PRINTING CTA SECTION -->
 <section class="custom-cta-section">
+  <div class="cta-bg-pattern" aria-hidden="true"></div>
   <div class="container custom-cta-container">
     <div class="custom-cta-text">
-      <span class="badge badge-accent">Bespoke Manufacturing</span>
+      <span class="cta-badge">
+        <i class="pi pi-cog" aria-hidden="true"></i>
+        Bespoke Manufacturing
+      </span>
       <h2>Have a 3D File or Unique Idea?</h2>
       <p>
         From custom family lithophanes and architectural models to functional replacement components and engineering prototypes. We slice, print, and finish with utmost precision.
       </p>
       <ul class="custom-perks">
-        <li><i class="pi pi-check"></i> Formats supported: STL, OBJ, 3MF, STEP</li>
-        <li><i class="pi pi-check"></i> Engineering materials: PLA+, PETG, ASA, Matte filaments</li>
-        <li><i class="pi pi-check"></i> Fast quoting within 24 business hours</li>
+        <li>
+          <span class="perk-icon"><i class="pi pi-check"></i></span>
+          Formats supported: STL, OBJ, 3MF, STEP
+        </li>
+        <li>
+          <span class="perk-icon"><i class="pi pi-check"></i></span>
+          Engineering materials: PLA+, PETG, ASA, Matte filaments
+        </li>
+        <li>
+          <span class="perk-icon"><i class="pi pi-check"></i></span>
+          Fast quoting within 24 business hours
+        </li>
       </ul>
-      <a routerLink="/custom-order" class="btn btn-primary">Start Custom Print Request</a>
+      <a routerLink="/custom-order" class="btn btn-cta-action">
+        Start Custom Print Request
+        <i class="pi pi-arrow-right"></i>
+        <span class="btn-shine"></span>
+      </a>
     </div>
     <div class="custom-cta-visual">
       <div class="tech-box">
-        <div class="tech-line"><span>Layer Height:</span> <strong>0.12 - 0.28 mm</strong></div>
-        <div class="tech-line"><span>Infill Density:</span> <strong>15% - 100%</strong></div>
-        <div class="tech-line"><span>Color Spectrum:</span> <strong>12+ Matte Finishes</strong></div>
-        <div class="tech-line"><span>Max Volume:</span> <strong>256 x 256 x 256 mm</strong></div>
+        <div class="tech-header">
+          <i class="pi pi-sliders-h" aria-hidden="true"></i>
+          <span>Print Specifications</span>
+        </div>
+        <div class="tech-line">
+          <span>Layer Height</span>
+          <strong>0.12 – 0.28 mm</strong>
+        </div>
+        <div class="tech-line">
+          <span>Infill Density</span>
+          <strong>15% – 100%</strong>
+        </div>
+        <div class="tech-line">
+          <span>Color Spectrum</span>
+          <strong>12+ Matte Finishes</strong>
+        </div>
+        <div class="tech-line">
+          <span>Max Volume</span>
+          <strong>256 × 256 × 256 mm</strong>
+        </div>
       </div>
     </div>
   </div>
@@ -116,29 +237,32 @@
 <!-- HOW IT WORKS -->
 <section class="section how-it-works-section">
   <div class="container">
-    <h2 class="section-title">How Craftora 3D Works</h2>
-    <p class="section-subtitle">Simple, seamless steps from digital geometry to physical doorstep delivery.</p>
+    <div class="section-heading">
+      <span class="section-badge">
+        <i class="pi pi-sitemap" aria-hidden="true"></i>
+        Process
+      </span>
+      <h2 class="section-title">How Craftora 3D Works</h2>
+      <p class="section-subtitle">Simple, seamless steps from digital geometry to physical doorstep delivery.</p>
+    </div>
 
     <div class="steps-grid">
-      <div class="step-card">
-        <div class="step-num">01</div>
-        <h4>Select or Upload</h4>
-        <p>Pick from our designed home décor catalog or send us your personal CAD / 3D model.</p>
-      </div>
-      <div class="step-card">
-        <div class="step-num">02</div>
-        <h4>Configure & Inspect</h4>
-        <p>Choose your colors, dimensions, and infill strength. We review model slicing metrics.</p>
-      </div>
-      <div class="step-card">
-        <div class="step-num">03</div>
-        <h4>Precision Print</h4>
-        <p>Manufactured on high-speed enclosed printers with high layer adhesion and zero warping.</p>
-      </div>
-      <div class="step-card">
-        <div class="step-num">04</div>
-        <h4>Delivered to You</h4>
-        <p>Carefully finished, quality-inspected, securely packed, and dispatched across India.</p>
+      <div class="step-card" *ngFor="let step of [
+        { num: '01', title: 'Select or Upload', desc: 'Pick from our designed home décor catalog or send us your personal CAD / 3D model.', icon: 'pi-cloud-upload' },
+        { num: '02', title: 'Configure & Inspect', desc: 'Choose your colors, dimensions, and infill strength. We review model slicing metrics.', icon: 'pi-sliders-h' },
+        { num: '03', title: 'Precision Print', desc: 'Manufactured on high-speed enclosed printers with high layer adhesion and zero warping.', icon: 'pi-print' },
+        { num: '04', title: 'Delivered to You', desc: 'Carefully finished, quality-inspected, securely packed, and dispatched across India.', icon: 'pi-truck' }
+      ]; let i = index" [style.animationDelay]="(i * 100) + 'ms'">
+        <div class="step-top">
+          <div class="step-icon-box">
+            <i class="pi {{ step.icon }}"></i>
+          </div>
+          <div class="step-num">{{ step.num }}</div>
+        </div>
+        <h4>{{ step.title }}</h4>
+        <p>{{ step.desc }}</p>
+        <!-- Connector line -->
+        <div class="step-connector" *ngIf="i < 3" aria-hidden="true"></div>
       </div>
     </div>
   </div>
@@ -147,33 +271,32 @@
 <!-- TESTIMONIALS -->
 <section class="section testimonials-section">
   <div class="container">
-    <h2 class="section-title">Loved by Design Enthusiasts</h2>
-    <p class="section-subtitle">Read what our customers say about our print quality and finish.</p>
+    <div class="section-heading">
+      <span class="section-badge">
+        <i class="pi pi-heart" aria-hidden="true"></i>
+        Reviews
+      </span>
+      <h2 class="section-title">Loved by Design Enthusiasts</h2>
+      <p class="section-subtitle">Read what our customers say about our print quality and finish.</p>
+    </div>
 
     <div class="testimonials-grid">
-      <div class="testimonial-card">
-        <div class="rating-stars">★★★★★</div>
-        <p class="quote">"The Parametric Vase is gorgeous! The matte teal finish looks like high-end ceramic without the fragility. Arrived safe and pristine."</p>
-        <div class="author-info">
-          <strong>Aravind S.</strong>
-          <span>Bengaluru, Karnataka</span>
+      <div class="testimonial-card" *ngFor="let review of [
+        { stars: 5, quote: 'The Parametric Vase is gorgeous! The matte teal finish looks like high-end ceramic without the fragility. Arrived safe and pristine.', name: 'Aravind S.', location: 'Bengaluru, Karnataka', avatar: 'A' },
+        { stars: 5, quote: 'Ordered a customized nameplate for our new apartment. The dual-color extrusion and sharp lettering blew us away. Outstanding work!', name: 'Priya & Karthik', location: 'Chennai, Tamil Nadu', avatar: 'P' },
+        { stars: 5, quote: 'I had a small custom bracket needed for my sim-racing rig. Uploaded the STL, got a quote in hours, and it arrived in 3 days. Rock solid.', name: 'Rohan Mehta', location: 'Mumbai, Maharashtra', avatar: 'R' }
+      ]; let i = index" [style.animationDelay]="(i * 100) + 'ms'">
+        <div class="review-header">
+          <div class="reviewer-avatar">{{ review.avatar }}</div>
+          <div class="reviewer-info">
+            <strong>{{ review.name }}</strong>
+            <span>{{ review.location }}</span>
+          </div>
+          <div class="rating-stars">
+            <i class="pi pi-star-fill" *ngFor="let s of [1,2,3,4,5]"></i>
+          </div>
         </div>
-      </div>
-      <div class="testimonial-card">
-        <div class="rating-stars">★★★★★</div>
-        <p class="quote">"Ordered a customized nameplate for our new apartment. The dual-color extrusion and sharp lettering blew us away. Outstanding work!"</p>
-        <div class="author-info">
-          <strong>Priya & Karthik</strong>
-          <span>Chennai, Tamil Nadu</span>
-        </div>
-      </div>
-      <div class="testimonial-card">
-        <div class="rating-stars">★★★★★</div>
-        <p class="quote">"I had a small custom bracket needed for my sim-racing rig. Uploaded the STL, got a quote in hours, and it arrived in 3 days. Rock solid."</p>
-        <div class="author-info">
-          <strong>Rohan Mehta</strong>
-          <span>Mumbai, Maharashtra</span>
-        </div>
+        <p class="quote">"{{ review.quote }}"</p>
       </div>
     </div>
   </div>
@@ -181,15 +304,27 @@
 
 <!-- INSTAGRAM GALLERY -->
 <section class="section insta-section">
-  <div class="container text-center">
-    <span class="badge badge-accent">#Craftora3D</span>
-    <h2 class="section-title mt-2">Follow Our Production Farm</h2>
-    <p class="section-subtitle">Real print timelapses, new product prototypes, and behind-the-scenes.</p>
+  <div class="container">
+    <div class="section-heading">
+      <span class="section-badge insta-badge">
+        <i class="pi pi-instagram" aria-hidden="true"></i>
+        #Craftora3D
+      </span>
+      <h2 class="section-title">Follow Our Production Farm</h2>
+      <p class="section-subtitle">Real print timelapses, new product prototypes, and behind-the-scenes.</p>
+    </div>
     <div class="insta-grid">
-      <div class="insta-item"><img src="https://images.unsplash.com/photo-1581783342308-f792dbdd27c5?w=500&auto=format&fit=crop&q=80" alt="Print 1" /></div>
-      <div class="insta-item"><img src="https://images.unsplash.com/photo-1485955900006-10f4d324d411?w=500&auto=format&fit=crop&q=80" alt="Print 2" /></div>
-      <div class="insta-item"><img src="https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=500&auto=format&fit=crop&q=80" alt="Print 3" /></div>
-      <div class="insta-item"><img src="https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=500&auto=format&fit=crop&q=80" alt="Print 4" /></div>
+      <div class="insta-item" *ngFor="let img of [
+        { src: 'https://images.unsplash.com/photo-1581783342308-f792dbdd27c5?w=500&auto=format&fit=crop&q=80', alt: 'Geometric Vase' },
+        { src: 'https://images.unsplash.com/photo-1485955900006-10f4d324d411?w=500&auto=format&fit=crop&q=80', alt: 'Plant Decor' },
+        { src: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=500&auto=format&fit=crop&q=80', alt: 'Modern Print' },
+        { src: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=500&auto=format&fit=crop&q=80', alt: 'Design Object' }
+      ]">
+        <img [src]="img.src" [alt]="img.alt" loading="lazy" />
+        <div class="insta-overlay">
+          <i class="pi pi-instagram"></i>
+        </div>
+      </div>
     </div>
   </div>
 </section>

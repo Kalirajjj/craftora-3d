@@ -1,45 +1,393 @@
 <div class="about-page">
-  <div class="about-hero">
-    <div class="container text-center">
-      <span class="badge badge-accent">Craftora 3D Story</span>
-      <h1>Where Ideas Take Shape.</h1>
-      <p class="lead">Merging mathematical parametric algorithms with modern additive manufacturing.</p>
-    </div>
-  </div>
+  <!-- =========================================================================
+       1 · HERO — THE CRAFTORA IDEA
+       ========================================================================== -->
+  <section class="about-hero">
+    <div class="ambient-glow glow-top" aria-hidden="true"></div>
+    <div class="ambient-glow glow-bottom" aria-hidden="true"></div>
 
-  <div class="container content-section">
-    <div class="about-grid">
-      <div class="text-block">
-        <h2>Our Mission</h2>
-        <p>
-          Founded in India, Craftora 3D is a modern digital fabrication studio dedicated to turning digital geometries into heirloom-grade physical objects. We believe 3D printing should move beyond plastic prototypes into durable, tactile home accents and meaningful personalized gifts.
-        </p>
-        <h2>Uncompromising Quality</h2>
-        <p>
-          We utilize industrial-grade high-speed enclosed printers with high layer adhesion and specialized custom profiles. Our materials comprise recyclable matte PLAs, engineering PETG, and composite wood polymers that deliver velvety tactile finishes without visible seams.
-        </p>
-      </div>
-      <div class="image-block">
-        <img src="https://images.unsplash.com/photo-1581783342308-f792dbdd27c5?w=700&auto=format&fit=crop&q=80" alt="Craftora 3D Manufacturing" />
-      </div>
-    </div>
+    <div class="container hero-container">
+      <div class="hero-content">
+        <div class="hero-brand-tag">
+          <span class="pulse-indicator"></span>
+          <span class="tag-label">CRAFTORA 3D · DESIGN & FABRICATION ATELIER</span>
+        </div>
 
-    <div class="values-grid">
-      <div class="value-card">
-        <i class="pi pi-shield"></i>
-        <h3>Eco-Responsible</h3>
-        <p>We prioritize corn-starch derived biodegradable PLA and eliminate single-use plastic in packaging.</p>
+        <h1 class="hero-title">Where Imagination Takes Form.</h1>
+
+        <p class="hero-lead">
+          Craftora 3D transforms ideas, designs, and imagination into tangible creations through the art and technology
+          of 3D.
+        </p>
+
+        <!-- Dynamic Concept Stage Badges -->
+        <div class="hero-concept-pills">
+          <div class="concept-pill" [class.active]="activeHeroConcept === 'idea'" (click)="setHeroConcept('idea')">
+            <span class="pill-number">01</span>
+            <div class="pill-text">
+              <strong>Idea</strong>
+              <span>Unconstrained intuition</span>
+            </div>
+          </div>
+
+          <div class="concept-pill" [class.active]="activeHeroConcept === 'digital'"
+            (click)="setHeroConcept('digital')">
+            <span class="pill-number">02</span>
+            <div class="pill-text">
+              <strong>Digital Form</strong>
+              <span>Parametric geometry</span>
+            </div>
+          </div>
+
+          <div class="concept-pill" [class.active]="activeHeroConcept === 'physical'"
+            (click)="setHeroConcept('physical')">
+            <span class="pill-number">03</span>
+            <div class="pill-text">
+              <strong>Physical Creation</strong>
+              <span>Tangible living artifact</span>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="value-card">
-        <i class="pi pi-pencil"></i>
-        <h3>Customization</h3>
-        <p>Every piece can be personalized with dates, names, or adapted to bespoke architectural dimensions.</p>
-      </div>
-      <div class="value-card">
-        <i class="pi pi-send"></i>
-        <h3>Pan-India Direct</h3>
-        <p>Safe shipping from our Chennai studio directly to doorsteps across India within 3–5 working days.</p>
+
+      <!-- Editorial Sculpture Visual Showcase -->
+      <div class="hero-showcase-stage">
+        <div class="sculpture-card-frame">
+          <div class="frame-tag-top">
+            <span class="tag-dot"></span>
+            <span>ATELIER SPECIMEN · EDITION 01</span>
+          </div>
+
+          <div class="image-wrapper">
+            <img src="/images/about/hero-sculpture.jpg" alt="Craftora 3D Parametric Sculptural Creation"
+              class="sculpture-image" loading="eager" />
+          </div>
+
+          <div class="frame-caption-bar">
+            <div class="caption-specs">
+              <span class="caption-title">Parametric Organic Topology</span>
+              <span class="caption-sub">0.12mm Micro-Layer Fidelity · Matte Biopolymer & Bronze Alloy</span>
+            </div>
+            <div class="caption-badge">
+              <i class="pi pi-box"></i>
+              <span>Physical Artifact</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
+  </section>
+
+  <!-- =========================================================================
+       2 · OUR STORY — "Why Craftora Exists"
+       ========================================================================== -->
+  <section class="story-section">
+    <div class="container">
+      <div class="story-layout">
+        <div class="story-sticky-aside">
+          <span class="editorial-eyebrow">OUR ORIGIN & REASON</span>
+          <h2 class="story-main-title">Why Craftora Exists</h2>
+          <div class="manifesto-pullquote">
+            <p>“Ideas should not remain trapped on a screen.”</p>
+          </div>
+        </div>
+
+        <div class="story-narrative-flow">
+          <p class="story-lead-para">
+            Every day, millions of breathtaking concepts are conceived inside software — intricate geometries,
+            architectural models, spatial dreams, and personal symbols. Yet almost all of them remain locked behind flat
+            glass displays, dissolved when the screen goes dark.
+          </p>
+
+          <p class="story-body-para">
+            Digital design allows human beings to imagine almost anything without the constraints of physics. 3D
+            creation gives those imaginations weight, presence, and a permanent place in the real world.
+          </p>
+
+          <p class="story-body-para">
+            Craftora 3D was founded to bridge that exact threshold. We believe that when an idea takes physical form,
+            something fundamental changes: it becomes real, it invites touch, it interacts with ambient light, and it
+            starts living alongside you.
+          </p>
+
+          <div class="story-stats-grid">
+            <div class="story-stat-card">
+              <span class="stat-meta">FOUNDATIONAL BELIEF</span>
+              <h4 class="stat-highlight">Screen to Substance</h4>
+              <p class="stat-desc">Transforming transient computer graphics into objects of tangible permanence.</p>
+            </div>
+            <div class="story-stat-card">
+              <span class="stat-meta">OUR APPROACH</span>
+              <h4 class="stat-highlight">Curated Fidelity</h4>
+              <p class="stat-desc">Treating additive fabrication not as an assembly line, but as modern bespoke craft.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       3 · THE PHILOSOPHY — "Made With Intention."
+       ========================================================================== -->
+  <section class="philosophy-section">
+    <div class="container">
+      <div class="philosophy-manifesto-card">
+        <span class="editorial-eyebrow">THE CRAFTORA CREED</span>
+        <h2 class="manifesto-hero-title">Made With Intention.</h2>
+        <p class="manifesto-subheading">
+          We are not focused on producing more objects. The world already has enough disposable things.
+          Our sole obsession is designing things worth keeping.
+        </p>
+
+        <div class="pillars-five-grid">
+          <div class="pillar-box">
+            <span class="pillar-index">01</span>
+            <h3 class="pillar-name">Purpose</h3>
+            <p class="pillar-text">Every object must have a reason to exist — whether functional, spatial, or purely
+              poetic.</p>
+          </div>
+
+          <div class="pillar-box">
+            <span class="pillar-index">02</span>
+            <h3 class="pillar-name">Character</h3>
+            <p class="pillar-text">Distinctive silhouette and personality that commands quiet presence in any room.</p>
+          </div>
+
+          <div class="pillar-box">
+            <span class="pillar-index">03</span>
+            <h3 class="pillar-name">Detail</h3>
+            <p class="pillar-text">Curves, bevels, and micro-layer textures that reward close inspection and touch.</p>
+          </div>
+
+          <div class="pillar-box">
+            <span class="pillar-index">04</span>
+            <h3 class="pillar-name">Thought</h3>
+            <p class="pillar-text">Deliberate engineering that balances structural integrity with ethereal lightness.
+            </p>
+          </div>
+
+          <div class="pillar-box">
+            <span class="pillar-index">05</span>
+            <h3 class="pillar-name">Craftsmanship</h3>
+            <p class="pillar-text">Hand-inspected curation where high technology meets human sensitivity and care.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       4 · FROM DIGITAL TO REAL — "From Pixels to Something You Can Hold."
+       ========================================================================== -->
+  <section class="creation-pipeline-section">
+    <div class="container">
+      <div class="pipeline-header">
+        <span class="editorial-eyebrow">THE METAMORPHOSIS</span>
+        <h2 class="pipeline-title">From Pixels to Something You Can Hold.</h2>
+        <p class="pipeline-desc">
+          How pure thought journeys through algorithms and material science into your hands.
+        </p>
+      </div>
+
+      <!-- Progressive Timeline Progression -->
+      <div class="pipeline-cards-row">
+        <div class="stage-card" *ngFor="let stage of creationStages; let i = index"
+          [class.active]="activeStageIndex === i" (click)="selectStage(i)">
+          <div class="stage-card-top">
+            <span class="stage-step">{{ stage.stepNumber }}</span>
+            <span class="stage-badge">{{ stage.badge }}</span>
+          </div>
+
+          <h3 class="stage-name">{{ stage.title }}</h3>
+          <h4 class="stage-subtitle">{{ stage.subtitle }}</h4>
+          <p class="stage-desc">{{ stage.description }}</p>
+
+          <div class="stage-manifesto">
+            <i class="pi pi-bolt manifesto-icon"></i>
+            <span>{{ stage.manifesto }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       5 · WHAT WE VALUE — Four-Part Visual Section
+       ========================================================================== -->
+  <section class="values-section">
+    <div class="container">
+      <div class="values-header">
+        <span class="editorial-eyebrow">OUR ANCHORS</span>
+        <h2 class="values-title">What We Value</h2>
+        <p class="values-desc">Principles that guide every line of CAD code and every cured layer.</p>
+      </div>
+
+      <div class="values-quad-grid">
+        <div class="value-block" *ngFor="let val of coreValues">
+          <div class="value-number-line">
+            <span class="val-num">{{ val.num }}</span>
+            <span class="val-aspect">{{ val.aspect }}</span>
+          </div>
+          <h3 class="val-title">{{ val.title }}</h3>
+          <p class="val-tagline">{{ val.tagline }}</p>
+          <p class="val-body">{{ val.description }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       6 · THE CRAFTORA DIFFERENCE — "Designed, Not Just Printed."
+       ========================================================================== -->
+  <section class="difference-section">
+    <div class="container">
+      <div class="difference-card">
+        <div class="difference-left">
+          <span class="editorial-eyebrow">THE CRAFTORA DIFFERENCE</span>
+          <h2 class="difference-title">Designed, Not Just Printed.</h2>
+          <p class="difference-lead">
+            Many see 3D printing as an automated tool to crank out plastic replicas. We see it as a transformative
+            sculptural medium.
+          </p>
+          <p class="difference-text">
+            We don’t simply download common meshes and hit start. Every silhouette is tested for balance, light-play,
+            and tactile resonance. We optimize wall densities, eliminate unnecessary mass, and choose bespoke matte and
+            stone formulations.
+          </p>
+          <div class="difference-axiom">
+            <strong>The distinction is simple:</strong>
+            <span>Anyone can manufacture an object. Craftora creates pieces you are proud to live with, display on your
+              desk, and hand down.</span>
+          </div>
+        </div>
+
+        <div class="difference-right">
+          <div class="contrast-item">
+            <span class="contrast-tag tag-utility">THE COMMON APPROACH</span>
+            <h4 class="contrast-heading">Automated Utility</h4>
+            <p class="contrast-text">Rushed extrusion, visible artifacts, disposable novelties, zero aesthetic
+              consideration.</p>
+          </div>
+          <div class="contrast-divider"></div>
+          <div class="contrast-item highlight-item">
+            <span class="contrast-tag tag-atelier">THE CRAFTORA APPROACH</span>
+            <h4 class="contrast-heading">Architectural Design</h4>
+            <p class="contrast-text">Intentional geometry, velvety tactile finishes, harmonious proportions, and
+              enduring substance.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       7 · HUMAN + TECHNOLOGY — Split Screen
+       ========================================================================== -->
+  <section class="tech-human-section">
+    <div class="container">
+      <div class="tech-human-grid">
+        <!-- Visual Column with Photography -->
+        <div class="tech-visual-col">
+          <div class="tech-image-frame">
+            <img src="/images/about/human-tech.jpg" alt="Designer hand-inspecting a 3D printed parametric structure"
+              class="tech-image" loading="lazy" />
+            <div class="tech-image-caption">
+              <span>Human Inspection · Tactile Quality & Layer Verification</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Narrative Column -->
+        <div class="tech-narrative-col">
+          <span class="editorial-eyebrow">SYNERGY OF CRAFT</span>
+          <h2 class="tech-headline">Technology Gives Us Possibilities. Imagination Gives Them Meaning.</h2>
+          <p class="tech-body-lead">
+            Machines do not dream. Algorithms do not feel balance. Code alone cannot understand the subtle emotional
+            resonance of an organic curve.
+          </p>
+
+          <div class="synergy-points-stack">
+            <div class="synergy-point">
+              <div class="synergy-bullet">01</div>
+              <div class="synergy-text">
+                <strong>Digital Design & Computational Geometry</strong>
+                <p>Generating mathematical structures and complex lattices that would be impossible through conventional
+                  casting or molding.</p>
+              </div>
+            </div>
+
+            <div class="synergy-point">
+              <div class="synergy-bullet">02</div>
+              <div class="synergy-text">
+                <strong>Modern 3D Fabrication</strong>
+                <p>Sub-millimeter additive precision that places material only where physics and aesthetics require it.
+                </p>
+              </div>
+            </div>
+
+            <div class="synergy-point">
+              <div class="synergy-bullet">03</div>
+              <div class="synergy-text">
+                <strong>Human Curation & Craftsmanship</strong>
+                <p>Post-processing by hand, examining reflections, testing center-of-gravity, and ensuring every edge is
+                  smooth to the touch.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       8 · FUTURE VISION — "What We’re Building"
+       ========================================================================== -->
+  <section class="future-vision-section">
+    <div class="container">
+      <div class="future-vision-header">
+        <span class="editorial-eyebrow">THE HORIZON</span>
+        <h2 class="future-title">What We’re Building</h2>
+        <p class="future-desc">
+          Craftora 3D is expanding into a comprehensive creative platform where original imagination seamlessly enters
+          physical reality.
+        </p>
+      </div>
+
+      <div class="vision-pillars-grid">
+        <div class="vision-card" *ngFor="let pillar of visionPillars">
+          <span class="vision-badge">{{ pillar.highlight }}</span>
+          <h3 class="vision-title">{{ pillar.title }}</h3>
+          <p class="vision-desc">{{ pillar.desc }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       9 · BRAND STATEMENT — Memorable Closing
+       ========================================================================== -->
+  <section class="brand-statement-section">
+    <div class="ambient-statement-glow" aria-hidden="true"></div>
+
+    <div class="container statement-container">
+      <div class="statement-inner">
+        <span class="statement-eyebrow">THE CRAFTORA ANTHEM</span>
+        <h2 class="statement-mantra">
+          <span>Imagine it.</span>
+          <span>Shape it.</span>
+          <span>Make it real.</span>
+        </h2>
+        <div class="brand-signature">
+          <span class="signature-line"></span>
+          <span class="signature-name">Craftora 3D</span>
+          <span class="signature-line"></span>
+        </div>
+        <p class="statement-subtext">
+          Bridging human imagination and tangible reality through modern 3D design and additive fabrication.
+        </p>
+      </div>
+    </div>
+  </section>
 </div>

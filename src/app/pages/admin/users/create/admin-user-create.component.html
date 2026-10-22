@@ -1,14 +1,454 @@
-<section class="admin-page-content">
-  <span class="eyebrow">ACCESS MANAGEMENT</span><h1>Create Admin User</h1>
-  <p class="page-lead">Create another account that can manage products and admins.</p>
-  <div class="user-form-card">
-    <form (ngSubmit)="create(userNgForm)" #userNgForm="ngForm">
-      <label><span>Username *</span><input type="text" name="username" [(ngModel)]="userForm.username" required minlength="3" maxlength="80" pattern="[A-Za-z0-9._-]+" autocomplete="off" /><small>3–80 letters, numbers, dots, underscores, or hyphens.</small></label>
-      <label><span>Password *</span><span class="password-input-wrapper"><input [type]="showPassword ? 'text' : 'password'" name="password" [(ngModel)]="userForm.password" required minlength="12" autocomplete="new-password" /><button class="password-toggle" type="button" (click)="togglePasswordVisibility('password')" [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'" [attr.aria-pressed]="showPassword"><i class="pi" [class.pi-eye]="!showPassword" [class.pi-eye-slash]="showPassword" aria-hidden="true"></i></button></span><small>At least 12 characters.</small></label>
-      <label><span>Confirm password *</span><span class="password-input-wrapper"><input [type]="showConfirmPassword ? 'text' : 'password'" name="confirmPassword" [(ngModel)]="userForm.confirmPassword" required minlength="12" autocomplete="new-password" /><button class="password-toggle" type="button" (click)="togglePasswordVisibility('confirmPassword')" [attr.aria-label]="showConfirmPassword ? 'Hide confirmation password' : 'Show confirmation password'" [attr.aria-pressed]="showConfirmPassword"><i class="pi" [class.pi-eye]="!showConfirmPassword" [class.pi-eye-slash]="showConfirmPassword" aria-hidden="true"></i></button></span></label>
-      <p class="notice success" *ngIf="successMessage">{{ successMessage }}</p>
-      <p class="notice error" *ngIf="errorMessage">{{ errorMessage }}</p>
-      <button class="button primary" type="submit" [disabled]="userNgForm.invalid || isBusy">{{ isBusy ? 'Creating…' : 'Create admin user' }}</button>
-    </form>
+<section class="admin-page-content users-management-page">
+  <div class="page-header">
+    <div class="header-titles">
+      <span class="eyebrow"><i class="pi pi-shield" aria-hidden="true"></i> ACCESS MANAGEMENT</span>
+      <h1>Admin Users & Access</h1>
+      <p class="page-lead">Create and manage administrator accounts, passwords, and permissions.</p>
+    </div>
+    <div class="header-actions">
+      <button type="button" class="btn-refresh" (click)="loadAdmins()" [disabled]="isLoadingList" title="Refresh admin list">
+        <i class="pi pi-refresh" [class.pi-spin]="isLoadingList" aria-hidden="true"></i>
+        <span>Refresh</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Global Alerts -->
+  <div class="alert-banner success-banner" *ngIf="successMessage" role="alert">
+    <div class="alert-content">
+      <i class="pi pi-check-circle" aria-hidden="true"></i>
+      <span>{{ successMessage }}</span>
+    </div>
+    <button type="button" class="btn-alert-close" (click)="dismissAlert()" aria-label="Dismiss alert">
+      <i class="pi pi-times" aria-hidden="true"></i>
+    </button>
+  </div>
+
+  <div class="alert-banner error-banner" *ngIf="errorMessage" role="alert">
+    <div class="alert-content">
+      <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
+      <span>{{ errorMessage }}</span>
+    </div>
+    <button type="button" class="btn-alert-close" (click)="dismissAlert()" aria-label="Dismiss alert">
+      <i class="pi pi-times" aria-hidden="true"></i>
+    </button>
+  </div>
+
+  <!-- Main Management Layout: Create Form + Admins List -->
+  <div class="management-grid">
+    <!-- Create Admin User Card -->
+    <div class="user-form-card">
+      <div class="card-header">
+        <div class="card-icon-wrap">
+          <i class="pi pi-user-plus"></i>
+        </div>
+        <div>
+          <h2>Create Admin User</h2>
+          <p class="card-sub">Create another account that can manage products and admins.</p>
+        </div>
+      </div>
+
+      <form (ngSubmit)="create(userNgForm)" #userNgForm="ngForm">
+        <label>
+          <span>Username *</span>
+          <input
+            type="text"
+            name="username"
+            [(ngModel)]="userForm.username"
+            required
+            minlength="3"
+            maxlength="80"
+            pattern="[A-Za-z0-9._-]+"
+            placeholder="e.g. store_manager"
+            autocomplete="off"
+          />
+          <small>3–80 letters, numbers, dots, underscores, or hyphens.</small>
+        </label>
+
+        <label>
+          <span>Password *</span>
+          <span class="password-input-wrapper">
+            <input
+              [type]="showPassword ? 'text' : 'password'"
+              name="password"
+              [(ngModel)]="userForm.password"
+              required
+              minlength="12"
+              placeholder="Minimum 12 characters"
+              autocomplete="new-password"
+            />
+            <button
+              class="password-toggle"
+              type="button"
+              (click)="togglePasswordVisibility('password')"
+              [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
+              [attr.aria-pressed]="showPassword"
+            >
+              <i class="pi" [class.pi-eye]="!showPassword" [class.pi-eye-slash]="showPassword" aria-hidden="true"></i>
+            </button>
+          </span>
+          <small>At least 12 characters.</small>
+        </label>
+
+        <label>
+          <span>Confirm password *</span>
+          <span class="password-input-wrapper">
+            <input
+              [type]="showConfirmPassword ? 'text' : 'password'"
+              name="confirmPassword"
+              [(ngModel)]="userForm.confirmPassword"
+              required
+              minlength="12"
+              placeholder="Confirm password"
+              autocomplete="new-password"
+            />
+            <button
+              class="password-toggle"
+              type="button"
+              (click)="togglePasswordVisibility('confirmPassword')"
+              [attr.aria-label]="showConfirmPassword ? 'Hide confirmation password' : 'Show confirmation password'"
+              [attr.aria-pressed]="showConfirmPassword"
+            >
+              <i class="pi" [class.pi-eye]="!showConfirmPassword" [class.pi-eye-slash]="showConfirmPassword" aria-hidden="true"></i>
+            </button>
+          </span>
+        </label>
+
+        <button class="button primary submit-btn" type="submit" [disabled]="userNgForm.invalid || isBusy">
+          <i class="pi" [ngClass]="isBusy ? 'pi-spin pi-spinner' : 'pi-user-plus'"></i>
+          <span>{{ isBusy ? 'Creating…' : 'Create Admin User' }}</span>
+        </button>
+      </form>
+    </div>
+
+    <!-- Created Admins List Card -->
+    <div class="admins-list-card">
+      <div class="card-header list-header">
+        <div class="card-icon-wrap user-list-icon">
+          <i class="pi pi-users"></i>
+        </div>
+        <div class="header-text-group">
+          <div class="title-with-pill">
+            <h2>Created Admins List</h2>
+            <span class="count-pill">{{ filteredAdmins.length }}</span>
+          </div>
+          <p class="card-sub">View credentials, inspect passwords with the eye button, and edit accounts.</p>
+        </div>
+      </div>
+
+      <!-- Search Toolbar -->
+      <div class="list-toolbar" *ngIf="adminUsers.length > 0">
+        <div class="search-wrap">
+          <i class="pi pi-search search-icon" aria-hidden="true"></i>
+          <input
+            type="text"
+            [(ngModel)]="searchQuery"
+            (ngModelChange)="onSearchChange()"
+            placeholder="Search username..."
+            aria-label="Search admin username"
+            class="search-input"
+          />
+          <button
+            type="button"
+            class="btn-clear-search"
+            *ngIf="searchQuery"
+            (click)="clearSearch()"
+            aria-label="Clear search"
+          >
+            <i class="pi pi-times" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div class="list-loading" *ngIf="isLoadingList">
+        <i class="pi pi-spin pi-spinner"></i>
+        <span>Loading admin accounts…</span>
+      </div>
+
+      <!-- Error State -->
+      <div class="notice error" *ngIf="!isLoadingList && listErrorMessage">
+        <i class="pi pi-exclamation-triangle"></i>
+        <span>{{ listErrorMessage }}</span>
+        <button type="button" class="btn-retry" (click)="loadAdmins()">Retry</button>
+      </div>
+
+      <!-- Empty Database State -->
+      <div class="empty-list" *ngIf="!isLoadingList && !listErrorMessage && adminUsers.length === 0">
+        <i class="pi pi-user-x"></i>
+        <p>No admin accounts found in database.</p>
+      </div>
+
+      <!-- No Search Results Found State -->
+      <div class="no-search-results" *ngIf="!isLoadingList && adminUsers.length > 0 && filteredAdmins.length === 0">
+        <i class="pi pi-search"></i>
+        <p>No admin username matches "<strong>{{ searchQuery }}</strong>"</p>
+        <button type="button" class="btn-clear-filter" (click)="clearSearch()">Clear search</button>
+      </div>
+
+      <!-- Admins Table -->
+      <div class="table-responsive" *ngIf="!isLoadingList && paginatedAdmins.length > 0">
+        <table class="admins-table">
+          <thead>
+            <tr>
+              <th class="col-id">ID</th>
+              <th class="col-username">Username</th>
+              <th class="col-password">Password</th>
+              <th class="col-actions">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let admin of paginatedAdmins" [class.current-user-row]="admin.username.toLowerCase() === auth.getUsername()?.toLowerCase()">
+              <td class="col-id">#{{ admin.id }}</td>
+              <td class="col-username">
+                <div class="user-meta">
+                  <span class="user-name">{{ admin.username }}</span>
+                  <span class="you-badge" *ngIf="admin.username.toLowerCase() === auth.getUsername()?.toLowerCase()">You</span>
+                </div>
+              </td>
+              <td class="col-password">
+                <div class="password-cell">
+                  <span class="password-display" *ngIf="isPasswordVisible(admin.id)">
+                    <code class="pwd-val" *ngIf="admin.password">{{ admin.password }}</code>
+                    <span class="pwd-legacy" *ngIf="!admin.password" (click)="startEdit(admin)" title="Click to set a visible password">Not stored yet (Click Edit)</span>
+                  </span>
+                  <span class="password-masked" *ngIf="!isPasswordVisible(admin.id)">••••••••••••</span>
+                  
+                  <button
+                    type="button"
+                    class="btn-toggle-pwd"
+                    (click)="toggleRowPassword(admin.id)"
+                    [attr.aria-label]="isPasswordVisible(admin.id) ? 'Hide password' : 'View password'"
+                    [title]="isPasswordVisible(admin.id) ? 'Hide password' : 'View password'"
+                  >
+                    <i class="pi" [ngClass]="isPasswordVisible(admin.id) ? 'pi-eye-slash' : 'pi-eye'"></i>
+                  </button>
+                </div>
+              </td>
+              <td class="col-actions">
+                <div class="actions-group">
+                  <button
+                    type="button"
+                    class="action-btn edit-btn"
+                    (click)="startEdit(admin)"
+                    title="Edit admin"
+                    [attr.aria-label]="'Edit ' + admin.username"
+                  >
+                    <i class="pi pi-pencil" aria-hidden="true"></i>
+                    <span>Edit</span>
+                  </button>
+                  <button
+                    type="button"
+                    class="action-btn delete-btn"
+                    (click)="openDeleteModal(admin)"
+                    [disabled]="admin.username.toLowerCase() === auth.getUsername()?.toLowerCase()"
+                    [title]="admin.username.toLowerCase() === auth.getUsername()?.toLowerCase() ? 'Cannot delete active account' : 'Delete admin'"
+                    [attr.aria-label]="'Delete ' + admin.username"
+                  >
+                    <i class="pi pi-trash" aria-hidden="true"></i>
+                    <span>Delete</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination Footer -->
+      <div class="pagination-footer" *ngIf="!isLoadingList && filteredAdmins.length > 0">
+        <span class="pagination-info">
+          Showing <strong>{{ startIndex }}–{{ endIndex }}</strong> of <strong>{{ filteredAdmins.length }}</strong>
+        </span>
+
+        <div class="pagination-controls" *ngIf="totalPages > 1">
+          <button
+            type="button"
+            class="btn-page-nav"
+            (click)="prevPage()"
+            [disabled]="currentPage === 1"
+            title="Previous page"
+            aria-label="Previous page"
+          >
+            <i class="pi pi-chevron-left" aria-hidden="true"></i>
+          </button>
+
+          <div class="page-pills">
+            <button
+              type="button"
+              *ngFor="let page of pageNumbers"
+              class="btn-page-pill"
+              [class.active]="page === currentPage"
+              (click)="goToPage(page)"
+              [attr.aria-current]="page === currentPage ? 'page' : null"
+            >
+              {{ page }}
+            </button>
+          </div>
+
+          <button
+            type="button"
+            class="btn-page-nav"
+            (click)="nextPage()"
+            [disabled]="currentPage === totalPages"
+            title="Next page"
+            aria-label="Next page"
+          >
+            <i class="pi pi-chevron-right" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Admin Modal -->
+  <div class="modal-backdrop" *ngIf="editingAdmin" (click)="cancelEdit()">
+    <div class="modal-dialog" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <i class="pi pi-user-edit modal-icon"></i>
+          <div>
+            <h3>Edit Admin Account</h3>
+            <p class="modal-subtitle">Update credentials for <strong>{{ editingAdmin.username }}</strong></p>
+          </div>
+        </div>
+        <button type="button" class="btn-modal-close" (click)="cancelEdit()" aria-label="Close dialog">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-alert error" *ngIf="editErrorMessage">
+          <i class="pi pi-exclamation-circle"></i>
+          <span>{{ editErrorMessage }}</span>
+        </div>
+
+        <form (ngSubmit)="saveEdit()" #editNgForm="ngForm">
+          <label>
+            <span>Username *</span>
+            <input
+              type="text"
+              name="editUsername"
+              [(ngModel)]="editForm.username"
+              required
+              minlength="3"
+              maxlength="80"
+              pattern="[A-Za-z0-9._-]+"
+              autocomplete="off"
+            />
+            <small>3–80 letters, numbers, dots, underscores, or hyphens.</small>
+          </label>
+
+          <label>
+            <span>New Password</span>
+            <span class="password-input-wrapper">
+              <input
+                [type]="showEditPassword ? 'text' : 'password'"
+                name="editPassword"
+                [(ngModel)]="editForm.password"
+                placeholder="Leave blank to keep current, or enter new password"
+                autocomplete="new-password"
+              />
+              <button
+                class="password-toggle"
+                type="button"
+                (click)="toggleEditPasswordVisibility('password')"
+                [attr.aria-label]="showEditPassword ? 'Hide password' : 'Show password'"
+              >
+                <i class="pi" [class.pi-eye]="!showEditPassword" [class.pi-eye-slash]="showEditPassword" aria-hidden="true"></i>
+              </button>
+            </span>
+            <small>At least 12 characters if updating password.</small>
+          </label>
+
+          <label *ngIf="editForm.password">
+            <span>Confirm New Password *</span>
+            <span class="password-input-wrapper">
+              <input
+                [type]="showEditConfirmPassword ? 'text' : 'password'"
+                name="editConfirmPassword"
+                [(ngModel)]="editForm.confirmPassword"
+                required
+                placeholder="Confirm new password"
+                autocomplete="new-password"
+              />
+              <button
+                class="password-toggle"
+                type="button"
+                (click)="toggleEditPasswordVisibility('confirmPassword')"
+                [attr.aria-label]="showEditConfirmPassword ? 'Hide confirmation password' : 'Show confirmation password'"
+              >
+                <i class="pi" [class.pi-eye]="!showEditConfirmPassword" [class.pi-eye-slash]="showEditConfirmPassword" aria-hidden="true"></i>
+              </button>
+            </span>
+          </label>
+
+          <div class="modal-actions">
+            <button type="button" class="btn-cancel" (click)="cancelEdit()" [disabled]="isEditBusy">
+              Cancel
+            </button>
+            <button type="submit" class="button primary btn-save" [disabled]="editNgForm.invalid || isEditBusy">
+              <i class="pi" [ngClass]="isEditBusy ? 'pi-spin pi-spinner' : 'pi-check'"></i>
+              <span>{{ isEditBusy ? 'Saving…' : 'Save Changes' }}</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Professional Delete Confirmation Modal Dialog -->
+  <div
+    class="modal-backdrop"
+    *ngIf="adminToDelete"
+    (click)="closeDeleteModal()"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="delete-admin-title"
+  >
+    <div class="modal-dialog modal-danger-dialog" (click)="$event.stopPropagation()">
+      <div class="modal-danger-icon">
+        <i class="pi pi-trash" aria-hidden="true"></i>
+      </div>
+
+      <div class="modal-header-danger">
+        <h2 id="delete-admin-title">Delete Admin Account?</h2>
+        <p class="modal-lead">
+          Are you sure you want to delete admin account <strong>"{{ adminToDelete.username }}"</strong>? This action cannot be undone and will permanently remove access.
+        </p>
+      </div>
+
+      <!-- Preview of admin being deleted -->
+      <div class="delete-preview-card">
+        <div class="preview-avatar">
+          <i class="pi pi-user"></i>
+        </div>
+        <div class="preview-info">
+          <strong>{{ adminToDelete.username }}</strong>
+          <span class="preview-sub">Account ID: #{{ adminToDelete.id }}</span>
+        </div>
+      </div>
+
+      <div class="modal-actions danger-actions">
+        <button
+          type="button"
+          class="btn-modal-cancel"
+          (click)="closeDeleteModal()"
+          [disabled]="isDeleting"
+        >
+          No, Cancel
+        </button>
+        <button
+          type="button"
+          class="btn-modal-delete"
+          (click)="confirmDelete()"
+          [disabled]="isDeleting"
+        >
+          <i class="pi pi-spin pi-spinner" *ngIf="isDeleting" aria-hidden="true"></i>
+          <i class="pi pi-trash" *ngIf="!isDeleting" aria-hidden="true"></i>
+          <span>{{ isDeleting ? 'Deleting…' : 'Yes, Delete' }}</span>
+        </button>
+      </div>
+    </div>
   </div>
 </section>

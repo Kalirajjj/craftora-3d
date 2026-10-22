@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="100%" height="100%">
+  <defs>
+    <radialGradient id="hp-bg" cx="50%" cy="40%" r="65%">
+      <stop offset="0%" stop-color="#212836"/>
+      <stop offset="55%" stop-color="#11151e"/>
+      <stop offset="100%" stop-color="#040608"/>
+    </radialGradient>
+    <linearGradient id="carbon-fiber" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#334155"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="800" fill="url(#hp-bg)"/>
+  <ellipse cx="400" cy="690" rx="200" ry="40" fill="#000000" opacity="0.6"/>
+
+  <!-- Sleek Cantilevered Arch Stand -->
+  <g fill="url(#carbon-fiber)" stroke="#475569" stroke-width="3">
+    <!-- Weighted Base -->
+    <ellipse cx="400" cy="660" rx="140" ry="32" fill="#1e293b"/>
+    <ellipse cx="400" cy="650" rx="120" ry="24" fill="#0f172a"/>
+    <ellipse cx="400" cy="650" rx="116" ry="20" fill="none" stroke="#00a896" stroke-width="2"/>
+
+    <!-- Organic Spine Stem -->
+    <path d="M 370 650 Q 380 400 450 250 Q 420 180 340 220 Q 410 140 470 210 Q 520 280 430 650 Z"/>
+    <!-- Headband Cradle Rest -->
+    <path d="M 340 200 C 400 170, 480 180, 520 230 C 500 240, 420 200, 340 220 Z" fill="#00a896"/>
+  </g>
+  <!-- Cyberpunk Headset Silhouette Outline on Stand -->
+  <g stroke="#38bdf8" stroke-width="3" fill="none" opacity="0.6">
+    <path d="M 330 250 C 370 170, 480 170, 520 250"/>
+    <ellipse cx="320" cy="330" rx="30" ry="50" fill="#0f172a" stroke="#38bdf8" stroke-width="3"/>
+    <ellipse cx="530" cy="330" rx="30" ry="50" fill="#0f172a" stroke="#38bdf8" stroke-width="3"/>
+  </g>
+</svg>

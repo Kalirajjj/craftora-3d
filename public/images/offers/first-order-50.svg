@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 380" width="1200" height="380">
+  <defs>
+    <linearGradient id="bgGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#140727" />
+      <stop offset="50%" stop-color="#240c42" />
+      <stop offset="100%" stop-color="#0a1128" />
+    </linearGradient>
+    <linearGradient id="magentaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF2E93" />
+      <stop offset="100%" stop-color="#FF8A00" />
+    </linearGradient>
+    <linearGradient id="cyanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00F0FF" />
+      <stop offset="100%" stop-color="#7000FF" />
+    </linearGradient>
+    <pattern id="dotGrid" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="3" cy="3" r="1.5" fill="rgba(255, 46, 147, 0.15)" />
+    </pattern>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="380" rx="20" fill="url(#bgGrad2)" />
+  <rect width="1200" height="380" rx="20" fill="url(#dotGrid)" />
+
+  <!-- Ambient Glow Circles -->
+  <circle cx="980" cy="180" r="190" fill="#FF2E93" opacity="0.22" filter="blur(50px)" />
+  <circle cx="220" cy="40" r="150" fill="#7000FF" opacity="0.2" filter="blur(60px)" />
+
+  <!-- Left Content Group -->
+  <g transform="translate(60, 55)">
+    <!-- Eyebrow Badge -->
+    <rect width="230" height="32" rx="16" fill="rgba(255, 46, 147, 0.2)" stroke="rgba(255, 46, 147, 0.5)" stroke-width="1.5" />
+    <text x="115" y="21" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#FF8EC7" text-anchor="middle" letter-spacing="1.5">★ WELCOME TO CRAFTORA</text>
+
+    <!-- Main Title -->
+    <text x="0" y="80" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="38" font-weight="800" fill="#FFFFFF" letter-spacing="-1">Get Flat ₹50 Instant Discount</text>
+    <text x="0" y="125" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="32" font-weight="700" fill="url(#magentaGrad)" letter-spacing="-0.5">On Your Very First Order</text>
+
+    <!-- Subtitle -->
+    <text x="0" y="165" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="400" fill="rgba(255, 255, 255, 0.8)">Discover bespoke 3D décor, planters, lithophanes &amp; gifts with welcome savings.</text>
+
+    <!-- Coupon Pill -->
+    <g transform="translate(0, 195)">
+      <rect width="270" height="48" rx="10" fill="rgba(255, 255, 255, 0.08)" stroke="rgba(255, 255, 255, 0.25)" stroke-width="1.5" stroke-dasharray="6,4"/>
+      <text x="18" y="30" font-family="monospace" font-size="13" fill="#A0AEC0">USE CODE:</text>
+      <text x="100" y="31" font-family="monospace" font-size="18" font-weight="800" fill="#FF8EC7" letter-spacing="2">WELCOME50</text>
+    </g>
+  </g>
+
+  <!-- Right Visual Motif: Big Badge & Discount Tag -->
+  <g transform="translate(890, 60)">
+    <!-- Big Circle Glow -->
+    <circle cx="130" cy="130" r="115" fill="rgba(255, 46, 147, 0.12)" stroke="url(#magentaGrad)" stroke-width="2" />
+    
+    <!-- Discount Numeric Typography -->
+    <text x="130" y="115" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="28" font-weight="700" fill="#FFFFFF" text-anchor="middle">SAVE</text>
+    <text x="130" y="175" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="64" font-weight="900" fill="url(#magentaGrad)" text-anchor="middle">₹50</text>
+    <text x="130" y="210" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="700" fill="#00F0FF" text-anchor="middle" letter-spacing="2">1ST PURCHASE</text>
+
+    <!-- Floating Sparkles -->
+    <path d="M 0 50 L 10 60 L 0 70 L -10 60 Z" fill="#FFE066"/>
+    <path d="M 250 160 L 258 168 L 250 176 L 242 168 Z" fill="#00F0FF"/>
+    <path d="M 30 200 L 36 206 L 30 212 L 24 206 Z" fill="#FF8EC7"/>
+  </g>
+</svg>

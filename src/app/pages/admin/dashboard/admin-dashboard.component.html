@@ -1,31 +1,337 @@
-<section class="admin-page-content">
-  <span class="eyebrow">ADMIN OVERVIEW</span>
-  <h1>Dashboard</h1>
-  <p class="page-lead">Choose a task to manage your Craftora 3D store.</p>
-  <div class="overview-card">
-    <i class="pi pi-box"></i>
-    <div><strong>{{ productCount }}</strong><span>Products in catalogue</span></div>
+<section class="admin-dashboard-page">
+  <!-- Page Header -->
+  <div class="dashboard-header">
+    <div class="header-intro">
+      <div class="header-eyebrow">
+        <span class="eyebrow-pill">
+          <i class="pi pi-compass" aria-hidden="true"></i>
+          <span>Workspace Overview</span>
+        </span>
+      </div>
+      <h1 class="dashboard-title">
+        Welcome back, <span class="admin-name">{{ adminUsername }}</span>
+      </h1>
+      <p class="dashboard-subtitle">
+        Monitor your product catalogue, incoming customer inquiries, custom 3D printing requests, and team credentials in real time.
+      </p>
+    </div>
+
+    <div class="header-status-group">
+      <div class="system-status-pill">
+        <span class="status-pulse-dot"></span>
+        <span>Store Online</span>
+      </div>
+      <div class="date-badge">
+        <i class="pi pi-calendar" aria-hidden="true"></i>
+        <span>{{ today | date:'EEE, MMM d, y' }}</span>
+      </div>
+      <button
+        type="button"
+        class="btn-dashboard-refresh"
+        (click)="loadDashboardData()"
+        [disabled]="isLoading"
+        title="Refresh dashboard metrics"
+      >
+        <i class="pi pi-refresh" [class.pi-spin]="isLoading" aria-hidden="true"></i>
+        <span>Refresh</span>
+      </button>
+    </div>
   </div>
-  <div class="admin-shortcuts">
-    <a routerLink="/admin/products/new" class="shortcut-card">
-      <span class="shortcut-icon"><i class="pi pi-plus-circle"></i></span>
-      <strong>Create Product</strong><small>Add product details and upload an image.</small>
-      <span class="shortcut-link">Open page <i class="pi pi-arrow-right"></i></span>
+
+  <!-- 4 Key Business Metrics Cards Grid -->
+  <div class="metrics-grid">
+    <!-- Card 1: Products -->
+    <a routerLink="/admin/products" class="metric-card metric-products">
+      <div class="metric-top">
+        <div class="metric-icon-wrap icon-products">
+          <i class="pi pi-box" aria-hidden="true"></i>
+        </div>
+        <span class="metric-pill">Storefront</span>
+      </div>
+      <div class="metric-body">
+        <div class="metric-number">{{ productCount }}</div>
+        <div class="metric-label">Products in Catalogue</div>
+        <p class="metric-desc">Live items displayed across store categories</p>
+      </div>
+      <div class="metric-footer">
+        <span>Manage products</span>
+        <i class="pi pi-arrow-right"></i>
+      </div>
     </a>
-    <a routerLink="/admin/products" class="shortcut-card">
-      <span class="shortcut-icon"><i class="pi pi-list"></i></span>
-      <strong>Product List</strong><small>View products saved in PostgreSQL.</small>
-      <span class="shortcut-link">Open page <i class="pi pi-arrow-right"></i></span>
+
+    <!-- Card 2: Customer Messages -->
+    <a routerLink="/admin/messages" class="metric-card metric-messages" [class.has-unread]="unreadMessagesCount > 0">
+      <div class="metric-top">
+        <div class="metric-icon-wrap icon-messages">
+          <i class="pi pi-envelope" aria-hidden="true"></i>
+        </div>
+        <span class="metric-pill pill-alert" *ngIf="unreadMessagesCount > 0">
+          {{ unreadMessagesCount }} New
+        </span>
+        <span class="metric-pill" *ngIf="unreadMessagesCount === 0">
+          All Read
+        </span>
+      </div>
+      <div class="metric-body">
+        <div class="metric-number">{{ unreadMessagesCount }}</div>
+        <div class="metric-label">Unread Customer Messages</div>
+        <p class="metric-desc">{{ totalMessagesCount }} total inquiries received from contact form</p>
+      </div>
+      <div class="metric-footer">
+        <span>Open message inbox</span>
+        <i class="pi pi-arrow-right"></i>
+      </div>
     </a>
-    <a routerLink="/admin/users/new" class="shortcut-card">
-      <span class="shortcut-icon"><i class="pi pi-user-plus"></i></span>
-      <strong>Create Admin User</strong><small>Add another account with admin access.</small>
-      <span class="shortcut-link">Open page <i class="pi pi-arrow-right"></i></span>
+
+    <!-- Card 3: Custom Quotes -->
+    <a routerLink="/admin/requests" class="metric-card metric-quotes">
+      <div class="metric-top">
+        <div class="metric-icon-wrap icon-quotes">
+          <i class="pi pi-inbox" aria-hidden="true"></i>
+        </div>
+        <span class="metric-pill pill-pending" *ngIf="pendingQuotesCount > 0">
+          {{ pendingQuotesCount }} Pending
+        </span>
+        <span class="metric-pill" *ngIf="pendingQuotesCount === 0">
+          Up to date
+        </span>
+      </div>
+      <div class="metric-body">
+        <div class="metric-number">{{ quoteRequestCount }}</div>
+        <div class="metric-label">Custom Print Requests</div>
+        <p class="metric-desc">Bespoke 3D models and customer specifications</p>
+      </div>
+      <div class="metric-footer">
+        <span>Review quote requests</span>
+        <i class="pi pi-arrow-right"></i>
+      </div>
     </a>
-    <a routerLink="/admin/requests" class="shortcut-card">
-      <span class="shortcut-icon"><i class="pi pi-inbox"></i></span>
-      <strong>Quote Requests</strong><small>Review customer custom-print enquiries and update their status.</small>
-      <span class="shortcut-link">Open page <i class="pi pi-arrow-right"></i></span>
+
+    <!-- Card 4: Admin Team -->
+    <a routerLink="/admin/users/new" class="metric-card metric-admins">
+      <div class="metric-top">
+        <div class="metric-icon-wrap icon-admins">
+          <i class="pi pi-users" aria-hidden="true"></i>
+        </div>
+        <span class="metric-pill">Team</span>
+      </div>
+      <div class="metric-body">
+        <div class="metric-number">{{ adminUserCount }}</div>
+        <div class="metric-label">Authorized Admin Users</div>
+        <p class="metric-desc">Accounts with access to the store management console</p>
+      </div>
+      <div class="metric-footer">
+        <span>Manage team access</span>
+        <i class="pi pi-arrow-right"></i>
+      </div>
     </a>
+  </div>
+
+  <!-- Two-Column Perfectly Aligned Section -->
+  <div class="dashboard-columns-layout">
+    <!-- Left Column: Workspace Navigation Hub -->
+    <div class="workspaces-column">
+      <div class="column-header-bar">
+        <div class="column-title-wrap">
+          <div class="header-icon-pill">
+            <i class="pi pi-th-large" aria-hidden="true"></i>
+          </div>
+          <div>
+            <h2 class="section-heading">Store Management Hub</h2>
+            <p class="section-subheading">Core store administration tools & workspaces</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="workspaces-grid">
+        <!-- 1. Customer Messages -->
+        <a routerLink="/admin/messages" class="workspace-card">
+          <div class="workspace-icon icon-messages-subtle">
+            <i class="pi pi-envelope"></i>
+          </div>
+          <div class="workspace-content">
+            <div class="workspace-title-row">
+              <h3>Customer Messages</h3>
+              <span class="badge-unread-tiny" *ngIf="unreadMessagesCount > 0">
+                {{ unreadMessagesCount }} unread
+              </span>
+            </div>
+            <p>Filter All, Unread, and Read customer inquiries. View complete details and reply directly.</p>
+            <div class="workspace-link">
+              <span>Open messages</span>
+              <i class="pi pi-arrow-right"></i>
+            </div>
+          </div>
+        </a>
+
+        <!-- 2. Product Catalogue -->
+        <a routerLink="/admin/products" class="workspace-card">
+          <div class="workspace-icon icon-products-subtle">
+            <i class="pi pi-list"></i>
+          </div>
+          <div class="workspace-content">
+            <div class="workspace-title-row">
+              <h3>Product Catalogue</h3>
+              <span class="badge-info-tiny">{{ productCount }} items</span>
+            </div>
+            <p>Browse catalogue inventory, update stock status, edit product details, or delete listings.</p>
+            <div class="workspace-link">
+              <span>View catalogue</span>
+              <i class="pi pi-arrow-right"></i>
+            </div>
+          </div>
+        </a>
+
+        <!-- 3. Create Product -->
+        <a routerLink="/admin/products/new" class="workspace-card">
+          <div class="workspace-icon icon-create-subtle">
+            <i class="pi pi-plus-circle"></i>
+          </div>
+          <div class="workspace-content">
+            <div class="workspace-title-row">
+              <h3>Create Product</h3>
+            </div>
+            <p>Publish a new 3D printed model to your catalogue with high-res photos, material specs, and price.</p>
+            <div class="workspace-link">
+              <span>Add product</span>
+              <i class="pi pi-arrow-right"></i>
+            </div>
+          </div>
+        </a>
+
+        <!-- 4. Quote Requests -->
+        <a routerLink="/admin/requests" class="workspace-card">
+          <div class="workspace-icon icon-quotes-subtle">
+            <i class="pi pi-inbox"></i>
+          </div>
+          <div class="workspace-content">
+            <div class="workspace-title-row">
+              <h3>Quote Requests</h3>
+              <span class="badge-pending-tiny" *ngIf="pendingQuotesCount > 0">{{ pendingQuotesCount }} pending</span>
+            </div>
+            <p>Inspect customer custom 3D model requirements, file attachments, and update job progress.</p>
+            <div class="workspace-link">
+              <span>Review quotes</span>
+              <i class="pi pi-arrow-right"></i>
+            </div>
+          </div>
+        </a>
+
+        <!-- 5. Admin Users -->
+        <a routerLink="/admin/users/new" class="workspace-card">
+          <div class="workspace-icon icon-admins-subtle">
+            <i class="pi pi-users"></i>
+          </div>
+          <div class="workspace-content">
+            <div class="workspace-title-row">
+              <h3>Admin Users</h3>
+              <span class="badge-info-tiny">{{ adminUserCount }} accounts</span>
+            </div>
+            <p>Create new admin credentials, toggle password visibility, edit accounts, or remove team members.</p>
+            <div class="workspace-link">
+              <span>Manage users</span>
+              <i class="pi pi-arrow-right"></i>
+            </div>
+          </div>
+        </a>
+
+        <!-- 6. Live Storefront -->
+        <a routerLink="/shop" target="_blank" class="workspace-card">
+          <div class="workspace-icon icon-storefront-subtle">
+            <i class="pi pi-external-link"></i>
+          </div>
+          <div class="workspace-content">
+            <div class="workspace-title-row">
+              <h3>Live Storefront</h3>
+              <span class="badge-live-tiny">Customer View</span>
+            </div>
+            <p>Preview the live customer-facing store, custom print creator, and products catalogue.</p>
+            <div class="workspace-link">
+              <span>Visit store</span>
+              <i class="pi pi-arrow-right"></i>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- Right Column: Recent Inquiries (Properly Aligned & Framed) -->
+    <div class="inquiries-column">
+      <div class="column-header-bar">
+        <div class="column-title-wrap">
+          <div class="header-icon-pill icon-inbox-pill">
+            <i class="pi pi-bell" aria-hidden="true"></i>
+          </div>
+          <div>
+            <div class="inquiries-title-inline">
+              <h2 class="section-heading">Recent Inquiries</h2>
+              <span class="unread-pill-count" *ngIf="unreadMessagesCount > 0">{{ unreadMessagesCount }} new</span>
+            </div>
+            <p class="section-subheading">Latest customer questions & requests</p>
+          </div>
+        </div>
+
+        <a routerLink="/admin/messages" class="btn-view-all-pill" title="View all messages in inbox">
+          <span>View All</span>
+          <i class="pi pi-arrow-right"></i>
+        </a>
+      </div>
+
+      <!-- Inquiries Container Card -->
+      <div class="inquiries-card-panel">
+        <div class="recent-messages-feed" *ngIf="recentMessages.length > 0">
+          <a
+            *ngFor="let msg of recentMessages"
+            routerLink="/admin/messages"
+            class="inquiry-item"
+            [class.is-unread-item]="!isMessageRead(msg)"
+          >
+            <div class="inquiry-avatar" [class.avatar-unread-glow]="!isMessageRead(msg)">
+              {{ getInitials(msg.name) }}
+            </div>
+
+            <div class="inquiry-details">
+              <div class="inquiry-top-row">
+                <div class="inquiry-author-group">
+                  <strong class="inquiry-name">{{ msg.name }}</strong>
+                  <span class="inquiry-pill-new" *ngIf="!isMessageRead(msg)">New</span>
+                </div>
+                <span class="inquiry-time">{{ msg.createdAt | date:'MMM d • h:mm a' }}</span>
+              </div>
+
+              <p class="inquiry-snippet">{{ msg.message }}</p>
+
+              <div class="inquiry-meta-bottom">
+                <span class="inquiry-email">
+                  <i class="pi pi-envelope"></i> {{ msg.email }}
+                </span>
+                <span class="inquiry-arrow-prompt">
+                  <span>View</span>
+                  <i class="pi pi-chevron-right"></i>
+                </span>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="inquiries-empty-state" *ngIf="recentMessages.length === 0">
+          <div class="empty-inbox-circle">
+            <i class="pi pi-inbox"></i>
+          </div>
+          <h4>No customer messages yet</h4>
+          <p>New inquiries submitted from your contact form will appear here in real-time.</p>
+        </div>
+
+        <div class="inquiries-card-footer" *ngIf="recentMessages.length > 0">
+          <span class="footer-count-text">
+            Showing latest <strong>{{ recentMessages.length }}</strong> of <strong>{{ totalMessagesCount }}</strong> inquiries
+          </span>
+          <a routerLink="/admin/messages" class="footer-inbox-link">
+            <i class="pi pi-envelope"></i>
+            <span>Open Full Inbox</span>
+          </a>
+        </div>
+      </div>
+    </div>
   </div>
 </section>

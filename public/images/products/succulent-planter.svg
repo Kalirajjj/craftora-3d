@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="100%" height="100%">
+  <defs>
+    <radialGradient id="pl-bg" cx="50%" cy="40%" r="65%">
+      <stop offset="0%" stop-color="#243038"/>
+      <stop offset="55%" stop-color="#141c22"/>
+      <stop offset="100%" stop-color="#0a0f12"/>
+    </radialGradient>
+    <linearGradient id="marble-facet-1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#cbd5e1"/>
+    </linearGradient>
+    <linearGradient id="marble-facet-2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#94a3b8"/>
+      <stop offset="100%" stop-color="#64748b"/>
+    </linearGradient>
+    <linearGradient id="succulent-green" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#86efac"/>
+      <stop offset="60%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#047857"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="800" fill="url(#pl-bg)"/>
+  <ellipse cx="400" cy="690" rx="220" ry="45" fill="#000000" opacity="0.65"/>
+
+  <!-- Low-Poly Faceted Geometric Pot -->
+  <g stroke="#475569" stroke-width="1.5">
+    <polygon points="400,660 300,580 350,470 450,470 500,580" fill="url(#marble-facet-1)"/>
+    <polygon points="300,580 230,520 270,430 350,470" fill="url(#marble-facet-2)"/>
+    <polygon points="500,580 570,520 530,430 450,470" fill="url(#marble-facet-2)"/>
+    <polygon points="350,470 270,430 330,360 400,380" fill="url(#marble-facet-1)"/>
+    <polygon points="450,470 530,430 470,360 400,380" fill="url(#marble-facet-2)"/>
+    <!-- Top Rim Edge -->
+    <polygon points="330,360 400,380 470,360 430,330 370,330" fill="#334155"/>
+  </g>
+
+  <!-- 3D Printed Succulent Rosette -->
+  <g fill="url(#succulent-green)" stroke="#065f46" stroke-width="2">
+    <!-- Outer Petals -->
+    <path d="M 400 370 C 350 340, 310 280, 330 240 C 360 270, 390 320, 400 370 Z"/>
+    <path d="M 400 370 C 450 340, 490 280, 470 240 C 440 270, 410 320, 400 370 Z"/>
+    <path d="M 400 370 C 460 370, 520 330, 520 290 C 480 300, 430 330, 400 370 Z"/>
+    <path d="M 400 370 C 340 370, 280 330, 280 290 C 320 300, 370 330, 400 370 Z"/>
+    <!-- Inner Center Rosette -->
+    <path d="M 400 370 C 380 320, 370 260, 400 220 C 430 260, 420 320, 400 370 Z" fill="#bbf7d0"/>
+  </g>
+</svg>

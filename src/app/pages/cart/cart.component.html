@@ -48,10 +48,71 @@
         <!-- Order Summary -->
         <div class="summary-card">
           <div class="summary-heading"><div><span class="cart-section-eyebrow">AT A GLANCE</span><h3>Order summary</h3></div><i class="pi pi-receipt" aria-hidden="true"></i></div>
+
+          <!-- Coupon Box -->
+          <div class="coupon-box">
+            <label class="coupon-input-label">Have a promo code?</label>
+            <div class="coupon-input-group" *ngIf="!cartService.appliedOffer()">
+              <input 
+                type="text" 
+                class="coupon-field" 
+                placeholder="e.g. FIRST299 or WELCOME50" 
+                [(ngModel)]="couponInput"
+                (keyup.enter)="applyCoupon()"
+              />
+              <button type="button" class="btn-coupon-apply" (click)="applyCoupon()" [disabled]="!couponInput.trim()">
+                Apply
+              </button>
+            </div>
+
+            <!-- Applied coupon banner -->
+            <div class="coupon-applied-pill" *ngIf="cartService.appliedOffer() as offer">
+              <div class="coupon-applied-info">
+                <i class="pi pi-check-circle"></i>
+                <div>
+                  <strong class="applied-code">{{ offer.code }}</strong>
+                  <span class="coupon-applied-title">{{ offer.title }}</span>
+                </div>
+              </div>
+              <button type="button" class="btn-remove-coupon" (click)="removeCoupon()" title="Remove coupon">
+                <i class="pi pi-times"></i>
+              </button>
+            </div>
+
+            <!-- Message alert -->
+            <div class="coupon-feedback" *ngIf="cartService.couponMessage() as msg" [ngClass]="msg.type">
+              <i class="pi" [ngClass]="msg.type === 'success' ? 'pi-check' : 'pi-exclamation-triangle'"></i>
+              <span>{{ msg.text }}</span>
+            </div>
+
+            <!-- Quick promo suggestion chips -->
+            <div class="quick-promos" *ngIf="!cartService.appliedOffer() && availableOffers.length > 0">
+              <span class="quick-promos-label">Available for you:</span>
+              <div class="promo-chips">
+                <button 
+                  type="button" 
+                  class="promo-chip" 
+                  *ngFor="let off of availableOffers" 
+                  (click)="applyCoupon(off.code)"
+                >
+                  <i class="pi pi-tag"></i> {{ off.code }}
+                  <span class="chip-benefit" *ngIf="off.type === 'FREE_DELIVERY'">(Free Delivery &gt;₹299)</span>
+                  <span class="chip-benefit" *ngIf="off.type === 'FLAT_DISCOUNT'">(₹{{ off.discountAmount }} Off)</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
           <div class="summary-row">
             <span>Subtotal</span>
             <strong>₹{{ cartService.subtotal() }}</strong>
           </div>
+
+          <div class="summary-row discount-row" *ngIf="cartService.discount() > 0">
+            <span>Discount ({{ cartService.appliedOffer()?.code }})</span>
+            <strong class="text-success">- ₹{{ cartService.discount() }}</strong>
+          </div>
+
           <div class="summary-row">
             <span>Standard Delivery</span>
             <span>{{ cartService.deliveryFee() === 0 ? 'FREE' : '₹' + cartService.deliveryFee() }}</span>
@@ -59,7 +120,13 @@
           
           @if (cartService.deliveryFee() === 0) {
             <div class="free-shipping-alert">
-              <i class="pi pi-check"></i> Free shipping applied on orders above ₹999!
+              <i class="pi pi-check"></i>
+              <span *ngIf="cartService.appliedOffer()?.type === 'FREE_DELIVERY'">
+                1st Order Free Delivery applied!
+              </span>
+              <span *ngIf="cartService.appliedOffer()?.type !== 'FREE_DELIVERY'">
+                Free shipping applied on orders above ₹999!
+              </span>
             </div>
           }
 

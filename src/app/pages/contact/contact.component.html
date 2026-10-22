@@ -1,85 +1,309 @@
 <div class="contact-page">
-  <div class="contact-header">
-    <div class="container text-center">
-      <h1>Get in Touch</h1>
-      <p>Have questions regarding custom print orders, bulk gifting, or existing deliveries?</p>
-    </div>
-  </div>
+  <!-- =========================================================================
+       1 · Hero Section
+       ========================================================================== -->
+  <section class="contact-hero">
+    <div class="hero-bg-glow glow-top-left" aria-hidden="true"></div>
+    <div class="hero-bg-glow glow-bottom-right" aria-hidden="true"></div>
 
-  <div class="container contact-body">
-    <div class="contact-grid">
-      <!-- Contact details -->
-      <div class="contact-info">
-        <h2>Studio Information</h2>
-        <p class="desc">Connect directly with our 3D design team via WhatsApp, call, or email.</p>
-
-        <div class="info-item">
-          <i class="pi pi-whatsapp"></i>
-          <div>
-            <strong>WhatsApp Hotline</strong>
-            <p><a href="https://wa.me/919361416827" target="_blank" rel="noopener">+91 9361416827 (Instant Response)</a></p>
-          </div>
+    <div class="container hero-inner">
+      <div class="hero-text-col">
+        <div class="hero-badge">
+          <i class="pi pi-sparkles"></i>
+          <span>CRAFTORA 3D · DESIGN & FABRICATION ATELIER</span>
         </div>
-
-        <div class="info-item">
-          <i class="pi pi-envelope"></i>
-          <div>
-            <strong>Direct Inquiries</strong>
-            <p><a href="mailto:craftora3d&#64;gmail.com">craftora3d&#64;gmail.com</a></p>
+        <h1 class="hero-headline">Let’s Create Something Extraordinary.</h1>
+        <p class="hero-subline">
+          Have an idea, a custom design, or a 3D project in mind? Tell us what you’re imagining,
+          and let’s turn it into something real.
+        </p>
+        <div class="hero-highlights">
+          <div class="hero-pill">
+            <i class="pi pi-bolt"></i>
+            <span>2-Hour Quote Feasibility</span>
           </div>
-        </div>
-
-        <div class="info-item">
-          <i class="pi pi-map-marker"></i>
-          <div>
-            <strong>Studio Location</strong>
-            <p>Chennai, Tamil Nadu</p>
+          <div class="hero-pill">
+            <i class="pi pi-shield"></i>
+            <span>Strict NDA & CAD Privacy</span>
           </div>
-        </div>
-
-        <div class="info-item">
-          <i class="pi pi-clock"></i>
-          <div>
-            <strong>Operational Hours</strong>
-            <p>Monday - Saturday: 9:30 AM – 7:30 PM IST</p>
+          <div class="hero-pill">
+            <i class="pi pi-globe"></i>
+            <span>Pan-India Express Delivery</span>
           </div>
         </div>
       </div>
 
-      <!-- Contact form -->
-      <div class="form-wrapper">
-        <div class="success-box" *ngIf="isSent">
-          <i class="pi pi-check-circle"></i>
-          <h3>Message Sent!</h3>
-          <p>Thank you for reaching out. We will get back to you shortly.</p>
+      <!-- 3D Interactive Hero Visual -->
+      <div class="hero-visual-col" (mousemove)="onCanvasMouseMove($event)">
+        <div class="canvas-3d-wrapper">
+          <canvas #hero3dCanvas class="hero-canvas"></canvas>
+          <div class="canvas-badge">
+            <i class="pi pi-box"></i>
+            <span>Interactive 3D Mesh Engine</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       2 · Contact Layout (Two Columns: Info & Form)
+       ========================================================================== -->
+  <section class="contact-main-section">
+    <div class="container">
+      <div class="contact-two-col-grid">
+        <!-- LEFT COLUMN: Contact Information -->
+        <div class="contact-info-col">
+          <div class="info-header">
+            <span class="info-eyebrow">DIRECT COMMUNICATION</span>
+            <h2 class="info-title">Let’s Talk</h2>
+            <p class="info-desc">
+              Whether you need a custom 3D print, personalized product, prototype, or simply want to discuss an idea,
+              we’d love to hear from you.
+            </p>
+          </div>
+
+          <!-- Contact Cards Grid -->
+          <div class="contact-cards-stack">
+            <!-- Email Card -->
+            <a href="mailto:hello@craftora3d.com" class="contact-card">
+              <div class="card-icon-box">
+                <i class="pi pi-envelope"></i>
+              </div>
+              <div class="card-text-box">
+                <span class="card-label">Email Us</span>
+                <strong class="card-value">hello&#64;craftora3d.com</strong>
+                <span class="card-meta">Inquiries & CAD file submissions</span>
+              </div>
+              <i class="pi pi-arrow-up-right card-arrow"></i>
+            </a>
+
+            <!-- WhatsApp Card -->
+            <a href="https://wa.me/919361416827" target="_blank" rel="noopener" class="contact-card whatsapp-card">
+              <div class="card-icon-box icon-whatsapp">
+                <i class="pi pi-whatsapp"></i>
+              </div>
+              <div class="card-text-box">
+                <span class="card-label">WhatsApp</span>
+                <strong class="card-value">Chat with us</strong>
+                <span class="card-meta">+91 9361416827 · Instant team replies</span>
+              </div>
+              <i class="pi pi-arrow-up-right card-arrow"></i>
+            </a>
+
+            <!-- Instagram Card -->
+            <a href="https://instagram.com" target="_blank" rel="noopener" class="contact-card">
+              <div class="card-icon-box icon-instagram">
+                <i class="pi pi-instagram"></i>
+              </div>
+              <div class="card-text-box">
+                <span class="card-label">Instagram</span>
+                <strong class="card-value">&#64;craftora3d</strong>
+                <span class="card-meta">Behind-the-scenes & print demos</span>
+              </div>
+              <i class="pi pi-arrow-up-right card-arrow"></i>
+            </a>
+
+            <!-- Location Card -->
+            <div class="contact-card no-link">
+              <div class="card-icon-box">
+                <i class="pi pi-map-marker"></i>
+              </div>
+              <div class="card-text-box">
+                <span class="card-label">Location</span>
+                <strong class="card-value">India</strong>
+                <span class="card-meta">Chennai, Tamil Nadu · Shipping nationwide</span>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <form *ngIf="!isSent" (ngSubmit)="sendMessage()" #cForm="ngForm">
-          <div class="form-group">
-            <label class="form-label">Name *</label>
-            <input type="text" class="form-control" [(ngModel)]="contactForm.name" name="name" required />
-          </div>
+        <!-- RIGHT COLUMN: Premium Floating Contact Form -->
+        <div class="contact-form-col">
+          <div class="form-card-container">
+            <!-- Normal Form State -->
+            <div *ngIf="!isSent" class="form-content">
+              <div class="form-card-header">
+                <span class="form-eyebrow">GET IN TOUCH</span>
+                <h3 class="form-title">Send Us a Message</h3>
+                <p class="form-subtitle">Fill in the fields below and our team will get back to you promptly.</p>
+              </div>
 
-          <div class="form-group">
-            <label class="form-label">Email *</label>
-            <input type="email" class="form-control" [(ngModel)]="contactForm.email" name="email" required />
-          </div>
+              <!-- Error Alert -->
+              <div class="form-error-alert" *ngIf="errorMessage">
+                <i class="pi pi-exclamation-circle"></i>
+                <span>{{ errorMessage }}</span>
+              </div>
 
-          <div class="form-group">
-            <label class="form-label">Phone</label>
-            <input type="tel" class="form-control" [(ngModel)]="contactForm.phone" name="phone" />
-          </div>
+              <form (ngSubmit)="sendMessage()" #projectForm="ngForm" class="project-form">
+                <!-- Name Field -->
+                <div class="form-field">
+                  <label for="fullName">Name <span class="required">*</span></label>
+                  <div class="input-with-icon">
+                    <i class="pi pi-user field-icon"></i>
+                    <input
+                      type="text"
+                      id="fullName"
+                      name="name"
+                      [(ngModel)]="contactForm.name"
+                      required
+                      placeholder="Your full name"
+                      [disabled]="isSubmitting"
+                    />
+                  </div>
+                </div>
 
-          <div class="form-group">
-            <label class="form-label">Message *</label>
-            <textarea class="form-control" rows="4" [(ngModel)]="contactForm.message" name="message" required></textarea>
-          </div>
+                <!-- Two-Column Fields (Email & Phone) -->
+                <div class="form-row-two">
+                  <div class="form-field">
+                    <label for="emailAddr">Email <span class="required">*</span></label>
+                    <div class="input-with-icon">
+                      <i class="pi pi-envelope field-icon"></i>
+                      <input
+                        type="email"
+                        id="emailAddr"
+                        name="email"
+                        [(ngModel)]="contactForm.email"
+                        required
+                        placeholder="yourname@domain.com"
+                        [disabled]="isSubmitting"
+                      />
+                    </div>
+                  </div>
 
-          <button type="submit" class="btn btn-primary btn-block" [disabled]="!cForm.form.valid">
-            Send Message
+                  <div class="form-field">
+                    <label for="phoneNum">Phone</label>
+                    <div class="input-with-icon">
+                      <i class="pi pi-phone field-icon"></i>
+                      <input
+                        type="tel"
+                        id="phoneNum"
+                        name="phone"
+                        [(ngModel)]="contactForm.phone"
+                        placeholder="+91 98765 43210"
+                        [disabled]="isSubmitting"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Message Textarea -->
+                <div class="form-field">
+                  <label for="projectMessage">Message <span class="required">*</span></label>
+                  <textarea
+                    id="projectMessage"
+                    name="message"
+                    rows="5"
+                    [(ngModel)]="contactForm.message"
+                    required
+                    placeholder="Tell us about your requirements, custom design ideas, or any questions you have…"
+                    [disabled]="isSubmitting">
+                  </textarea>
+                </div>
+
+                <!-- Submit CTA Button -->
+                <div class="form-actions">
+                  <button
+                    type="submit"
+                    class="btn-submit-project"
+                    [disabled]="!projectForm.form.valid || isSubmitting">
+                    <i class="pi pi-spin pi-spinner" *ngIf="isSubmitting"></i>
+                    <span *ngIf="!isSubmitting">Send Message</span>
+                    <i class="pi pi-arrow-right btn-arrow" *ngIf="!isSubmitting"></i>
+                    <span *ngIf="isSubmitting">Sending Message…</span>
+                  </button>
+                  <p class="privacy-note">
+                    <i class="pi pi-lock"></i>
+                    <span>Your contact details and inquiries remain strictly confidential.</span>
+                  </p>
+                </div>
+              </form>
+            </div>
+
+            <!-- Success Confirmation State -->
+            <div *ngIf="isSent" class="success-state-container">
+              <div class="success-animation-badge">
+                <i class="pi pi-check"></i>
+              </div>
+              <h3 class="success-title">Message Received!</h3>
+              <p class="success-desc">
+                Thank you for reaching out. We will review your message and get back to you shortly.
+              </p>
+
+              <div class="success-actions">
+                <a href="https://wa.me/919361416827" target="_blank" rel="noopener" class="btn-success-whatsapp">
+                  <i class="pi pi-whatsapp"></i>
+                  <span>Need an Instant Response? Chat on WhatsApp</span>
+                </a>
+                <button type="button" class="btn-send-another" (click)="resetForm()">
+                  <i class="pi pi-refresh"></i>
+                  <span>Send Another Message</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       3 · Trust Section ("Built Around Your Ideas")
+       ========================================================================== -->
+  <section class="trust-section">
+    <div class="container">
+      <div class="trust-header">
+        <span class="trust-eyebrow">OUR COMMITMENT</span>
+        <h2 class="trust-title">Built Around Your Ideas</h2>
+        <p class="trust-desc">
+          Crafting exceptional physical objects requires engineering rigor, aesthetic sensitivity, and reliable support.
+        </p>
+      </div>
+
+      <div class="trust-cards-grid">
+        <div class="trust-card" *ngFor="let point of trustPoints">
+          <div class="trust-icon-box">
+            <i class="pi {{ point.icon }}"></i>
+          </div>
+          <h4 class="trust-card-title">{{ point.title }}</h4>
+          <p class="trust-card-desc">{{ point.desc }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       4 · FAQ Section
+       ========================================================================== -->
+  <section class="faq-section">
+    <div class="container">
+      <div class="faq-header">
+        <span class="faq-eyebrow">COMMON INQUIRIES</span>
+        <h2 class="faq-title">Frequently Asked Questions</h2>
+        <p class="faq-desc">
+          Everything you need to know about our custom 3D printing and design workflows.
+        </p>
+      </div>
+
+      <div class="faq-accordion-list">
+        <div
+          class="faq-item"
+          *ngFor="let faq of faqs; let i = index"
+          [class.open]="activeFaqIndex === i">
+          <button
+            type="button"
+            class="faq-question-btn"
+            (click)="toggleFaq(i)"
+            [attr.aria-expanded]="activeFaqIndex === i">
+            <span class="faq-question-text">{{ faq.question }}</span>
+            <i class="pi pi-chevron-down faq-chevron"></i>
           </button>
-        </form>
+
+          <div class="faq-answer-panel" *ngIf="activeFaqIndex === i">
+            <p>{{ faq.answer }}</p>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
+  </section>
 </div>

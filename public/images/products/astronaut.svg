@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="100%" height="100%">
+  <defs>
+    <radialGradient id="studio-bg" cx="50%" cy="45%" r="65%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="50%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </radialGradient>
+    <radialGradient id="gold-visor" cx="40%" cy="35%" r="60%">
+      <stop offset="0%" stop-color="#fef08a"/>
+      <stop offset="35%" stop-color="#eab308"/>
+      <stop offset="75%" stop-color="#ca8a04"/>
+      <stop offset="100%" stop-color="#713f12"/>
+    </radialGradient>
+    <linearGradient id="suit-white" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="45%" stop-color="#e2e8f0"/>
+      <stop offset="85%" stop-color="#94a3b8"/>
+      <stop offset="100%" stop-color="#64748b"/>
+    </linearGradient>
+    <linearGradient id="backpack-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#475569"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <filter id="pedestal-shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="24"/>
+      <feOffset dx="0" dy="18" result="offsetblur"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.45"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="glow-teal">
+      <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
+      <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Studio Background -->
+  <rect width="800" height="800" fill="url(#studio-bg)"/>
+  
+  <!-- Studio Floor Grid (3D CAD styling) -->
+  <g opacity="0.12" stroke="#38bdf8" stroke-width="1">
+    <ellipse cx="400" cy="680" rx="340" ry="85" fill="none"/>
+    <ellipse cx="400" cy="680" rx="260" ry="65" fill="none"/>
+    <ellipse cx="400" cy="680" rx="180" ry="45" fill="none"/>
+    <line x1="60" y1="680" x2="740" y2="680"/>
+    <line x1="400" y1="600" x2="400" y2="760"/>
+  </g>
+
+  <!-- Pedestal Floor Shadow -->
+  <ellipse cx="400" cy="670" rx="190" ry="45" fill="#000000" opacity="0.6" filter="url(#pedestal-shadow)"/>
+
+  <!-- Pedestal Base -->
+  <g id="pedestal">
+    <path d="M 280 660 L 520 660 L 540 680 L 260 680 Z" fill="#334155" opacity="0.8"/>
+    <ellipse cx="400" cy="660" rx="120" ry="24" fill="#1e293b"/>
+    <ellipse cx="400" cy="660" rx="116" ry="20" fill="none" stroke="#00a896" stroke-width="2" filter="url(#glow-teal)" opacity="0.8"/>
+  </g>
+
+  <!-- Astronaut 3D Sculpture -->
+  <g id="astronaut-body">
+    <!-- Life support backpack -->
+    <rect x="290" y="270" width="220" height="260" rx="28" fill="url(#backpack-grad)" stroke="#334155" stroke-width="3"/>
+    <circle cx="340" cy="310" r="14" fill="#00a896" opacity="0.8" filter="url(#glow-teal)"/>
+    <circle cx="380" cy="310" r="14" fill="#028090" opacity="0.8"/>
+    
+    <!-- Torso and suit folds -->
+    <path d="M 320 330 C 310 460, 310 520, 340 580 L 460 580 C 490 520, 490 460, 480 330 Z" fill="url(#suit-white)"/>
+    <!-- Chest control unit -->
+    <rect x="365" y="370" width="70" height="70" rx="10" fill="#0f172a" stroke="#475569" stroke-width="2"/>
+    <rect x="375" y="382" width="22" height="10" rx="3" fill="#00a896"/>
+    <rect x="403" y="382" width="22" height="10" rx="3" fill="#f59e0b"/>
+    <line x1="375" y1="410" x2="425" y2="410" stroke="#334155" stroke-width="3"/>
+    <line x1="375" y1="422" x2="415" y2="422" stroke="#334155" stroke-width="3"/>
+
+    <!-- Left Leg -->
+    <path d="M 345 580 C 340 610, 335 630, 340 655 L 390 655 C 390 630, 395 610, 395 580 Z" fill="url(#suit-white)"/>
+    <!-- Right Leg -->
+    <path d="M 405 580 C 405 610, 410 630, 410 655 L 460 655 C 465 630, 460 610, 455 580 Z" fill="url(#suit-white)"/>
+    <!-- Boots -->
+    <path d="M 325 650 C 325 640, 385 640, 395 650 L 395 664 L 325 664 Z" fill="#334155"/>
+    <path d="M 405 650 C 405 640, 475 640, 475 650 L 475 664 L 405 664 Z" fill="#334155"/>
+
+    <!-- Arms -->
+    <!-- Left Arm posed -->
+    <path d="M 320 340 C 260 380, 250 440, 275 490 C 285 500, 305 485, 300 470 C 285 435, 290 395, 330 370 Z" fill="url(#suit-white)"/>
+    <!-- Right Arm holding tether or wave -->
+    <path d="M 480 340 C 535 375, 545 425, 525 475 C 515 485, 495 470, 505 455 C 520 420, 515 385, 470 370 Z" fill="url(#suit-white)"/>
+
+    <!-- Helmet Outer -->
+    <circle cx="400" cy="250" r="105" fill="url(#suit-white)" stroke="#cbd5e1" stroke-width="4"/>
+    <ellipse cx="400" cy="252" rx="88" ry="78" fill="#090d16"/>
+    <!-- Golden Metallic Reflective Visor -->
+    <ellipse cx="400" cy="252" rx="80" ry="70" fill="url(#gold-visor)"/>
+    <!-- Visor Highlight Sheen -->
+    <path d="M 350 205 C 380 195, 420 195, 450 205 C 430 220, 370 220, 350 205 Z" fill="#ffffff" opacity="0.6"/>
+    <!-- Earth Reflection subtle -->
+    <circle cx="430" cy="265" r="18" fill="#38bdf8" opacity="0.35"/>
+  </g>
+
+  <!-- Technical Spec Badge overlay in corner -->
+  <g transform="translate(48, 64)" opacity="0.75">
+    <rect width="140" height="32" rx="16" fill="rgba(15,23,42,0.8)" stroke="#00a896" stroke-width="1.2"/>
+    <text x="70" y="21" font-family="'Segoe UI', Roboto, sans-serif" font-size="11.5" font-weight="700" fill="#00a896" text-anchor="middle" letter-spacing="1.2">PRECISION 3D</text>
+  </g>
+</svg>

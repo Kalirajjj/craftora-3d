@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="100%" height="100%">
+  <defs>
+    <radialGradient id="lev-bg" cx="50%" cy="40%" r="65%">
+      <stop offset="0%" stop-color="#172533"/>
+      <stop offset="55%" stop-color="#0c151e"/>
+      <stop offset="100%" stop-color="#030609"/>
+    </radialGradient>
+    <filter id="mag-glow">
+      <feGaussianBlur stdDeviation="12" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="800" height="800" fill="url(#lev-bg)"/>
+  
+  <!-- Base Station Floor Shadow -->
+  <ellipse cx="400" cy="690" rx="220" ry="45" fill="#000000" opacity="0.6"/>
+
+  <!-- High-Tech Magnetic Base Platform -->
+  <ellipse cx="400" cy="620" rx="170" ry="45" fill="#1e293b" stroke="#334155" stroke-width="3"/>
+  <ellipse cx="400" cy="615" rx="140" ry="35" fill="#0f172a"/>
+  <!-- Circular Induction Light Ring -->
+  <ellipse cx="400" cy="615" rx="130" ry="32" fill="none" stroke="#00a896" stroke-width="4" filter="url(#mag-glow)"/>
+
+  <!-- Floating Magnetic Field Particles/Rays -->
+  <ellipse cx="400" cy="510" rx="100" ry="24" fill="none" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="6 6" opacity="0.6"/>
+
+  <!-- Floating Dodecahedron Planter Pot -->
+  <g transform="translate(0, -60)">
+    <polygon points="400,320 320,380 340,480 460,480 480,380" fill="#334155" stroke="#64748b" stroke-width="2"/>
+    <polygon points="400,320 480,380 460,480 400,530" fill="#1e293b" stroke="#64748b" stroke-width="2"/>
+    <polygon points="400,320 320,380 340,480 400,530" fill="#475569" stroke="#64748b" stroke-width="2"/>
+    <!-- Bonsai / Air Plant inside -->
+    <path d="M 400 320 C 370 280, 360 220, 390 170 C 410 220, 420 270, 400 320 Z" fill="#10b981"/>
+    <path d="M 400 320 C 430 290, 470 250, 480 200 C 450 240, 420 280, 400 320 Z" fill="#059669"/>
+    <path d="M 400 320 C 350 300, 310 270, 310 220 C 340 250, 370 290, 400 320 Z" fill="#34d399"/>
+  </g>
+</svg>

@@ -1,0 +1,614 @@
+/* ==========================================================================
+   CRAFTORA 3D — GLOBAL DESIGN STUDIO HERO EXPERIENCE
+   ========================================================================== */
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+.hero-3d-section {
+  position: relative;
+  min-height: auto;
+  background-color: #080c10;
+  color: #f8fafc;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  padding: 1.75rem 0 1.25rem;
+}
+
+/* --------------------------------------------------------------------------
+   AMBIENT BACKGROUND EFFECTS & GRID
+   -------------------------------------------------------------------------- */
+.ambient-glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(120px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.glow-teal {
+  width: 550px;
+  height: 550px;
+  background: radial-gradient(circle, rgba(0, 168, 150, 0.16) 0%, rgba(0, 168, 150, 0) 70%);
+  top: 10%;
+  right: 5%;
+  animation: pulseAmbient 12s ease-in-out infinite alternate;
+}
+
+.glow-slate {
+  width: 650px;
+  height: 650px;
+  background: radial-gradient(circle, rgba(14, 165, 233, 0.08) 0%, rgba(15, 23, 42, 0) 70%);
+  bottom: -10%;
+  left: -5%;
+}
+
+@keyframes pulseAmbient {
+  0% { transform: scale(1) translate(0, 0); opacity: 0.8; }
+  100% { transform: scale(1.15) translate(-20px, 20px); opacity: 1; }
+}
+
+.hero-grid-pattern {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, #000 60%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, #000 60%, transparent 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* --------------------------------------------------------------------------
+   LAYOUT CONTAINER (2 COLUMNS)
+   -------------------------------------------------------------------------- */
+.hero-3d-container {
+  position: relative;
+  z-index: 1;
+  max-width: 1320px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 1.75rem;
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  align-items: center;
+  gap: 2.25rem;
+}
+
+/* --------------------------------------------------------------------------
+   LEFT COLUMN: BRAND TYPOGRAPHY & VALUE PROPOSITION
+   -------------------------------------------------------------------------- */
+.hero-text-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+/* Studio Eyebrow Tag */
+.hero-studio-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.4rem 0.95rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  backdrop-filter: blur(10px);
+  width: fit-content;
+}
+
+.tag-status-light {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: #00e5c3;
+  box-shadow: 0 0 10px #00e5c3;
+  animation: pulseLed 2s ease-in-out infinite;
+}
+
+@keyframes pulseLed {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+.tag-title {
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #ffffff;
+}
+
+.tag-sep {
+  color: rgba(255, 255, 255, 0.2);
+  font-size: 0.75rem;
+}
+
+.tag-sub {
+  font-size: 0.7rem;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  color: var(--accent-color, #00a896);
+}
+
+/* Main Headline */
+.hero-title {
+  font-size: 2.75rem;
+  font-weight: 850;
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+  color: #ffffff;
+  margin: 0;
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #00e5c3 0%, #00a896 45%, #ffffff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Description */
+.hero-description {
+  font-size: 0.96rem;
+  line-height: 1.5;
+  color: #94a3b8;
+  max-width: 500px;
+  margin: 0;
+}
+
+/* Process Flow Journey (Imagine -> Design -> Create -> Print -> Reality) */
+.journey-flow-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  padding: 0.35rem 0.65rem;
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  width: fit-content;
+}
+
+.flow-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #64748b;
+  transition: all 0.2s ease;
+}
+
+.flow-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background-color: #475569;
+}
+
+.flow-dot.active {
+  background-color: #00e5c3;
+  box-shadow: 0 0 6px #00e5c3;
+}
+
+.flow-pill.flow-highlight {
+  background-color: rgba(0, 168, 150, 0.15);
+  color: #00e5c3;
+}
+
+.flow-arrow {
+  font-size: 0.65rem;
+  color: #334155;
+}
+
+/* CTA Buttons */
+.hero-cta-group {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-top: 0.2rem;
+}
+
+.cta-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  height: 42px;
+  padding: 0 1.45rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #00e5c3 0%, #00a896 100%);
+  color: #080c10;
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 750;
+  text-decoration: none;
+  letter-spacing: -0.01em;
+  box-shadow: 0 4px 16px rgba(0, 229, 195, 0.24);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+}
+
+.cta-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 229, 195, 0.36);
+}
+
+.cta-btn-primary i {
+  font-size: 0.8rem;
+  transition: transform 0.2s ease;
+}
+
+.cta-btn-primary:hover i {
+  transform: translateX(3px);
+}
+
+.cta-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  height: 42px;
+  padding: 0 1.35rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 0.86rem;
+  font-weight: 650;
+  text-decoration: none;
+  backdrop-filter: blur(10px);
+  transition: all 0.2s ease;
+}
+
+.cta-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.cta-btn-secondary i {
+  color: #00e5c3;
+  font-size: 0.88rem;
+}
+
+/* Studio Precision Specs Bar */
+.studio-spec-strip {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin-top: 0.25rem;
+}
+
+.spec-unit {
+  display: flex;
+  flex-direction: column;
+}
+
+.spec-val {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.spec-val small {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #00e5c3;
+  margin-left: 2px;
+}
+
+.spec-lbl {
+  font-size: 0.66rem;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 2px;
+}
+
+.spec-sep {
+  width: 1px;
+  height: 26px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* --------------------------------------------------------------------------
+   RIGHT COLUMN: 3D HOLOGRAPHIC STAGE
+   -------------------------------------------------------------------------- */
+.hero-stage-col {
+  position: relative;
+  width: 100%;
+  height: 380px;
+}
+
+.stage-frame {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 24px;
+  background: radial-gradient(circle at 50% 50%, rgba(15, 23, 42, 0.45) 0%, rgba(8, 12, 16, 0.9) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 24px 60px -15px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  cursor: grab;
+  user-select: none;
+}
+
+.stage-frame:active {
+  cursor: grabbing;
+}
+
+.canvas-3d-viewport {
+  width: 100%;
+  height: 100%;
+}
+
+/* Top Holographic Bar */
+.hud-top-bar {
+  position: absolute;
+  top: 1.25rem;
+  left: 1.25rem;
+  right: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.hud-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  backdrop-filter: blur(8px);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #cbd5e1;
+}
+
+.hud-led {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #00e5c3;
+  box-shadow: 0 0 8px #00e5c3;
+}
+
+.hud-coord {
+  font-family: monospace;
+  color: #94a3b8;
+}
+
+.hud-sep {
+  color: rgba(255, 255, 255, 0.2);
+}
+
+/* Phase Switcher */
+.hud-phase-switcher {
+  position: absolute;
+  top: 4.5rem;
+  right: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  z-index: 5;
+}
+
+.phase-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #94a3b8;
+  font-family: inherit;
+  font-size: 0.74rem;
+  font-weight: 650;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: all 0.18s ease;
+}
+
+.phase-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.phase-btn.active {
+  background: rgba(0, 168, 150, 0.25);
+  border-color: #00e5c3;
+  color: #00e5c3;
+  box-shadow: 0 0 12px rgba(0, 229, 195, 0.25);
+}
+
+.phase-btn i {
+  font-size: 0.75rem;
+}
+
+/* Bottom Holographic Bar */
+.hud-bottom-bar {
+  position: absolute;
+  bottom: 1.25rem;
+  left: 1.25rem;
+  right: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.hud-material-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  backdrop-filter: blur(8px);
+  font-size: 0.73rem;
+  color: #cbd5e1;
+}
+
+.material-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #38bdf8;
+}
+
+.material-name {
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.material-slice {
+  color: #00e5c3;
+  font-family: monospace;
+}
+
+.hud-drag-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(8px);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.hud-drag-hint i {
+  font-size: 0.75rem;
+}
+
+/* Optical CAD Corner Brackets */
+.corner-bracket {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-color: rgba(0, 229, 195, 0.4);
+  pointer-events: none;
+  z-index: 4;
+}
+
+.cb-tl { top: 8px; left: 8px; border-top: 2px solid; border-left: 2px solid; }
+.cb-tr { top: 8px; right: 8px; border-top: 2px solid; border-right: 2px solid; }
+.cb-bl { bottom: 8px; left: 8px; border-bottom: 2px solid; border-left: 2px solid; }
+.cb-br { bottom: 8px; right: 8px; border-bottom: 2px solid; border-right: 2px solid; }
+
+/* --------------------------------------------------------------------------
+   RESPONSIVE DESIGN (TABLET & MOBILE)
+   -------------------------------------------------------------------------- */
+@media (max-width: 1080px) {
+  .hero-3d-container {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+
+  .hero-title {
+    font-size: 3.2rem;
+  }
+
+  .hero-stage-col {
+    height: 480px;
+    max-width: 650px;
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-3d-section {
+    padding: 3rem 0 4rem;
+  }
+
+  .hero-3d-container {
+    padding: 0 1.25rem;
+    gap: 2.5rem;
+  }
+
+  .hero-title {
+    font-size: 2.6rem;
+  }
+
+  .hero-description {
+    font-size: 1rem;
+  }
+
+  .hero-stage-col {
+    height: 400px;
+  }
+
+  .hud-phase-switcher {
+    top: auto;
+    bottom: 3.8rem;
+    right: 1.25rem;
+    flex-direction: row;
+  }
+
+  .studio-spec-strip {
+    gap: 1rem;
+  }
+
+  .spec-val {
+    font-size: 1.15rem;
+  }
+
+  .hero-cta-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .cta-btn-primary,
+  .cta-btn-secondary {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-title {
+    font-size: 2.2rem;
+  }
+
+  .hero-stage-col {
+    height: 340px;
+  }
+
+  .hud-drag-hint {
+    display: none;
+  }
+
+  .phase-btn span {
+    display: none;
+  }
+
+  .journey-flow-bar {
+    gap: 0.25rem;
+  }
+
+  .flow-pill {
+    padding: 0.15rem 0.35rem;
+    font-size: 0.72rem;
+  }
+}

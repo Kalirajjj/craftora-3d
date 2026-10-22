@@ -1,0 +1,162 @@
+<section class="hero-3d-section">
+  <!-- Subtle dark studio ambient backdrop -->
+  <div class="ambient-glow glow-teal" aria-hidden="true"></div>
+  <div class="ambient-glow glow-slate" aria-hidden="true"></div>
+  <div class="hero-grid-pattern" aria-hidden="true"></div>
+
+  <div class="hero-3d-container">
+    <!-- Left Column: Studio Headline & Value Proposition -->
+    <div class="hero-text-col">
+      <!-- Studio Eyebrow Tag -->
+      <div class="hero-studio-tag">
+        <span class="tag-status-light"></span>
+        <span class="tag-title">CRAFTORA 3D</span>
+        <span class="tag-sep">|</span>
+        <span class="tag-sub">DIGITAL FABRICATION STUDIO</span>
+      </div>
+
+      <!-- Main Headline -->
+      <h1 class="hero-title">
+        Ideas, <br>
+        <span class="gradient-text">Crafted in 3D.</span>
+      </h1>
+
+      <!-- Supporting Subtitle -->
+      <p class="hero-description">
+        From imagination to reality — we transform digital ideas into beautifully crafted 3D creations with industrial-grade precision.
+      </p>
+
+      <!-- Digital Transformation Journey Bar -->
+      <div class="journey-flow-bar" aria-label="Creation Process Flow">
+        <div class="flow-pill">
+          <span class="flow-dot"></span>
+          <span class="flow-label">Imagine</span>
+        </div>
+        <i class="pi pi-arrow-right flow-arrow" aria-hidden="true"></i>
+        <div class="flow-pill">
+          <span class="flow-dot"></span>
+          <span class="flow-label">Design</span>
+        </div>
+        <i class="pi pi-arrow-right flow-arrow" aria-hidden="true"></i>
+        <div class="flow-pill">
+          <span class="flow-dot"></span>
+          <span class="flow-label">Create</span>
+        </div>
+        <i class="pi pi-arrow-right flow-arrow" aria-hidden="true"></i>
+        <div class="flow-pill flow-highlight">
+          <span class="flow-dot active"></span>
+          <span class="flow-label">Print</span>
+        </div>
+        <i class="pi pi-arrow-right flow-arrow" aria-hidden="true"></i>
+        <div class="flow-pill">
+          <span class="flow-dot"></span>
+          <span class="flow-label">Reality</span>
+        </div>
+      </div>
+
+      <!-- Call to Action Buttons -->
+      <div class="hero-cta-group">
+        <a routerLink="/shop" class="cta-btn-primary">
+          <span>Explore Creations</span>
+          <i class="pi pi-arrow-right" aria-hidden="true"></i>
+        </a>
+
+        <a routerLink="/custom-order" class="cta-btn-secondary">
+          <i class="pi pi-sliders-h" aria-hidden="true"></i>
+          <span>Create Your Own</span>
+        </a>
+      </div>
+
+      <!-- Studio Precision Specs -->
+      <div class="studio-spec-strip">
+        <div class="spec-unit">
+          <span class="spec-val">0.12<small>mm</small></span>
+          <span class="spec-lbl">Layer Precision</span>
+        </div>
+        <div class="spec-sep"></div>
+        <div class="spec-unit">
+          <span class="spec-val">100<small>%</small></span>
+          <span class="spec-lbl">Parametric CAD</span>
+        </div>
+        <div class="spec-sep"></div>
+        <div class="spec-unit">
+          <span class="spec-val">24<small>h</small></span>
+          <span class="spec-lbl">Rapid Slicing</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Interactive 3D Holographic Stage -->
+    <div class="hero-stage-col">
+      <div class="stage-frame" 
+           (mousedown)="onPointerDown($event)"
+           (mousemove)="onPointerMove($event)"
+           (mouseup)="onPointerUp()"
+           (mouseleave)="onPointerUp()"
+           (touchstart)="onPointerDown($event)"
+           (touchmove)="onPointerMove($event)"
+           (touchend)="onPointerUp()">
+
+        <!-- WebGL 3D Canvas Mounting Point -->
+        <div #canvasContainer class="canvas-3d-viewport"></div>
+
+        <!-- Top Holographic HUD Bar -->
+        <div class="hud-top-bar" aria-hidden="true">
+          <div class="hud-chip">
+            <span class="hud-led"></span>
+            <span class="hud-chip-text">SLICING ENGINE v3.2</span>
+          </div>
+          <div class="hud-chip hud-coord">
+            <span>ROT: {{ hudRotation }}°</span>
+            <span class="hud-sep">·</span>
+            <span>RES: 0.12mm</span>
+          </div>
+        </div>
+
+        <!-- Interactive Phase Switcher -->
+        <div class="hud-phase-switcher" role="tablist" aria-label="3D Render Modes">
+          <button type="button" 
+                  class="phase-btn" 
+                  [class.active]="currentPhase === 'wireframe'" 
+                  (click)="setPhase('wireframe')">
+            <i class="pi pi-th-large" aria-hidden="true"></i>
+            <span>Wireframe</span>
+          </button>
+          <button type="button" 
+                  class="phase-btn" 
+                  [class.active]="currentPhase === 'slicing'" 
+                  (click)="setPhase('slicing')">
+            <i class="pi pi-bolt" aria-hidden="true"></i>
+            <span>Layer Scan</span>
+          </button>
+          <button type="button" 
+                  class="phase-btn" 
+                  [class.active]="currentPhase === 'solid'" 
+                  (click)="setPhase('solid')">
+            <i class="pi pi-box" aria-hidden="true"></i>
+            <span>Solid Object</span>
+          </button>
+        </div>
+
+        <!-- Bottom Holographic Status & Drag Indicator -->
+        <div class="hud-bottom-bar" aria-hidden="true">
+          <div class="hud-material-info">
+            <span class="material-dot"></span>
+            <span class="material-name">Satin Carbon PLA</span>
+            <span class="material-slice">· {{ hudSlicePct }}% Sliced</span>
+          </div>
+          <div class="hud-drag-hint">
+            <i class="pi pi-arrows-alt" aria-hidden="true"></i>
+            <span>Drag to rotate 360°</span>
+          </div>
+        </div>
+
+        <!-- Ambient Optical Corner Accents -->
+        <div class="corner-bracket cb-tl" aria-hidden="true"></div>
+        <div class="corner-bracket cb-tr" aria-hidden="true"></div>
+        <div class="corner-bracket cb-bl" aria-hidden="true"></div>
+        <div class="corner-bracket cb-br" aria-hidden="true"></div>
+      </div>
+    </div>
+  </div>
+</section>

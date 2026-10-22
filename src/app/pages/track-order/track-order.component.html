@@ -1,0 +1,515 @@
+<div class="track-order-page">
+  <div class="ambient-glow glow-top" aria-hidden="true"></div>
+  <div class="ambient-glow glow-bottom" aria-hidden="true"></div>
+
+  <div class="container track-container">
+    <!-- Header Card -->
+    <header class="track-search-card">
+      <div class="search-header-text">
+        <div class="brand-eyebrow">
+          <i class="pi pi-box"></i>
+          <span>CRAFTORA 3D · ORDER FULFILLMENT &amp; PRODUCTION TRACKING</span>
+        </div>
+        <h1 class="page-title">{{ isLoggedIn ? 'My Orders' : 'Track Your Order' }}</h1>
+        <p class="page-sub">
+          {{ isLoggedIn 
+            ? 'Real-time 3D printing production progress, precision slicing calibration, hand-inspection, and courier dispatch records for your purchases.' 
+            : 'Sign in to your Craftora account to view your complete order history and live 3D fabrication status.' }}
+        </p>
+      </div>
+
+      <!-- Distinction note for Custom Quotes -->
+      <div class="quote-distinction-note">
+        <i class="pi pi-info-circle"></i>
+        <span>
+          Looking for a custom 3D printing project or CAD quote request instead?
+          <a routerLink="/track-quote" class="quote-link">Track Your Custom Quotes Here →</a>
+        </span>
+      </div>
+
+      <!-- Alerts -->
+      <div class="order-success-alert" *ngIf="cancelSuccessMessage">
+        <i class="pi pi-check-circle"></i>
+        <span>{{ cancelSuccessMessage }}</span>
+      </div>
+
+      <div class="order-error-alert" *ngIf="errorMessage">
+        <i class="pi pi-exclamation-circle"></i>
+        <span>{{ errorMessage }}</span>
+      </div>
+    </header>
+
+    <!-- Loading State -->
+    <div class="loading-state-card" *ngIf="isLoading">
+      <div class="spinner-box">
+        <i class="pi pi-spin pi-spinner"></i>
+      </div>
+      <h3>Locating Your 3D Production Orders…</h3>
+      <p>Retrieving slicing queue, additive fabrication status, and courier records.</p>
+    </div>
+
+    <!-- Empty State: Logged in customer with 0 orders -->
+    <div class="empty-orders-card" *ngIf="isLoggedIn && !isLoading && orders.length === 0">
+      <div class="empty-icon-wrap">
+        <i class="pi pi-shopping-bag"></i>
+      </div>
+      <h3>No Orders Placed Yet</h3>
+      <p>You haven't placed any 3D creation orders yet. Browse our curated collections to start your first custom order!</p>
+      <a routerLink="/shop" class="btn btn-primary btn-explore">
+        <i class="pi pi-compass"></i> Explore Shop Collections
+      </a>
+    </div>
+
+    <!-- Guest State: Not logged in -->
+    <div class="auth-required-card" *ngIf="!isLoggedIn && !isLoading && !selectedOrder">
+      <div class="auth-icon-wrap">
+        <i class="pi pi-lock"></i>
+      </div>
+      <h3>Sign In to View Your Orders</h3>
+      <p>Sign in to your Craftora 3D account to view your orders and track live 3D print farm progress.</p>
+      <a [routerLink]="['/account/login']" [queryParams]="{ returnUrl: '/track-order' }" class="btn btn-primary btn-signin">
+        <i class="pi pi-sign-in"></i> Sign In to View Orders
+      </a>
+    </div>
+
+    <!-- Section 14: Customer Order List ("My Orders" clean compact list) -->
+    <section class="customer-order-list-section" *ngIf="isLoggedIn && !isLoading && orders.length > 0">
+      <div class="orders-list-header">
+        <div class="orders-header-title">
+          <h3>
+            <i class="pi pi-box"></i>
+            <span>Your Orders ({{ orders.length }})</span>
+          </h3>
+          <span class="sub-hint">Click on any order or "View Order" to open complete details in popup</span>
+        </div>
+      </div>
+
+      <div class="orders-clean-grid">
+        <div 
+          class="order-summary-row-card" 
+          *ngFor="let ord of orders" 
+          (click)="openOrderModal(ord)"
+          role="button"
+          tabindex="0"
+          (keydown.enter)="openOrderModal(ord)"
+          (keydown.space)="openOrderModal(ord); $event.preventDefault()"
+          [attr.aria-label]="'View order details for #' + ord.id">
+          
+          <div class="ord-thumb">
+            <img 
+              [src]="getPrimaryProductImage(ord)" 
+              [alt]="getPrimaryProductName(ord)"
+              onerror="this.src='/images/products/voronoi-lamp.svg'"
+            />
+          </div>
+
+          <div class="ord-info-main">
+            <div class="ord-id-line">
+              <strong class="ord-id-code">#{{ ord.id }}</strong>
+              <span class="ord-date-text">Ordered on {{ ord.createdAt | date:'d MMM yyyy' }}</span>
+            </div>
+            <h4 class="ord-product-name">{{ getPrimaryProductName(ord) }}</h4>
+            <div class="ord-sub-details">
+              <span class="ord-qty">Qty: {{ getPrimaryProductQuantity(ord) }}</span>
+              <span class="ord-separator">·</span>
+              <span class="ord-total">₹{{ ord.total | number }}</span>
+              <span class="ord-separator" *ngIf="ord.items.length > 1">·</span>
+              <span class="ord-more-items" *ngIf="ord.items.length > 1">+{{ ord.items.length - 1 }} more item(s)</span>
+            </div>
+          </div>
+
+          <div class="ord-status-action">
+            <span class="chip-status-badge" [ngClass]="getStatusBadgeClass(ord.status)">
+              <span class="status-pulse-dot" *ngIf="ord.status === 'Printing'"></span>
+              {{ ord.status }}
+            </span>
+            <button type="button" class="btn-view-order-pill" (click)="$event.stopPropagation(); openOrderModal(ord)">
+              <span>View Order</span>
+              <i class="pi pi-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- ORDER DETAILS POPUP / MODAL                                              -->
+  <!-- ========================================================================= -->
+  <div class="order-modal-backdrop" *ngIf="isOrderModalOpen" (click)="closeOrderModal()" role="dialog" aria-modal="true" aria-labelledby="modalOrderTitle">
+    <div class="order-details-modal" (click)="$event.stopPropagation()">
+      
+      <!-- Skeleton / Loading State -->
+      <div class="modal-loading-box" *ngIf="isLoadingOrderDetails">
+        <div class="spinner-box">
+          <i class="pi pi-spin pi-spinner"></i>
+        </div>
+        <h4>Loading order details…</h4>
+        <p>Retrieving production progress and telemetry</p>
+      </div>
+
+      <!-- Complete Order Popup Content -->
+      <div class="modal-body-container" *ngIf="!isLoadingOrderDetails && selectedOrder">
+        
+        <!-- 3. POPUP HEADER -->
+        <header class="modal-header">
+          <div class="modal-title-wrap">
+            <div class="order-number-row">
+              <span class="modal-order-tag">ORDER</span>
+              <h2 id="modalOrderTitle" class="modal-order-id">#{{ selectedOrder.id }}</h2>
+            </div>
+            <p class="modal-order-date">Placed on {{ selectedOrder.createdAt | date:'d MMM yyyy' }}</p>
+          </div>
+          <button type="button" class="btn-modal-close" (click)="closeOrderModal()" aria-label="Close order details popup">
+            <i class="pi pi-times"></i>
+          </button>
+        </header>
+
+        <!-- MODAL SCROLLABLE CONTENT -->
+        <div class="modal-scroll-content">
+          
+          <!-- 4. ORDER STATUS & COMPACT PROGRESS ROADMAP -->
+          <div class="modal-status-card">
+            <div class="status-prominent-row">
+              <div class="status-badge-wrap">
+                <span class="prominent-status-badge" [ngClass]="getStatusBadgeClass(selectedOrder.status)">
+                  <span class="status-pulse-dot" *ngIf="selectedOrder.status === 'Printing'"></span>
+                  <i class="pi pi-spin pi-spinner" *ngIf="selectedOrder.status === 'Printing'"></i>
+                  <i class="pi pi-check-circle" *ngIf="selectedOrder.status === 'Confirmed' || selectedOrder.status === 'Delivered'"></i>
+                  <i class="pi pi-send" *ngIf="selectedOrder.status === 'Shipped'"></i>
+                  <i class="pi pi-clock" *ngIf="selectedOrder.status === 'Pending'"></i>
+                  <i class="pi pi-ban" *ngIf="selectedOrder.status === 'Cancelled'"></i>
+                  <span>● {{ selectedOrder.status }}</span>
+                </span>
+              </div>
+              <div class="est-delivery-pill" *ngIf="selectedOrder.status !== 'Cancelled' && selectedOrder.status !== 'Delivered'">
+                <i class="pi pi-calendar"></i>
+                <span>Estimated Delivery: <strong>{{ selectedOrder.estimatedDelivery || '3–5 business days' }}</strong></span>
+              </div>
+            </div>
+
+            <!-- Compact Progress Roadmap (Active Flow) -->
+            <div class="compact-roadmap" *ngIf="selectedOrder.status !== 'Cancelled'">
+              <div class="roadmap-step" [class.step-completed]="isRoadmapCompleted(1)" [class.step-current]="isRoadmapCurrent(1)">
+                <div class="step-circle">
+                  <i class="pi pi-check" *ngIf="isRoadmapCompleted(1) && !isRoadmapCurrent(1)"></i>
+                  <span class="current-inner-dot" *ngIf="isRoadmapCurrent(1)"></span>
+                </div>
+                <span class="step-title">Ordered</span>
+              </div>
+
+              <div class="roadmap-connector" [class.connector-active]="isRoadmapCompleted(2)"></div>
+
+              <div class="roadmap-step" [class.step-completed]="isRoadmapCompleted(2)" [class.step-current]="isRoadmapCurrent(2)">
+                <div class="step-circle">
+                  <i class="pi pi-check" *ngIf="isRoadmapCompleted(2) && !isRoadmapCurrent(2)"></i>
+                  <span class="current-inner-dot" *ngIf="isRoadmapCurrent(2)"></span>
+                </div>
+                <span class="step-title">Confirmed</span>
+              </div>
+
+              <div class="roadmap-connector" [class.connector-active]="isRoadmapCompleted(3)"></div>
+
+              <div class="roadmap-step" [class.step-completed]="isRoadmapCompleted(3)" [class.step-current]="isRoadmapCurrent(3)">
+                <div class="step-circle">
+                  <i class="pi pi-check" *ngIf="isRoadmapCompleted(3) && !isRoadmapCurrent(3)"></i>
+                  <span class="current-inner-dot" *ngIf="isRoadmapCurrent(3)"></span>
+                </div>
+                <span class="step-title">Printing</span>
+              </div>
+
+              <div class="roadmap-connector" [class.connector-active]="isRoadmapCompleted(4)"></div>
+
+              <div class="roadmap-step" [class.step-completed]="isRoadmapCompleted(4)" [class.step-current]="isRoadmapCurrent(4)">
+                <div class="step-circle">
+                  <i class="pi pi-check" *ngIf="isRoadmapCompleted(4) && !isRoadmapCurrent(4)"></i>
+                  <span class="current-inner-dot" *ngIf="isRoadmapCurrent(4)"></span>
+                </div>
+                <span class="step-title">Shipped</span>
+              </div>
+
+              <div class="roadmap-connector" [class.connector-active]="isRoadmapCompleted(5)"></div>
+
+              <div class="roadmap-step" [class.step-completed]="isRoadmapCompleted(5)" [class.step-current]="isRoadmapCurrent(5)">
+                <div class="step-circle">
+                  <i class="pi pi-check" *ngIf="isRoadmapCompleted(5)"></i>
+                </div>
+                <span class="step-title">Delivered</span>
+              </div>
+            </div>
+
+            <!-- Compact Progress Roadmap (Cancelled Flow) -->
+            <div class="compact-roadmap roadmap-cancelled" *ngIf="selectedOrder.status === 'Cancelled'">
+              <div class="roadmap-step step-completed">
+                <div class="step-circle">
+                  <i class="pi pi-check"></i>
+                </div>
+                <span class="step-title">Ordered</span>
+              </div>
+              <div class="roadmap-connector connector-cancelled"></div>
+              <div class="roadmap-step step-cancelled step-current">
+                <div class="step-circle">
+                  <i class="pi pi-times"></i>
+                </div>
+                <span class="step-title">Cancelled</span>
+              </div>
+            </div>
+
+            <!-- 11. Subtle Informational Message on Cancellation Restrictions -->
+            <div class="subtle-info-notice" *ngIf="!canCancelSelectedOrder().allowed && selectedOrder.status !== 'Cancelled'">
+              <i class="pi pi-info-circle"></i>
+              <span *ngIf="selectedOrder.status === 'Printing'">Cancellation is no longer available because production has started.</span>
+              <span *ngIf="selectedOrder.status === 'Shipped'">Cancellation is no longer available because this order has been shipped.</span>
+              <span *ngIf="selectedOrder.status === 'Delivered'">This order has been delivered and is complete.</span>
+            </div>
+
+            <!-- Cancellation details notice -->
+            <div class="subtle-info-notice notice-cancelled" *ngIf="selectedOrder.status === 'Cancelled'">
+              <i class="pi pi-ban"></i>
+              <div>
+                <strong>Order Cancelled.</strong>
+                <span *ngIf="selectedOrder.cancellationReason"> Reason: "{{ selectedOrder.cancellationReason }}"</span>
+                <span *ngIf="selectedOrder.paymentStatus === 'Refund Pending'"> — Refund scheduled to your original payment method.</span>
+                <span *ngIf="selectedOrder.paymentStatus === 'Refund Processed'"> — Refund processed. Ref: {{ selectedOrder.transactionId || 'Confirmed' }}.</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 5. ORDER ITEMS -->
+          <section class="modal-section order-items-modal-section">
+            <h3 class="modal-section-title">
+              <i class="pi pi-shopping-bag"></i>
+              <span>Order Items ({{ selectedOrder.items.length }})</span>
+            </h3>
+
+            <div class="modal-items-list">
+              <div class="modal-item-card" *ngFor="let item of selectedOrder.items">
+                <div class="item-img-container">
+                  <img [src]="item.product.image || item.product.imageUrl || '/images/products/voronoi-lamp.svg'" 
+                       [alt]="item.product.name" 
+                       onerror="this.src='/images/products/voronoi-lamp.svg'" />
+                </div>
+                <div class="item-details-container">
+                  <h4 class="item-title">{{ item.product.name }}</h4>
+                  <div class="item-variant-row">
+                    <span class="pill-variant" *ngIf="item.selectedColor">Color: <strong>{{ item.selectedColor }}</strong></span>
+                    <span class="pill-material" *ngIf="item.product.material">{{ item.product.material }}</span>
+                  </div>
+                  <div class="item-qty-price-row">
+                    <span class="item-qty-tag">Qty: {{ item.quantity }}</span>
+                    <span class="item-unit-calc">₹{{ item.product.price | number }} each</span>
+                  </div>
+                </div>
+                <div class="item-subtotal-block">
+                  <span class="subtotal-val">₹{{ (item.product.price * item.quantity) | number }}</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- 6, 7, 8. RESPONSIVE TWO-COLUMN GRID: Delivery & Payment | Price Summary & Timeline -->
+          <div class="modal-two-col-grid">
+            
+            <!-- Left Column: Delivery Details & Payment Information -->
+            <div class="modal-col">
+              
+              <!-- 7. DELIVERY INFORMATION -->
+              <div class="modal-card-block delivery-details-block">
+                <h3 class="modal-section-title">
+                  <i class="pi pi-map-marker"></i>
+                  <span>Delivery Details</span>
+                </h3>
+                <div class="delivery-body">
+                  <span class="delivering-to-label">Delivering to</span>
+                  <h4 class="recipient-fullname">{{ selectedOrder.customer.fullName }}</h4>
+                  <p class="recipient-address-line">{{ selectedOrder.customer.address }}</p>
+                  <p class="recipient-locality">{{ selectedOrder.customer.city }}, {{ selectedOrder.customer.state }} - {{ selectedOrder.customer.pincode }}</p>
+                  <p class="recipient-contact-line">
+                    <i class="pi pi-phone"></i>
+                    <span>{{ selectedOrder.customer.phone }}</span>
+                  </p>
+                  
+                  <div class="delivery-method-card">
+                    <div class="method-line">
+                      <span class="m-label">Delivery Method:</span>
+                      <strong class="m-val">{{ selectedOrder.shippingMethod || selectedOrder.courierPartner || 'Standard Delivery' }}</strong>
+                    </div>
+                    <div class="method-line" *ngIf="selectedOrder.estimatedDelivery">
+                      <span class="m-label">Estimated Delivery:</span>
+                      <span class="m-val text-accent font-semibold">{{ selectedOrder.estimatedDelivery }}</span>
+                    </div>
+                    <div class="method-line" *ngIf="selectedOrder.trackingNumber">
+                      <span class="m-label">AWB Tracking:</span>
+                      <span class="awb-pill">{{ selectedOrder.trackingNumber }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 8. PAYMENT INFORMATION -->
+              <div class="modal-card-block payment-details-block">
+                <h3 class="modal-section-title">
+                  <i class="pi pi-credit-card"></i>
+                  <span>Payment</span>
+                </h3>
+                <div class="payment-body">
+                  <div class="pay-info-row">
+                    <span class="p-label">Payment Status:</span>
+                    <span class="p-status-badge" [class.badge-paid]="selectedOrder.paymentStatus === 'Paid' || !selectedOrder.paymentStatus">
+                      {{ selectedOrder.paymentStatus || 'Paid' }}
+                    </span>
+                  </div>
+                  <div class="pay-info-row">
+                    <span class="p-label">Payment Method:</span>
+                    <span class="p-val">{{ selectedOrder.paymentMethod || 'Prepaid (UPI / Card)' }}</span>
+                  </div>
+                  <div class="pay-info-row" *ngIf="selectedOrder.transactionId">
+                    <span class="p-label">Transaction ID:</span>
+                    <span class="txn-code">{{ selectedOrder.transactionId }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Column: Price Summary & Order Timeline -->
+            <div class="modal-col">
+              
+              <!-- 6. PRICE SUMMARY -->
+              <div class="modal-card-block price-summary-block">
+                <h3 class="modal-section-title">
+                  <i class="pi pi-receipt"></i>
+                  <span>Price Summary</span>
+                </h3>
+                <div class="price-breakdown-list">
+                  <div class="price-line">
+                    <span class="p-item-name">Subtotal</span>
+                    <span class="p-item-val">₹{{ selectedOrder.subtotal | number }}</span>
+                  </div>
+                  <div class="price-line" *ngIf="selectedOrder.discount">
+                    <span class="p-item-name">Discount</span>
+                    <span class="p-item-val text-discount">-₹{{ selectedOrder.discount | number }}</span>
+                  </div>
+                  <div class="price-line">
+                    <span class="p-item-name">Shipping</span>
+                    <span class="p-item-val text-shipping">{{ selectedOrder.deliveryFee === 0 ? 'FREE' : '₹' + (selectedOrder.deliveryFee | number) }}</span>
+                  </div>
+                  <div class="price-divider"></div>
+                  <div class="price-line total-paid-line">
+                    <span class="total-title">Total Paid</span>
+                    <strong class="total-amount-display">₹{{ selectedOrder.total | number }}</strong>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 9. ORDER TIMELINE -->
+              <div class="modal-card-block timeline-progress-block" *ngIf="selectedOrder.timeline && selectedOrder.timeline.length > 0">
+                <h3 class="modal-section-title">
+                  <i class="pi pi-history"></i>
+                  <span>Order Progress</span>
+                </h3>
+                <div class="timeline-compact-list">
+                  <div class="timeline-compact-node" *ngFor="let ev of selectedOrder.timeline">
+                    <div class="node-icon-dot" [ngClass]="getStatusBadgeClass(ev.status)">
+                      <i class="pi pi-check" *ngIf="ev.status !== 'Cancelled'"></i>
+                      <i class="pi pi-times" *ngIf="ev.status === 'Cancelled'"></i>
+                    </div>
+                    <div class="node-content">
+                      <div class="node-header">
+                        <strong class="node-title">{{ ev.title }}</strong>
+                        <span class="node-timestamp">{{ ev.timestamp | date:'d MMM, h:mm a' }}</span>
+                      </div>
+                      <p class="node-desc" *ngIf="ev.description">{{ ev.description }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 12. POPUP FOOTER -->
+        <footer class="modal-footer">
+          <div class="footer-left-actions">
+            <!-- For active orders: Track / Studio Team Chat -->
+            <a *ngIf="selectedOrder.status !== 'Cancelled' && selectedOrder.status !== 'Delivered'"
+               [href]="getWhatsAppSupportUrl()" 
+               target="_blank" 
+               rel="noopener" 
+               class="btn-footer-chat">
+              <i class="pi pi-whatsapp"></i>
+              <span>Studio Support</span>
+            </a>
+
+            <!-- For completed orders: Buy Again -->
+            <a *ngIf="selectedOrder.status === 'Delivered'" 
+               routerLink="/shop" 
+               (click)="closeOrderModal()" 
+               class="btn-footer-buyagain">
+              <i class="pi pi-shopping-bag"></i>
+              <span>Buy Again</span>
+            </a>
+          </div>
+
+          <div class="footer-right-actions">
+            <!-- 10. For eligible orders: Cancel Order -->
+            <button type="button" 
+                    class="btn-footer-cancel-order" 
+                    *ngIf="canCancelSelectedOrder().allowed" 
+                    (click)="openCancelModal()">
+              <i class="pi pi-times-circle"></i>
+              <span>Cancel Order</span>
+            </button>
+
+            <!-- For all orders: Close button -->
+            <button type="button" class="btn-footer-close-main" (click)="closeOrderModal()">
+              Close
+            </button>
+          </div>
+        </footer>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- Section 10: CUSTOMER CANCELLATION CONFIRMATION MODAL                      -->
+  <!-- ========================================================================= -->
+  <div class="customer-modal-backdrop" *ngIf="showCancelModal" (click)="closeCancelModal()" role="dialog" aria-modal="true">
+    <div class="customer-cancel-card" (click)="$event.stopPropagation()">
+      <div class="modal-warn-icon">
+        <i class="pi pi-exclamation-circle"></i>
+      </div>
+
+      <div class="modal-header">
+        <h2>Cancel this order?</h2>
+        <p class="modal-sub">
+          Are you sure you want to cancel order <strong>#{{ selectedOrder?.id }}</strong>?
+        </p>
+      </div>
+
+      <div class="cancel-reason-form">
+        <label for="cancelReasonSelect" class="reason-label">Please select a reason for cancellation:</label>
+        <select id="cancelReasonSelect" [(ngModel)]="selectedCancelReason" class="reason-select">
+          <option *ngFor="let r of cancellationReasons" [value]="r">{{ r }}</option>
+        </select>
+
+        <textarea 
+          *ngIf="selectedCancelReason === 'Other reason'" 
+          [(ngModel)]="otherCancelReason" 
+          rows="3" 
+          placeholder="Please tell us a bit more about why you are cancelling..."
+          class="reason-textarea">
+        </textarea>
+      </div>
+
+      <div class="customer-modal-actions">
+        <button type="button" class="btn-keep-order-cust" (click)="closeCancelModal()" [disabled]="isCancelling">
+          Keep Order
+        </button>
+        <button type="button" class="btn-confirm-cancel-cust" (click)="confirmCancelOrder()" [disabled]="isCancelling">
+          <i class="pi pi-spin pi-spinner" *ngIf="isCancelling"></i>
+          <span>{{ isCancelling ? 'Cancelling…' : 'Cancel Order' }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

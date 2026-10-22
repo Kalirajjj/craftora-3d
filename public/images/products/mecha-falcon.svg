@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="100%" height="100%">
+  <defs>
+    <radialGradient id="mf-bg" cx="50%" cy="40%" r="65%">
+      <stop offset="0%" stop-color="#1e2430"/>
+      <stop offset="55%" stop-color="#10141d"/>
+      <stop offset="100%" stop-color="#05070a"/>
+    </radialGradient>
+    <linearGradient id="resin-body" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#64748b"/>
+      <stop offset="50%" stop-color="#334155"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="800" fill="url(#mf-bg)"/>
+  <ellipse cx="400" cy="680" rx="200" ry="40" fill="#000000" opacity="0.6"/>
+  
+  <!-- Mechanical Wings Spread (Geometric Origami Wings) -->
+  <g fill="url(#resin-body)" stroke="#475569" stroke-width="2">
+    <!-- Left Wing Feathers -->
+    <polygon points="360,350 160,260 220,340 340,390" fill="#475569"/>
+    <polygon points="340,390 190,360 240,430 330,440"/>
+    <polygon points="330,440 220,440 280,490 340,480"/>
+
+    <!-- Right Wing Feathers -->
+    <polygon points="440,350 640,260 580,340 460,390" fill="#475569"/>
+    <polygon points="460,390 610,360 560,430 470,440"/>
+    <polygon points="470,440 580,440 520,490 460,480"/>
+
+    <!-- Falcon Torso & Beak -->
+    <polygon points="400,240 370,300 400,340 430,300" fill="#00a896" stroke="#ffffff" stroke-width="1.5"/>
+    <polygon points="400,240 390,210 400,190 410,210" fill="#f59e0b"/>
+    <polygon points="370,330 400,490 430,330" fill="url(#resin-body)"/>
+
+    <!-- Tail Feathers -->
+    <polygon points="370,490 350,600 400,560 450,600 430,490" fill="#1e293b"/>
+
+    <!-- Optics Eye -->
+    <circle cx="390" cy="245" r="4" fill="#38bdf8"/>
+    <circle cx="410" cy="245" r="4" fill="#38bdf8"/>
+  </g>
+</svg>

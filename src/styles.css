@@ -35,6 +35,27 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  scrollbar-width: none !important; /* Firefox */
+  -ms-overflow-style: none !important; /* IE / Edge */
+}
+
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
+  width: 100%;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+/* Remove web main scrollbar and all element scrollbars for WebKit browsers */
+::-webkit-scrollbar,
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+*::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
 }
 
 body {
@@ -174,7 +195,7 @@ img {
 html[data-theme='dark'] body{color:var(--text-primary);background-color:var(--bg-color)}
 html[data-theme='dark'] .navbar{background-color:rgba(17,24,39,.95)}
 html[data-theme='dark'] .nav-links{background-color:var(--bg-color)}
-html[data-theme='dark'] .product-card,html[data-theme='dark'] .filters-sidebar,html[data-theme='dark'] .cart-item,html[data-theme='dark'] .summary-card,html[data-theme='dark'] .checkout-form,html[data-theme='dark'] .order-summary-sidebar,html[data-theme='dark'] .order-details-box,html[data-theme='dark'] .contact-info,html[data-theme='dark'] .form-wrapper,html[data-theme='dark'] .order-form,html[data-theme='dark'] .success-card,html[data-theme='dark'] .login-card,html[data-theme='dark'] .admin-sidebar,html[data-theme='dark'] .admin-main,html[data-theme='dark'] .admin-form,html[data-theme='dark'] .user-form-card,html[data-theme='dark'] .overview-card,html[data-theme='dark'] .shortcut-card,html[data-theme='dark'] .specs-card,html[data-theme='dark'] .image-dialog,html[data-theme='dark'] .gallery-wrapper,html[data-theme='dark'] .category-card,html[data-theme='dark'] .step-card,html[data-theme='dark'] .testimonial-card,html[data-theme='dark'] .filter-group,html[data-theme='dark'] .table-wrap{background-color:var(--surface-color);border-color:var(--border-color);color:var(--text-primary)}
+html[data-theme='dark'] .product-card,html[data-theme='dark'] .top-filter-hub,html[data-theme='dark'] .filters-sidebar,html[data-theme='dark'] .cart-item,html[data-theme='dark'] .summary-card,html[data-theme='dark'] .checkout-form,html[data-theme='dark'] .order-summary-sidebar,html[data-theme='dark'] .order-details-box,html[data-theme='dark'] .contact-info,html[data-theme='dark'] .form-wrapper,html[data-theme='dark'] .order-form,html[data-theme='dark'] .success-card,html[data-theme='dark'] .login-card,html[data-theme='dark'] .admin-sidebar,html[data-theme='dark'] .admin-main,html[data-theme='dark'] .admin-form,html[data-theme='dark'] .user-form-card,html[data-theme='dark'] .overview-card,html[data-theme='dark'] .shortcut-card,html[data-theme='dark'] .specs-card,html[data-theme='dark'] .image-dialog,html[data-theme='dark'] .gallery-wrapper,html[data-theme='dark'] .category-card,html[data-theme='dark'] .step-card,html[data-theme='dark'] .testimonial-card,html[data-theme='dark'] .filter-group,html[data-theme='dark'] .table-wrap{background-color:var(--surface-color);border-color:var(--border-color);color:var(--text-primary)}
 html[data-theme='dark'] .admin-workspace{background-color:var(--bg-color)}
 html[data-theme='dark'] .toolbar input,html[data-theme='dark'] .toolbar select,html[data-theme='dark'] .form-control,html[data-theme='dark'] .login-card input,html[data-theme='dark'] .admin-form input:not([type=checkbox]):not([type=file]),html[data-theme='dark'] .admin-form textarea,html[data-theme='dark'] .user-form-card input{background-color:#111827;border-color:var(--border-color);color:var(--text-primary)}
 html[data-theme='dark'] .shop-header,html[data-theme='dark'] .page-header,html[data-theme='dark'] .contact-header,html[data-theme='dark'] .login-page{background:linear-gradient(135deg,#111827,#172c35)}

@@ -1,0 +1,481 @@
+<section class="product-reviews-section" id="customerReviewsSection">
+  <!-- Section Title -->
+  <div class="reviews-section-header">
+    <div class="title-with-eyebrow">
+      <span class="eyebrow-tag">
+        <i class="pi pi-star-fill"></i>
+        <span>REAL CUSTOMER EXPERIENCES</span>
+      </span>
+      <h2 class="section-title">Customer Reviews</h2>
+    </div>
+  </div>
+
+  <!-- Success Notification -->
+  <div class="review-success-banner" *ngIf="successMessage">
+    <div class="success-icon">
+      <i class="pi pi-check-circle"></i>
+    </div>
+    <div class="success-text">
+      <strong>Thank You!</strong>
+      <p>{{ successMessage }}</p>
+    </div>
+    <button type="button" class="btn-dismiss-alert" (click)="successMessage = ''" aria-label="Dismiss">
+      <i class="pi pi-times"></i>
+    </button>
+  </div>
+
+  <!-- ZERO REVIEWS STATE (When this product has 0 reviews) -->
+  <div class="reviews-zero-state-card" *ngIf="summary.totalReviews === 0 && !isFormOpen">
+    <div class="zero-state-icon">
+      <i class="pi pi-star"></i>
+    </div>
+    <div class="zero-state-content">
+      <h3>No Customer Reviews Yet</h3>
+      <p>Be the first verified customer to share photos and your 3D print experience for <strong>{{ productName || 'this design' }}</strong>.</p>
+    </div>
+    <button type="button" class="btn-write-first-review" (click)="onWriteReviewClick()">
+      <i class="pi pi-pencil"></i>
+      <span>Write the First Review</span>
+    </button>
+  </div>
+
+  <!-- 1. COMPACT RATING SUMMARY & ACTION CARD (When reviews exist) -->
+  <div class="reviews-summary-card" *ngIf="summary.totalReviews > 0">
+    <div class="summary-left-score">
+      <div class="big-score-display">
+        <span class="rating-number">{{ summary.averageRating | number:'1.1-1' }}</span>
+        <div class="star-rating-stars" aria-hidden="true">
+          <i class="pi pi-star-fill active-star" *ngFor="let s of [1,2,3,4,5]"></i>
+        </div>
+      </div>
+      <p class="review-count-sub">
+        Based on <strong>{{ summary.totalReviews }}</strong> {{ summary.totalReviews === 1 ? 'review' : 'reviews' }}
+      </p>
+    </div>
+
+    <!-- Rating Distribution Bars -->
+    <div class="rating-distribution-column">
+      <div class="distribution-row" *ngFor="let star of [5, 4, 3, 2, 1]" 
+           [class.filter-active]="selectedStarFilter === star"
+           (click)="setStarFilter(star)"
+           role="button"
+           tabindex="0"
+           (keydown.enter)="setStarFilter(star)"
+           [attr.aria-label]="star + ' stars: ' + getStarCount(star) + ' reviews'">
+        
+        <span class="dist-star-label">
+          <span>{{ star }}</span>
+          <i class="pi pi-star-fill"></i>
+        </span>
+
+        <div class="dist-progress-track">
+          <div class="dist-progress-fill" [style.width.%]="getStarDistributionPercentage(star)"></div>
+        </div>
+
+        <span class="dist-count">{{ getStarCount(star) }}</span>
+      </div>
+    </div>
+
+    <!-- Review Action Call-to-Action -->
+    <div class="summary-right-action">
+      <div class="action-prompt-box">
+        <h4>Share Your 3D Creation</h4>
+        <p>Tell the community how you use this model and inspect print details.</p>
+        <button type="button" class="btn-write-review-main" (click)="onWriteReviewClick()">
+          <i class="pi" [ngClass]="userReview ? 'pi-pencil' : 'pi-plus-circle'"></i>
+          <span>{{ userReview ? 'Edit Your Review' : 'Write a Review' }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 17. PREVENT DUPLICATE REVIEWS: Banner when customer already reviewed -->
+  <div class="already-reviewed-banner" *ngIf="isLoggedIn && userReview && !isFormOpen">
+    <div class="banner-info">
+      <i class="pi pi-info-circle"></i>
+      <div>
+        <strong>You’ve already reviewed this product.</strong>
+        <p>You rated it {{ userReview.rating }} ★ on {{ formatDate(userReview.createdAt) }}. You can edit or delete your review at any time.</p>
+      </div>
+    </div>
+    <div class="banner-actions">
+      <button type="button" class="btn-edit-existing" (click)="startEditReview(userReview)">
+        <i class="pi pi-pencil"></i>
+        <span>Edit Review</span>
+      </button>
+      <button type="button" class="btn-delete-existing" (click)="promptDeleteReview(userReview.id)">
+        <i class="pi pi-trash"></i>
+        <span>Delete</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- 3. REVIEW FORM (Share Your Experience) -->
+  <div class="review-form-card" *ngIf="isFormOpen">
+    <div class="form-header-bar">
+      <div class="form-title-group">
+        <h3 class="form-main-title">{{ isEditing ? 'Edit Your Review' : 'Share Your Experience' }}</h3>
+        <p class="reviewing-as-line">
+          Reviewing as <strong>{{ customerName }}</strong>
+        </p>
+      </div>
+      <button type="button" class="btn-close-form" (click)="closeReviewForm()" aria-label="Close form">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <form (ngSubmit)="submitReview()" class="review-main-form">
+      
+      <!-- 4. Interactive Star Rating -->
+      <div class="form-field-group">
+        <label class="field-label required-label">Your Rating</label>
+        <div class="interactive-star-selector">
+          <div class="stars-hover-row" (mouseleave)="clearHoverRating()">
+            <button 
+              type="button" 
+              class="star-btn" 
+              *ngFor="let s of [1, 2, 3, 4, 5]" 
+              (mouseenter)="setHoverRating(s)" 
+              (click)="setRating(s)"
+              [class.star-lit]="s <= (hoverRating || formRating)"
+              [attr.aria-label]="s + ' stars'">
+              <i class="pi pi-star-fill"></i>
+            </button>
+          </div>
+          <span class="rating-descriptor-pill" [class.has-selection]="formRating > 0">
+            {{ displayedRatingLabel }}
+          </span>
+        </div>
+      </div>
+
+      <!-- 5. Review Comment Textarea -->
+      <div class="form-field-group">
+        <div class="label-with-counter">
+          <label for="reviewCommentText" class="field-label required-label">Your Review</label>
+          <span class="char-counter" [class.counter-warn]="formComment.length > 900">
+            {{ formComment.length }} / 1000
+          </span>
+        </div>
+        <textarea 
+          id="reviewCommentText"
+          name="reviewComment" 
+          [(ngModel)]="formComment" 
+          maxlength="1000"
+          rows="4" 
+          placeholder="Tell us what you liked, what stood out, and how you’re using it…"
+          class="review-textarea"
+          required>
+        </textarea>
+      </div>
+
+      <!-- 6 & 7. Multiple Image Upload & Thumbnails -->
+      <div class="form-field-group">
+        <label class="field-label">Add Photos <span class="optional-tag">(Up to 5 images)</span></label>
+        <p class="field-subtext">Show others what your Craftora 3D creation looks like.</p>
+
+        <!-- Dropzone / Upload Trigger -->
+        <div class="photos-upload-area" (drop)="onFileDrop($event)" (dragover)="onDragOver($event)">
+          <input 
+            type="file" 
+            #fileInput 
+            (change)="onFileSelected($event)" 
+            multiple 
+            accept="image/jpeg,image/png,image/webp" 
+            class="hidden-file-input" 
+            id="reviewPhotosInput" 
+          />
+
+          <!-- Uploaded Thumbnails Preview -->
+          <div class="uploaded-thumbnails-grid" *ngIf="formImages.length > 0">
+            <div class="thumbnail-item-wrap" *ngFor="let img of formImages; let i = index">
+              <img [src]="img" alt="Review Photo {{ i + 1 }}" (click)="openLightbox(formImages, i)" />
+              <button type="button" class="btn-remove-thumb" (click)="removeFormImage(i)" title="Remove Photo" aria-label="Remove photo">
+                <i class="pi pi-times"></i>
+              </button>
+            </div>
+
+            <!-- Add More Button if < 5 -->
+            <button 
+              type="button" 
+              class="btn-add-more-photos" 
+              *ngIf="formImages.length < 5" 
+              (click)="fileInput.click()">
+              <i class="pi pi-plus"></i>
+              <span>Add More</span>
+            </button>
+          </div>
+
+          <!-- Empty Upload Dropzone -->
+          <div class="empty-upload-prompt" *ngIf="formImages.length === 0" (click)="fileInput.click()">
+            <div class="upload-icon-circle">
+              <i class="pi pi-camera"></i>
+            </div>
+            <div class="prompt-text">
+              <strong>＋ Add Photos</strong>
+              <span>Drag &amp; drop photos or click to browse (JPG, PNG, WebP up to 5MB)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Error Message -->
+      <div class="form-error-alert" *ngIf="formError">
+        <i class="pi pi-exclamation-triangle"></i>
+        <span>{{ formError }}</span>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-footer-actions">
+        <button type="button" class="btn-cancel-form" (click)="closeReviewForm()" [disabled]="isSubmitting">
+          Cancel
+        </button>
+        <button type="submit" class="btn-submit-review" [disabled]="isSubmitting || formRating === 0 || !formComment.trim()">
+          <i class="pi pi-spin pi-spinner" *ngIf="isSubmitting"></i>
+          <i class="pi pi-send" *ngIf="!isSubmitting"></i>
+          <span>{{ isSubmitting ? 'Submitting Review…' : (isEditing ? 'Update Review' : 'Submit Review') }}</span>
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- 13 & 14. FILTERS & SORTING BAR -->
+  <div class="reviews-controls-bar" *ngIf="summary.totalReviews > 0">
+    <div class="filters-chips-scroll">
+      <!-- All Filter -->
+      <button 
+        type="button" 
+        class="filter-chip-pill" 
+        [class.chip-active]="selectedStarFilter === null && !onlyWithPhotos" 
+        (click)="setStarFilter(null); onlyWithPhotos = false">
+        <span>All</span>
+        <span class="count-badge">{{ summary.totalReviews }}</span>
+      </button>
+
+      <!-- Star Filters -->
+      <button 
+        type="button" 
+        class="filter-chip-pill" 
+        *ngFor="let star of [5, 4, 3, 2, 1]" 
+        [class.chip-active]="selectedStarFilter === star" 
+        (click)="setStarFilter(star)">
+        <span>{{ star }} ★</span>
+        <span class="count-badge">{{ getStarCount(star) }}</span>
+      </button>
+
+      <!-- With Photos Filter -->
+      <button 
+        type="button" 
+        class="filter-chip-pill" 
+        [class.chip-active]="onlyWithPhotos" 
+        (click)="togglePhotosFilter()">
+        <i class="pi pi-images"></i>
+        <span>With Photos</span>
+      </button>
+    </div>
+
+    <!-- Sorting Dropdown -->
+    <div class="sort-selector-wrap">
+      <span class="sort-label">Sort:</span>
+      <select [(ngModel)]="selectedSort" (change)="onSortChange()" class="sort-select-input" aria-label="Sort reviews">
+        <option value="recent">Most Recent</option>
+        <option value="highest">Highest Rating</option>
+        <option value="lowest">Lowest Rating</option>
+        <option value="helpful">Most Helpful</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- 10. REVIEWS LIST -->
+  <div class="reviews-cards-list" *ngIf="reviews.length > 0">
+    <div class="review-item-card" *ngFor="let r of reviews">
+      
+      <!-- Card Top: Customer Info & Rating -->
+      <div class="review-card-top">
+        <div class="reviewer-meta">
+          <div class="reviewer-avatar-circle">
+            {{ r.customerName.charAt(0) }}
+          </div>
+          <div class="reviewer-info-block">
+            <div class="reviewer-name-row">
+              <strong class="reviewer-name">{{ r.customerName }}</strong>
+              
+              <!-- 11. Verified Purchase Badge -->
+              <span class="verified-badge-pill" *ngIf="r.verifiedPurchase" title="Verified Customer Purchase">
+                <i class="pi pi-check-circle"></i>
+                <span>Verified Purchase</span>
+              </span>
+            </div>
+
+            <!-- Stars and Date -->
+            <div class="rating-and-date">
+              <div class="stars-display-row" [attr.aria-label]="r.rating + ' out of 5 stars'">
+                <i class="pi pi-star-fill active-star" *ngFor="let s of [1,2,3,4,5]" [class.dim-star]="s > r.rating"></i>
+              </div>
+              <span class="meta-sep">·</span>
+              <span class="review-date-text">{{ formatDate(r.createdAt) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Own Review Actions -->
+        <div class="review-card-actions" *ngIf="isLoggedIn && customerName.toLowerCase() === r.customerName.toLowerCase()">
+          <button type="button" class="btn-card-action btn-edit" (click)="startEditReview(r)" title="Edit this review" aria-label="Edit review">
+            <i class="pi pi-pencil"></i>
+            <span>Edit</span>
+          </button>
+          <button type="button" class="btn-card-action btn-delete" (click)="promptDeleteReview(r.id)" title="Delete this review" aria-label="Delete review">
+            <i class="pi pi-trash"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Review Comment Text -->
+      <p class="review-comment-body">{{ r.comment }}</p>
+
+      <!-- Review Photos Gallery -->
+      <div class="review-photos-gallery" *ngIf="r.images && r.images.length > 0">
+        <div 
+          class="review-photo-thumb" 
+          *ngFor="let photo of r.images; let idx = index" 
+          (click)="openLightbox(r.images, idx)"
+          role="button"
+          tabindex="0"
+          (keydown.enter)="openLightbox(r.images, idx)"
+          aria-label="View larger photo">
+          <img [src]="photo" alt="Photo from {{ r.customerName }}" loading="lazy" />
+        </div>
+      </div>
+
+      <!-- Card Footer: Helpful Interaction -->
+      <div class="review-card-footer">
+        <button 
+          type="button" 
+          class="btn-helpful" 
+          (click)="markReviewHelpful(r)" 
+          title="Mark review as helpful"
+          [attr.aria-label]="'Mark review as helpful. Currently ' + (r.helpfulCount || 0) + ' helpful'">
+          <i class="pi pi-thumbs-up"></i>
+          <span>Helpful</span>
+          <span class="helpful-num" *ngIf="r.helpfulCount && r.helpfulCount > 0">· {{ r.helpfulCount }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="reviews-loading-state" *ngIf="isLoading">
+    <i class="pi pi-spin pi-spinner"></i>
+    <span>Loading reviews…</span>
+  </div>
+
+  <!-- Empty State when 0 reviews match filter -->
+  <div class="empty-reviews-state" *ngIf="!isLoading && reviews.length === 0 && summary.totalReviews > 0">
+    <div class="empty-icon-wrap">
+      <i class="pi pi-comment"></i>
+    </div>
+    <h4>No reviews match your filter</h4>
+    <p>Try selecting a different star rating or clearing the filter.</p>
+    <button type="button" class="btn-clear-filter" (click)="setStarFilter(null); onlyWithPhotos = false">
+      Clear Filters
+    </button>
+  </div>
+
+  <!-- 12. PROGRESSIVE LOADING / VIEW ALL REVIEWS -->
+  <div class="progressive-load-wrapper" *ngIf="hasMore && !isLoading">
+    <button type="button" class="btn-view-all-reviews" (click)="loadMoreReviews()">
+      <span>Load More Reviews</span>
+      <i class="pi pi-chevron-down"></i>
+    </button>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 2. SIGN IN REQUIRED PROMPT MODAL                                         -->
+  <!-- ========================================================================= -->
+  <div class="auth-prompt-backdrop" *ngIf="showAuthPrompt" (click)="closeAuthPrompt()" role="dialog" aria-modal="true">
+    <div class="auth-prompt-card" (click)="$event.stopPropagation()">
+      <div class="auth-prompt-icon">
+        <i class="pi pi-user-plus"></i>
+      </div>
+      <h3 class="auth-prompt-heading">Sign in to share your experience</h3>
+      <p class="auth-prompt-message">
+        Please sign in to write a review for this product. You will be returned here immediately after signing in.
+      </p>
+      <div class="auth-prompt-actions">
+        <button type="button" class="btn-auth-signin" (click)="goToSignIn()">
+          Sign In
+        </button>
+        <button type="button" class="btn-auth-register" (click)="goToRegister()">
+          Create Account
+        </button>
+      </div>
+      <button type="button" class="btn-auth-dismiss" (click)="closeAuthPrompt()">
+        Cancel
+      </button>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 18. DELETE CONFIRMATION DIALOG                                           -->
+  <!-- ========================================================================= -->
+  <div class="auth-prompt-backdrop" *ngIf="showDeleteModal" (click)="cancelDelete()" role="dialog" aria-modal="true">
+    <div class="delete-confirm-card" (click)="$event.stopPropagation()">
+      <div class="delete-icon-circle">
+        <i class="pi pi-exclamation-triangle"></i>
+      </div>
+      <h3 class="delete-heading">Delete your review?</h3>
+      <p class="delete-desc">
+        Are you sure you want to delete this review? This action cannot be undone.
+      </p>
+      <div class="delete-dialog-actions">
+        <button type="button" class="btn-cancel-delete" (click)="cancelDelete()">
+          Cancel
+        </button>
+        <button type="button" class="btn-confirm-delete" (click)="confirmDeleteReview()">
+          Delete Review
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 15. REVIEW IMAGE LIGHTBOX / MODAL VIEWER                                  -->
+  <!-- ========================================================================= -->
+  <div class="review-lightbox-backdrop" *ngIf="lightboxOpen" (click)="closeLightbox()" role="dialog" aria-modal="true">
+    <div class="lightbox-stage" (click)="$event.stopPropagation()">
+      
+      <!-- Close Button -->
+      <button type="button" class="lightbox-btn-close" (click)="closeLightbox()" aria-label="Close image viewer">
+        <i class="pi pi-times"></i>
+      </button>
+
+      <!-- Image Display -->
+      <div class="lightbox-image-container">
+        <img [src]="lightboxImages[lightboxIndex]" alt="Review Large Image" />
+      </div>
+
+      <!-- Navigation Arrows -->
+      <button 
+        type="button" 
+        class="lightbox-nav-btn btn-prev" 
+        *ngIf="lightboxImages.length > 1" 
+        (click)="prevLightboxImage()" 
+        aria-label="Previous image">
+        <i class="pi pi-chevron-left"></i>
+      </button>
+
+      <button 
+        type="button" 
+        class="lightbox-nav-btn btn-next" 
+        *ngIf="lightboxImages.length > 1" 
+        (click)="nextLightboxImage()" 
+        aria-label="Next image">
+        <i class="pi pi-chevron-right"></i>
+      </button>
+
+      <!-- Image Counter -->
+      <div class="lightbox-counter-pill" *ngIf="lightboxImages.length > 1">
+        {{ lightboxIndex + 1 }} / {{ lightboxImages.length }}
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,51 +1,179 @@
-<header class="navbar">
-  <div class="container nav-container">
-    <a routerLink="/" class="brand-logo" (click)="closeMobileMenu()">
-      <img src="images/logo.svg" alt="Craftora 3D Logo" class="brand-logo-img" />
-      <div class="brand-text">
-        <span class="brand-title">Craftora <span class="brand-badge">3D</span></span> 
-        <span class="brand-tagline">Where Ideas Take Shape</span>
+<header class="navbar" [class.scrolled]="isScrolled">
+  <div class="nav-wrapper">
+    <!-- Brand / Logo (Left) -->
+    <a routerLink="/" class="brand-link" (click)="closeAll()" aria-label="Craftora 3D Home">
+      <img src="images/logo.svg" alt="Craftora 3D Logo" class="brand-icon" />
+      <div class="brand-typography">
+        <span class="brand-title">Craftora</span>
+        <span class="brand-chip">3D</span>
       </div>
     </a>
 
-    <nav class="nav-links" [class.active]="isMobileMenuOpen">
-      <a routerLink="/" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}"
-        (click)="closeMobileMenu()">Home</a>
-      <a routerLink="/shop" routerLinkActive="active-link" (click)="closeMobileMenu()">Shop</a>
-      <a routerLink="/custom-order" routerLinkActive="active-link" (click)="closeMobileMenu()">Custom 3D Printing</a>
-      <a routerLink="/about" routerLinkActive="active-link" (click)="closeMobileMenu()">About</a>
-      <a routerLink="/contact" routerLinkActive="active-link" (click)="closeMobileMenu()">Contact</a>
+    <!-- Direct Navigation Links (Center) -->
+    <nav class="desktop-nav" aria-label="Main Navigation">
+      <a routerLink="/" routerLinkActive="active-nav" [routerLinkActiveOptions]="{exact: true}" class="nav-link" (click)="closeAll()">Home</a>
+      <a routerLink="/shop" routerLinkActive="active-nav" class="nav-link" (click)="closeAll()">Shop</a>
+      <a routerLink="/custom-order" routerLinkActive="active-nav" class="nav-link" (click)="closeAll()">Custom 3D Print</a>
+      <a routerLink="/track-order" routerLinkActive="active-nav" class="nav-link" (click)="closeAll()">Track Order</a>
+      <a routerLink="/contact" routerLinkActive="active-nav" class="nav-link" (click)="closeAll()">Contact</a>
     </nav>
 
-    <div class="nav-actions">
-      <a class="customer-account-link" [routerLink]="customerAuth.isSignedIn() ? '/account' : '/account/login'" [attr.aria-label]="customerAuth.isSignedIn() ? 'My Account' : 'Sign in'" (click)="closeMobileMenu()">
-        <i class="pi" [ngClass]="customerAuth.isSignedIn() ? 'pi-user' : 'pi-sign-in'" aria-hidden="true"></i>
-        <span>{{ customerAuth.isSignedIn() ? (customerAuth.customer()?.fullName || 'My Account') : 'Sign in' }}</span>
+    <!-- Right Actions Group -->
+    <div class="right-actions">
+      <!-- Dark / Light Mode Switcher -->
+      <button type="button" 
+              class="icon-action-btn" 
+              (click)="themeService.toggle()" 
+              [attr.aria-label]="themeService.isDarkMode() ? 'Switch to light theme' : 'Switch to dark theme'"
+              [title]="themeService.isDarkMode() ? 'Switch to light theme' : 'Switch to dark theme'">
+        <i class="pi" [ngClass]="themeService.isDarkMode() ? 'pi-sun' : 'pi-moon'" aria-hidden="true"></i>
+      </button>
+
+      <!-- Wishlist Action with Counter Badge -->
+      <a routerLink="/wishlist" 
+         class="icon-action-btn wishlist-action" 
+         aria-label="My Wishlist" 
+         title="My Wishlist" 
+         (click)="closeAll()">
+        <i class="pi pi-heart" aria-hidden="true"></i>
+        <span class="action-count-badge wishlist-badge" *ngIf="wishlistService.count() > 0">
+          {{ wishlistService.count() }}
+        </span>
       </a>
 
-      <a routerLink="/cart" class="cart-btn" aria-label="Shopping Cart" title="Shopping Cart" (click)="closeMobileMenu()">
-        <i class="pi pi-shopping-bag"></i>
-        <span class="cart-count" *ngIf="cartService.totalItemsCount() > 0">
+      <!-- Cart Button with Soft Counter Badge -->
+      <a routerLink="/cart" 
+         class="icon-action-btn cart-action" 
+         aria-label="Shopping Cart" 
+         title="Shopping Cart" 
+         (click)="closeAll()">
+        <i class="pi pi-shopping-bag" aria-hidden="true"></i>
+        <span class="action-count-badge" *ngIf="cartService.totalItemsCount() > 0">
           {{ cartService.totalItemsCount() }}
         </span>
       </a>
 
-      <div class="utility-menu">
-        <button class="utility-menu-toggle" type="button" (click)="toggleUtilityMenu()" [attr.aria-expanded]="isUtilityMenuOpen" aria-haspopup="true" [attr.aria-label]="isUtilityMenuOpen ? 'Close site menu' : 'Open site menu'">
-          <i class="pi pi-ellipsis-v" aria-hidden="true"></i>
-        </button>
-        <div class="utility-menu-panel" *ngIf="isUtilityMenuOpen" role="menu">
-          <a routerLink="/admin/login" role="menuitem" (click)="closeUtilityMenu()"><i class="pi pi-lock" aria-hidden="true"></i><span>Admin Login</span></a>
-          <button type="button" role="menuitem" (click)="themeService.toggle()">
-            <i class="pi" [ngClass]="themeService.isDarkMode() ? 'pi-sun' : 'pi-moon'" aria-hidden="true"></i>
-            <span>{{ themeService.isDarkMode() ? 'Light mode' : 'Dark mode' }}</span>
-          </button>
-        </div>
-      </div>
+      <!-- Signed Out Guest State -->
+      <ng-container *ngIf="!customerAuth.isSignedIn()">
+        <a routerLink="/account/login" class="user-account-pill guest-signin-pill" (click)="closeAll()" title="Sign In">
+          <span class="user-avatar-circle"><i class="pi pi-user" style="font-size: 0.75rem;"></i></span>
+          <span class="user-first-name">Sign In</span>
+        </a>
+      </ng-container>
 
-      <button class="menu-toggle" type="button" (click)="toggleMobileMenu()" [attr.aria-expanded]="isMobileMenuOpen" aria-label="Toggle Navigation">
+      <!-- Signed In Customer State -->
+      <ng-container *ngIf="customerAuth.isSignedIn()">
+        <div class="nav-item-dropdown user-dropdown-area" [class.is-open]="isUserMenuOpen">
+          <button type="button" 
+                  class="user-account-pill" 
+                  [class.active]="isUserMenuOpen"
+                  (click)="toggleUserMenu()"
+                  aria-haspopup="true"
+                  [attr.aria-expanded]="isUserMenuOpen">
+            <span class="user-avatar-circle">{{ getInitials() }}</span>
+            <span class="user-first-name">{{ getFirstName() }}</span>
+            <i class="pi pi-chevron-down nav-chevron" aria-hidden="true"></i>
+          </button>
+
+          <div class="dropdown-panel user-panel" role="menu">
+            <div class="user-info-card">
+              <span class="user-full-name">{{ customerAuth.customer()?.fullName || 'Customer' }}</span>
+              <span class="user-email-text">{{ customerAuth.customer()?.email }}</span>
+            </div>
+
+            <div class="dropdown-divider"></div>
+
+            <a routerLink="/account" class="dropdown-menu-item" role="menuitem" (click)="closeAll()">
+              <div class="item-icon-wrap"><i class="pi pi-user" aria-hidden="true"></i></div>
+              <div class="item-text-wrap"><span class="item-title">Account & Addresses</span></div>
+            </a>
+
+            <a routerLink="/wishlist" class="dropdown-menu-item" role="menuitem" (click)="closeAll()">
+              <div class="item-icon-wrap"><i class="pi pi-heart" aria-hidden="true"></i></div>
+              <div class="item-text-wrap">
+                <span class="item-title">My Wishlist</span>
+                <span class="item-sub" *ngIf="wishlistService.count() > 0">({{ wishlistService.count() }})</span>
+              </div>
+            </a>
+
+            <a routerLink="/track-order" class="dropdown-menu-item" role="menuitem" (click)="closeAll()">
+              <div class="item-icon-wrap"><i class="pi pi-box" aria-hidden="true"></i></div>
+              <div class="item-text-wrap"><span class="item-title">Track Orders</span></div>
+            </a>
+
+            <a routerLink="/track-quote" class="dropdown-menu-item" role="menuitem" (click)="closeAll()">
+              <div class="item-icon-wrap"><i class="pi pi-file-edit" aria-hidden="true"></i></div>
+              <div class="item-text-wrap"><span class="item-title">Custom 3D Quotes</span></div>
+            </a>
+
+            <a [routerLink]="adminAuth.isLoggedIn() ? '/admin/dashboard' : '/admin/login'" class="dropdown-menu-item" role="menuitem" (click)="closeAll()">
+              <div class="item-icon-wrap"><i class="pi pi-shield" aria-hidden="true"></i></div>
+              <div class="item-text-wrap"><span class="item-title">{{ adminAuth.isLoggedIn() ? 'Admin Portal' : 'Admin Login' }}</span></div>
+            </a>
+
+            <div class="dropdown-divider"></div>
+
+            <button type="button" class="dropdown-menu-item logout-btn" role="menuitem" (click)="signOut()">
+              <div class="item-icon-wrap"><i class="pi pi-sign-out" aria-hidden="true"></i></div>
+              <div class="item-text-wrap"><span class="item-title">Sign out</span></div>
+            </button>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- Mobile Hamburger Toggle -->
+      <button type="button" 
+              class="mobile-nav-toggle" 
+              (click)="toggleMobileMenu()" 
+              [attr.aria-expanded]="isMobileMenuOpen" 
+              aria-label="Toggle navigation">
         <i class="pi" [ngClass]="isMobileMenuOpen ? 'pi-times' : 'pi-bars'"></i>
       </button>
+    </div>
+  </div>
+
+  <!-- Mobile Drawer Overlay & Panel -->
+  <div class="mobile-drawer" *ngIf="isMobileMenuOpen">
+    <div class="mobile-drawer-inner">
+      <a routerLink="/" routerLinkActive="active-mobile-link" [routerLinkActiveOptions]="{exact: true}" class="mobile-direct-link" (click)="closeAll()">Home</a>
+      <a routerLink="/shop" routerLinkActive="active-mobile-link" class="mobile-direct-link" (click)="closeAll()">Shop</a>
+      <a routerLink="/custom-order" routerLinkActive="active-mobile-link" class="mobile-direct-link" (click)="closeAll()">Custom 3D Print</a>
+      <a routerLink="/track-order" routerLinkActive="active-mobile-link" class="mobile-direct-link" (click)="closeAll()">Track Order</a>
+      <a routerLink="/contact" routerLinkActive="active-mobile-link" class="mobile-direct-link" (click)="closeAll()">Contact Support</a>
+
+      <div class="mobile-drawer-divider"></div>
+
+      <!-- Mobile User / Auth State -->
+      <div class="mobile-auth-section">
+        <ng-container *ngIf="!customerAuth.isSignedIn()">
+          <a routerLink="/account/login" class="mobile-outline-btn" (click)="closeAll()">Sign In</a>
+        </ng-container>
+
+        <ng-container *ngIf="customerAuth.isSignedIn()">
+          <div class="mobile-user-card">
+            <span class="user-avatar-circle">{{ getInitials() }}</span>
+            <div class="mobile-user-details">
+              <strong>{{ customerAuth.customer()?.fullName || 'Customer' }}</strong>
+              <small>{{ customerAuth.customer()?.email }}</small>
+            </div>
+          </div>
+          <a routerLink="/account" class="mobile-link-with-icon" (click)="closeAll()">
+            <i class="pi pi-user"></i> Account Settings
+          </a>
+          <a routerLink="/wishlist" class="mobile-link-with-icon" (click)="closeAll()">
+            <i class="pi pi-heart"></i> My Wishlist ({{ wishlistService.count() }})
+          </a>
+          <a routerLink="/track-order" class="mobile-link-with-icon" (click)="closeAll()">
+            <i class="pi pi-box"></i> Track Orders
+          </a>
+          <a routerLink="/track-quote" class="mobile-link-with-icon" (click)="closeAll()">
+            <i class="pi pi-file-edit"></i> Custom 3D Quotes
+          </a>
+          <button type="button" class="mobile-signout-btn" (click)="signOut()">
+            <i class="pi pi-sign-out"></i> Sign Out
+          </button>
+        </ng-container>
+      </div>
     </div>
   </div>
 </header>

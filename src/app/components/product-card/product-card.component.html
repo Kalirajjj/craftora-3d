@@ -1,39 +1,119 @@
 <div class="product-card" [routerLink]="['/product', product.id]">
+  <!-- Image Section -->
   <div class="image-wrapper">
-    <img 
-      [src]="product.image || product.imageUrl || 'assets/placeholder.png'" 
-      [alt]="product.name" 
-      loading="lazy" 
+    <img
+      [src]="product.image || product.imageUrl || '/images/products/astronaut.svg'"
+      [alt]="product.name"
+      loading="lazy"
     />
-    @if (product.category) {
-      <span class="category-pill">{{ product.category }}</span>
-    }
-  </div>
+    <div class="image-overlay"></div>
 
-  <div class="product-info">
-    <div class="rating-row">
-      <span class="stars"><i class="pi pi-star-fill"></i> {{ product.rating || 5.0 }}</span>
-      <span class="colors-indicator">
-        {{ (product.availableColors?.length) || 1 }} {{ (product.availableColors?.length === 1) ? 'Color' : 'Colors' }}
+    <!-- Top Left Badges -->
+    <div class="badges-wrap">
+      <span *ngIf="product.badge" class="product-badge" [attr.data-badge]="product.badge">
+        {{ product.badge }}
+      </span>
+      <span *ngIf="product.has3dModel" class="badge-3d" title="Interactive 3D preview available">
+        <i class="pi pi-box"></i>
+        <span>3D</span>
       </span>
     </div>
 
-    <h3 class="product-title">{{ product.name }}</h3>
+    <!-- Top Right Actions Group (Share & Wishlist) -->
+    <div class="card-top-actions">
+      <button
+        type="button"
+        class="card-action-btn btn-card-share"
+        [class.is-copied]="isCopied"
+        (click)="onShare($event)"
+        [title]="isCopied ? 'Link Copied!' : 'Share Product'"
+        [attr.aria-label]="'Share ' + product.name">
+        <i class="pi" [ngClass]="isCopied ? 'pi-check text-accent' : 'pi-share-alt'"></i>
+        <span class="share-copied-pill" *ngIf="isCopied">Copied!</span>
+      </button>
+
+      <button
+        type="button"
+        class="card-action-btn btn-wishlist"
+        [class.active]="wishlisted"
+        (click)="onToggleWishlist($event)"
+        [attr.aria-label]="wishlisted ? 'Remove from wishlist' : 'Add to wishlist'">
+        <i class="pi" [ngClass]="wishlisted ? 'pi-heart-fill' : 'pi-heart'"></i>
+      </button>
+    </div>
+
+    <!-- Hover Action Bar -->
+    <div class="hover-actions">
+      <button
+        type="button"
+        class="quick-action-btn btn-view"
+        (click)="onQuickView($event)"
+        title="Quick 3D View">
+        <i class="pi pi-eye"></i>
+        <span>Quick View</span>
+      </button>
+
+      <button
+        type="button"
+        class="quick-action-btn btn-add"
+        (click)="addToCart($event)"
+        [disabled]="isAdded"
+        [class.added]="isAdded"
+        title="Add to cart">
+        <i class="pi" [ngClass]="isAdded ? 'pi-check' : 'pi-shopping-cart'"></i>
+        <span>{{ isAdded ? 'Added' : 'Add' }}</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Product Info -->
+  <div class="product-info">
+    <!-- Meta row: Category & Rating -->
+    <div class="meta-row">
+      <span class="category-tag" *ngIf="product.category">{{ product.category }}</span>
+      <div class="rating-box" *ngIf="product.rating">
+        <i class="pi pi-star-fill star-icon"></i>
+        <span class="rating-val">{{ product.rating }}</span>
+        <span class="reviews-count" *ngIf="product.reviewCount">({{ product.reviewCount }})</span>
+      </div>
+    </div>
+
+    <!-- Title & Description -->
+    <h3 class="product-title" [title]="product.name">{{ product.name }}</h3>
     <p class="product-desc">{{ product.description }}</p>
 
+    <!-- Material / Spec Tag -->
+    <div class="specs-preview" *ngIf="product.material || product.dimensions">
+      <span class="spec-pill" *ngIf="product.material">
+        <i class="pi pi-sliders-h"></i> {{ product.material }}
+      </span>
+      <span class="spec-pill" *ngIf="product.dimensions">
+        <i class="pi pi-arrows-alt"></i> {{ product.dimensions }}
+      </span>
+    </div>
+
+    <!-- Footer: Price + Cart Button -->
     <div class="card-footer">
-      <div class="price-box">
-        <span class="currency">₹</span>
-        <span class="amount">{{ product.price }}</span>
+      <div class="price-wrap">
+        <div class="price-current">
+          <span class="currency">₹</span>
+          <span class="amount">{{ product.price }}</span>
+        </div>
+        <div class="price-original-wrap" *ngIf="product.originalPrice && product.originalPrice > product.price">
+          <span class="price-original">₹{{ product.originalPrice }}</span>
+          <span class="discount-badge" *ngIf="discountPercent">{{ discountPercent }}% OFF</span>
+        </div>
       </div>
 
-      <button 
+      <button
         type="button"
-        class="btn btn-card" 
-        (click)="addToCart($event)" 
-        [disabled]="isAdded">
+        class="btn-cart-main"
+        (click)="addToCart($event)"
+        [disabled]="isAdded"
+        [class.added]="isAdded"
+        aria-label="Add product to cart">
         <i class="pi" [ngClass]="isAdded ? 'pi-check' : 'pi-shopping-cart'"></i>
-        {{ isAdded ? 'Added' : 'Add' }}
+        <span class="btn-text">{{ isAdded ? 'Added' : 'Add' }}</span>
       </button>
     </div>
   </div>

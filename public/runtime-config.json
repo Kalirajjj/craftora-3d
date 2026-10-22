@@ -1,0 +1,5 @@
+{
+  "apiGatewayUrl": "http://localhost:8080",
+  "razorpayKeyId": "rzp_test_TmCU7veRqWGyKO",
+  "environment": "development"
+}
